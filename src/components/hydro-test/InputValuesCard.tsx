@@ -36,7 +36,7 @@ export default function InputValuesCard({
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <Box sx={{ display: "flex", gap: 2 }}>
             <TextField
-              label="Internal Design Gauge Pressure P"
+              label="Internal Design Gauge Pressure, P"
               type="number"
               fullWidth
               value={P}
@@ -45,21 +45,21 @@ export default function InputValuesCard({
           </Box>
 
           <Box sx={{ display: "flex", gap: 2 }}>
-          <Tooltip title="See ASME B31.3 Table A-1 or A-1M at test temperature">
-            <TextField
-              label="Allowable Stress at Test Temp for Pipe Material Sₜ"
-              type="number"
-              fullWidth
-              value={St}
-              onChange={(e) => setSt(Number(e.target.value))}
-            />
+            <Tooltip title="See ASME B31.3 Table A-1 or A-1M at test temperature">
+              <TextField
+                label="Allowable Stress at Test Temp for Pipe Material, Sₜ"
+                type="number"
+                fullWidth
+                value={St}
+                onChange={(e) => setSt(Number(e.target.value))}
+              />
             </Tooltip>
           </Box>
 
           <Box sx={{ display: "flex", gap: 2 }}>
             <Tooltip title="See ASME B31.3 Table A-1 or A-1M at design temperature">
               <TextField
-                label="Allowable Stress at Design Temp for Pipe Material S"
+                label="Allowable Stress at Design Temp for Pipe Material, S"
                 type="number"
                 fullWidth
                 value={S}

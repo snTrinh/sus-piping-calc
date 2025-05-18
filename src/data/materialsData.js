@@ -1,7 +1,7 @@
 // materialsData.js
 
 export const materialsData = {
-    metric: {
+    Metric: {
       label: "Up to 40",
       columns: [40, 65, 100, 150, 200, 250, 300, 325, 350, 375, 400, 425, 450, 475, 500, 525, 550, 575, 600],
       materials: {
@@ -11,7 +11,7 @@ export const materialsData = {
         A312TP304L: [138000, 138000, 138000, 138000, 129000, 122000, 116000, 113000, 111000, 109000, 107000, 105000, 103000, 101000, 99100, 97300] // ends early
       }
     },
-    imperial: {
+    Imperial: {
       label: "Up to 100",
       columns: [100, 200, 300, 400, 500, 600, 650, 700, 750, 800, 850, 900, 950, 1000, 1050, 1100],
       materials: {

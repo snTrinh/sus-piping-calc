@@ -7,9 +7,10 @@ import {
   Button,
   Card,
   CardContent,
-  IconButton,
 } from "@mui/material";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+import { Units } from "@/types/units";
+import { unitConversions } from "@/utils/unitConversions";
 
 type Pipe = {
   id: string;
@@ -23,7 +24,7 @@ type PipeCardProps = {
   thicknessByNpsSchedule: any;
   updatePipe: (id: string, key: keyof Pipe, value: any) => void;
   removePipe: (id: string) => void;
-  units: "imperial" | "metric";
+  units: Units;
 };
 
 const npsOptions = ["0.5", "1", "2", "4", "6", "8", "10", "12"];
@@ -38,16 +39,10 @@ export default function PipeCard({
 }: PipeCardProps) {
   const rawThickness = thicknessByNpsSchedule[pipe.nps]?.[pipe.schedule] ?? 0;
 
-  const displayedThickness =
-    units === "imperial" ? rawThickness : rawThickness * 25.4;
-  const thicknessLabel =
-    units === "imperial"
-      ? "Provided Thickness (in)"
-      : "Provided Thickness (mm)";
-  const tRequiredLabel =
-    units === "imperial"
-      ? "Required Thickness tᵣ (in)"
-      : "Required Thickness tᵣ (mm)";
+  // Use centralized unit conversion
+  const thicknessConversion = unitConversions.thickness[units];
+  const displayedThickness = thicknessConversion.to(rawThickness);
+  const unitLabel = thicknessConversion.unit;
 
   return (
     <Card
@@ -102,16 +97,16 @@ export default function PipeCard({
           </TextField>
 
           <TextField
-            label={thicknessLabel}
-            value={displayedThickness.toFixed(units === "imperial" ? 3 : 2)}
+            label={`Provided Thickness (${unitLabel})`}
+            value={displayedThickness.toFixed(2)}
             size="small"
             disabled
             sx={{ minWidth: 120 }}
           />
 
           <TextField
-            label={tRequiredLabel}
-            value={pipe.tRequired.toFixed(units === "imperial" ? 3 : 2)}
+            label={`Required Thickness tᵣ (${unitLabel})`}
+            value={pipe.tRequired.toFixed(2)}
             size="small"
             disabled
             sx={{ minWidth: 120 }}

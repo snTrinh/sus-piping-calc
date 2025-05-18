@@ -19,6 +19,10 @@ import PipeCard from "./PipeCard";
 import PdfExport from "../PdfExport";
 import UnitsToggle from "./../common/UnitsToggle";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import LabeledInput from "../common/LabeledInput";
+import { Units } from "@/types/units";
+import { convertDesignInputs, unitConversions } from "@/utils/unitConversions";
+
 type Pipe = {
   id: string;
   nps: string;
@@ -27,7 +31,7 @@ type Pipe = {
 };
 
 export default function B31_3Calculator() {
-  const [units, setUnits] = useState<"imperial" | "metric">("imperial");
+  const [units, setUnits] = useState<Units>(Units.Imperial);
 
   const [material, setMaterial] = useState("A333 Grade 6");
   const [temperature, setTemperature] = useState(100); // °F internally
@@ -51,14 +55,6 @@ export default function B31_3Calculator() {
       tRequired: 0,
     },
   ]);
-
-  // Unit conversion helpers
-  const psiToMpa = (psi: number) => psi * 0.00689476;
-  const mpaToPsi = (mpa: number) => mpa / 0.00689476;
-  const inchToMm = (inch: number) => inch * 25.4;
-  const mmToInch = (mm: number) => mm / 25.4;
-  const fToC = (f: number) => ((f - 32) * 5) / 9;
-  const cToF = (c: number) => (c * 9) / 5 + 32;
 
   // Update stress based on material and temperature
   useEffect(() => {
@@ -85,59 +81,35 @@ export default function B31_3Calculator() {
   // Unit toggle and conversions
   const handleUnitsChange = (
     event: React.MouseEvent<HTMLElement>,
-    newUnits: "imperial" | "metric" | null
+    newUnits: Units
   ) => {
     if (!newUnits || newUnits === units) return;
 
-    if (newUnits === "imperial") {
-      setTemperature(cToF(temperature));
-      setStress(mpaToPsi(stress ?? 0));
-      setCA(mmToInch(ca));
-      setDesignPressure(designPressure / 6.89476); // kPa → psi
-      setPipes((prev) =>
-        prev.map((pipe) => ({
-          ...pipe,
-          tRequired: mmToInch(pipe.tRequired),
-        }))
-      );
-    } else {
-      setTemperature(fToC(temperature));
-      setStress(psiToMpa(stress ?? 0));
-      setCA(inchToMm(ca));
-      setDesignPressure(designPressure * 6.89476); // psi → kPa
-      setPipes((prev) =>
-        prev.map((pipe) => ({
-          ...pipe,
-          tRequired: inchToMm(pipe.tRequired),
-        }))
-      );
-    }
+    setTemperature(unitConversions.temperature[newUnits].from(temperature));
+    setStress(unitConversions.pressure[newUnits].from(stress ?? 0));
+    setCA(unitConversions.thickness[newUnits].from(ca));
+    setDesignPressure(unitConversions.pressure[newUnits].from(designPressure));
+
+    setPipes((prev) =>
+      prev.map((pipe) => ({
+        ...pipe,
+        tRequired: unitConversions.thickness[newUnits].from(pipe.tRequired),
+      }))
+    );
 
     setUnits(newUnits);
   };
 
   const handleTemperatureChange = (value: number) => {
-    if (units === "imperial") {
-      setTemperature(value);
-    } else {
-      setTemperature(cToF(value));
-    }
+    setTemperature(unitConversions.temperature[units].from(value));
   };
 
   const handleCAChange = (value: number) => {
-    if (units === "imperial") {
-      setCA(value);
-    } else {
-      setCA(mmToInch(value));
-    }
+    setCA(unitConversions.thickness[units].from(value));
   };
 
   const handleDesignPressureChange = (value: number) => {
-    if (units === "imperial") {
-      setDesignPressure(value);
-    } else {
-      setDesignPressure(value / 6.89476); // kPa → psi
-    }
+    setDesignPressure(unitConversions.pressure[units].from(value));
   };
 
   const updatePipe = (id: string, key: keyof Pipe, value: any) => {
@@ -148,11 +120,26 @@ export default function B31_3Calculator() {
 
   const pipesForDisplay = pipes.map((pipe) => ({
     ...pipe,
-    tRequired: units === "imperial" ? pipe.tRequired : inchToMm(pipe.tRequired),
+    tRequired: unitConversions.thickness[units].to(pipe.tRequired),
   }));
 
   const materials = [...new Set(stressData.map((d) => d.material))];
-
+  const {
+    temperatureDisplay,
+    stressDisplay,
+    caDisplay,
+    pressureDisplay,
+    pressureUnit,
+    caUnit,
+    stressUnit,
+    tempUnit,
+  } = convertDesignInputs({
+    units,
+    temperature,
+    stress: stress ?? 0,
+    ca,
+    designPressure,
+  });
   return (
     <Container maxWidth="md" sx={{ pb: 8 }}>
       <Typography variant="h4" fontWeight="bold" align="left" gutterBottom>
@@ -182,83 +169,64 @@ export default function B31_3Calculator() {
             </MenuItem>
           ))}
         </TextField>
-
-        <TextField
-          label={`Design Pressure P (${units === "imperial" ? "psi" : "kPa"})`}
-          type="number"
-          value={
-            units === "imperial"
-              ? Math.round(designPressure * 100) / 100
-              : Math.round(designPressure * 6.89476 * 100) / 100
-          }
-          onChange={(e) => handleDesignPressureChange(Number(e.target.value))}
-          size="small"
-          sx={{ minWidth: 180 }}
+        <LabeledInput
+          label="Design Pressure"
+          symbol="P"
+          unit={pressureUnit}
+          value={pressureDisplay}
+          onChange={handleDesignPressureChange}
         />
 
-        <TextField
-          label={`Temperature (${units === "imperial" ? "°F" : "°C"})`}
-          type="number"
-          value={
-            units === "imperial"
-              ? temperature
-              : Math.round(fToC(temperature) * 100) / 100
-          }
-          onChange={(e) => handleTemperatureChange(Number(e.target.value))}
-          size="small"
-          inputProps={{ min: 0 }}
-          sx={{ minWidth: 180 }}
+        <LabeledInput
+          label="Temperature"
+          symbol="T"
+          unit={tempUnit}
+          value={temperatureDisplay}
+          onChange={handleTemperatureChange}
         />
 
-        <TextField
-          label={`Corrosion Allowance CA (${units === "imperial" ? "in" : "mm"})`}
-          type="number"
-          value={
-            units === "imperial" ? ca : Math.round(inchToMm(ca) * 100) / 100
-          }
-          onChange={(e) => handleCAChange(Number(e.target.value))}
-          size="small"
-          inputProps={{ step: 0.01, min: 0 }}
-          sx={{ minWidth: 180 }}
+        <LabeledInput
+          label="Corrosion Allowance"
+          symbol="CA"
+          unit={caUnit}
+          value={caDisplay}
+          onChange={handleCAChange}
         />
-        <TextField
-          label={`Allowable Stress S (${units === "imperial" ? "psi" : "MPa"})`}
-          value={
-            units === "imperial"
-              ? (stress ?? 0).toFixed(2)
-              : ((stress ?? 0) * 0.00689476).toFixed(2)
-          }
-          size="small"
+
+        <LabeledInput
+          label="Allowable Stress"
+          symbol="S"
+          unit={stressUnit}
+          value={stressDisplay}
+          onChange={() => {}}
           disabled
-          sx={{ minWidth: 200 }}
         />
 
-        {/* New fields for E, W, and gamma */}
-        <TextField
-          label="Weld Joint Efficiency E"
-          type="number"
+        <LabeledInput
+          label="Weld Joint Efficiency"
+          symbol="E"
+          unit=""
           value={e}
+          onChange={() => {}}
           disabled
-          size="small"
-          sx={{ minWidth: 180 }}
         />
 
-        <TextField
-          label="Weld Strength Reduction Factor W"
-          type="number"
+        <LabeledInput
+          label="Weld Strength Reduction Factor"
+          symbol="W"
+          unit=""
           value={w}
+          onChange={() => {}}
           disabled
-          size="small"
-          sx={{ minWidth: 180 }}
         />
 
-        <TextField
-          label="Temperature Coefficient γ"
-          type="number"
+        <LabeledInput
+          label="Temperature Coefficient"
+          symbol="γ"
+          unit=""
           value={gamma}
+          onChange={() => {}}
           disabled
-          size="small"
-          sx={{ minWidth: 180 }}
         />
       </Box>
       <Box sx={{ backgroundColor: "#f9f9f9", p: 2, borderRadius: 1, mb: 3 }}>

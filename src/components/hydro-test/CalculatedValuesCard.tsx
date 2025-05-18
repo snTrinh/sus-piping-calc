@@ -64,7 +64,7 @@ export default function CalculatedValueCard({
             </Box>
           </Box>
         </Box>
-        <Box sx={{ display: "flex", gap: 2}}>
+        <Box sx={{ display: "flex", gap: 2 }}>
           <TextField
             label="Test Gauge Pressure P"
             type="number"

@@ -5,9 +5,10 @@ import { Box, Typography } from "@mui/material";
 import InputValuesCard from "./../../components/hydro-test/InputValuesCard";
 import CalculatedValueCard from "./../../components/hydro-test/CalculatedValuesCard";
 import UnitsToggle from "@/components/common/UnitsToggle";
+import { Units } from "@/types/units";
 
 export default function HydroTestPage() {
-  const [units, setUnits] = useState<"imperial" | "metric">("imperial");
+  const [units, setUnits] = useState<Units>(Units.Imperial);
 
   const [P, setP] = useState(250);
   const [St, setSt] = useState(132000);
@@ -22,7 +23,7 @@ export default function HydroTestPage() {
   // Unit toggle and conversions
   const handleUnitsChange = (
     event: React.MouseEvent<HTMLElement>,
-    newUnits: "imperial" | "metric" | null
+    newUnits: Units
   ) => {
     if (!newUnits || newUnits === units) return;
 

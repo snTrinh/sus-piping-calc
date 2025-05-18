@@ -1,8 +1,8 @@
 import { materialsData } from "./../data/materialsData";
 
 export function materialStressLookup(
-  category: "imperial" | "metric",
-  material: keyof (typeof materialsData)["metric"]["materials"],
+  category: "Imperial" | "Metric",
+  material: keyof (typeof materialsData)["Metric"]["materials"],
   temperature: number
 ): number | null {
   const table = materialsData[category];
