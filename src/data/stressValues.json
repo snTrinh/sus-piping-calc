@@ -1,0 +1,4 @@
+[
+  { "material": "A333 Grade 6", "temp": 100, "stress": 20000 },
+  { "material": "A106 Grade B", "temp": 100, "stress": 17000 }
+]
