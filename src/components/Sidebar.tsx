@@ -18,6 +18,8 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import AssessmentIcon from "@mui/icons-material/Assessment"; // new icon for Z662 Calculator
 import Link from "next/link";
 import { useState } from "react";
+import ContactMailIcon from "@mui/icons-material/ContactMail";
+import WaterDropIcon from "@mui/icons-material/WaterDrop";
 
 const drawerWidth = 240;
 const collapsedWidth = 72;
@@ -44,6 +46,16 @@ export default function Sidebar() {
       label: "Interpolation",
       icon: <FunctionsIcon />,
       href: "/interpolation",
+    },
+    {
+      label: "Hydro Test Pressure",
+      icon: <WaterDropIcon />,
+      href: "/hydro-test",
+    },
+    {
+      label: "Contact Us",
+      icon: <ContactMailIcon />,
+      href: "/contact",
     },
   ];
 

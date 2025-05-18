@@ -6,7 +6,7 @@ export default function HomePage() {
   return (
     <main className="font-sans flex flex-col justify-center">
       <B31_3Calculator />
-      <PdfExport />
+      
     </main>
   );
 }

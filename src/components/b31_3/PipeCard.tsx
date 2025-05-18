@@ -10,9 +10,7 @@ import {
   IconButton,
 } from "@mui/material";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
-import ClearIcon from "@mui/icons-material/Clear";
 
-import CheckIcon from "@mui/icons-material/Check";
 type Pipe = {
   id: string;
   nps: string;
@@ -48,8 +46,8 @@ export default function PipeCard({
       : "Provided Thickness (mm)";
   const tRequiredLabel =
     units === "imperial"
-      ? "Required Thickness (in)"
-      : "Required Thickness (mm)";
+      ? "Required Thickness tᵣ (in)"
+      : "Required Thickness tᵣ (mm)";
 
   return (
     <Card
@@ -108,7 +106,7 @@ export default function PipeCard({
             value={displayedThickness.toFixed(units === "imperial" ? 3 : 2)}
             size="small"
             disabled
-            sx={{ minWidth: 180 }}
+            sx={{ minWidth: 120 }}
           />
 
           <TextField
@@ -116,7 +114,7 @@ export default function PipeCard({
             value={pipe.tRequired.toFixed(units === "imperial" ? 3 : 2)}
             size="small"
             disabled
-            sx={{ minWidth: 180 }}
+            sx={{ minWidth: 120 }}
           />
         </Box>
 
@@ -135,6 +133,7 @@ export default function PipeCard({
 
         <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
           <Button
+            startIcon={<RemoveCircleOutlineIcon />}
             variant="outlined"
             color="error"
             size="small"
@@ -142,9 +141,6 @@ export default function PipeCard({
           >
             Remove Pipe
           </Button>
-          <IconButton onClick={() => removePipe(pipe.id)} color="error">
-            <RemoveCircleOutlineIcon />
-          </IconButton>
         </Box>
       </CardContent>
     </Card>

@@ -2,38 +2,30 @@
 
 import { Box, Card, CardContent, TextField, Typography } from "@mui/material";
 
-type InterpolatedValueCardProps = {
-  x0: number;
-  y0: number;
-  x1: number;
-  y1: number;
-  x: number;
-  y: number;
+type CalculatedValueCardProps = {
+  Pt: number;
+  P: number;
+  St: number;
+  S: number;
 };
 
-export default function InterpolatedValueCard({
-  x0,
-  y0,
-  x1,
-  y1,
-  x,
-  y,
-}: InterpolatedValueCardProps) {
+export default function CalculatedValueCard({
+  Pt,
+  P,
+  St,
+  S,
+}: CalculatedValueCardProps) {
   return (
     <Card sx={{ height: "100%" }}>
       <CardContent>
         <Typography variant="h6" gutterBottom>
-          Interpolated Value
-        </Typography>
-        <Typography variant="body1" gutterBottom>
-          (x₀, y₀) = ({x0}, {y0})<br />
-          (x₁, y₁) = ({x1}, {y1})<br />
+          Calculated Value as per B31.3 345.4.2
         </Typography>
         {/* Formula Display */}
         <Box>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Typography variant="body2" component="span">
-              y = y₀ + (x − x₀)
+              Pₜ = 1.5P
             </Typography>
             <Box
               sx={{
@@ -44,16 +36,19 @@ export default function InterpolatedValueCard({
                 lineHeight: 1,
               }}
             >
-              <Box sx={{ borderBottom: "1px solid #000", px: 0.5 }}>
-                y₁ − y₀
-              </Box>
-              <Box sx={{ px: 0.5 }}>x₁ − x₀</Box>
+              <Box sx={{ borderBottom: "1px solid #000", px: 0.5 }}>Sₜ*</Box>
+              <Box sx={{ px: 0.5 }}>S</Box>
             </Box>
+            <Typography variant="body2" component="span">
+              * Typically test temp is &lt; 38 &deg;C
+              <br />
+            </Typography>
           </Box>
+
           {/* Formula with actual values */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Typography variant="body2" component="span">
-              y = {y0} + ({x} − {x0})
+              Pₜ = 1.5({P})
             </Typography>
             <Box
               sx={{
@@ -64,21 +59,17 @@ export default function InterpolatedValueCard({
                 lineHeight: 1,
               }}
             >
-              <Box sx={{ borderBottom: "1px solid #000", px: 0.5 }}>
-                {y1} − {y0}
-              </Box>
-              <Box sx={{ px: 0.5 }}>
-                {x1} − {x0}
-              </Box>
+              <Box sx={{ borderBottom: "1px solid #000", px: 0.5 }}>{St}</Box>
+              <Box sx={{ px: 0.5 }}>{S}</Box>
             </Box>
           </Box>
         </Box>
-        <Box sx={{ display: "flex", gap: 2, mb: 5 }}>
+        <Box sx={{ display: "flex", gap: 2}}>
           <TextField
-            label="y"
+            label="Test Gauge Pressure P"
             type="number"
             fullWidth
-            value={y}
+            value={Pt}
             disabled
             sx={{
               // Match styles from InputValuesCard

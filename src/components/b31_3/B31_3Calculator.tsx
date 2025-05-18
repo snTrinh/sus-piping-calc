@@ -12,11 +12,13 @@ import {
   ToggleButton,
   ToggleButtonGroup,
 } from "@mui/material";
-
+import { materialStressLookup } from "./../../utils/materialStressLookup";
 import stressData from "@/data/stressValues.json";
 import thicknessByNpsSchedule from "@/data/thicknessByNpsSchedule.json";
 import PipeCard from "./PipeCard";
-
+import PdfExport from "../PdfExport";
+import UnitsToggle from "./../common/UnitsToggle";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 type Pipe = {
   id: string;
   nps: string;
@@ -29,7 +31,9 @@ export default function B31_3Calculator() {
 
   const [material, setMaterial] = useState("A333 Grade 6");
   const [temperature, setTemperature] = useState(100); // °F internally
-  const [stress, setStress] = useState(20000); // psi internally
+  const [stress, setStress] = useState(
+    materialStressLookup(units, "A312TP316L", temperature)
+  ); // psi internally
   const [ca, setCA] = useState(0); // inches
 
   // New variables for the formula
@@ -70,7 +74,8 @@ export default function B31_3Calculator() {
       prev.map((pipe) => {
         const diameterInches = Number(pipe.nps);
         const numerator = designPressure * diameterInches;
-        const denominator = 2 * (stress * e * w + designPressure * gamma);
+        const denominator =
+          2 * ((stress ?? 0) * e * w + designPressure * gamma);
         const tRequired = denominator !== 0 ? numerator / denominator + ca : 0;
         return { ...pipe, tRequired };
       })
@@ -86,7 +91,7 @@ export default function B31_3Calculator() {
 
     if (newUnits === "imperial") {
       setTemperature(cToF(temperature));
-      setStress(mpaToPsi(stress));
+      setStress(mpaToPsi(stress ?? 0));
       setCA(mmToInch(ca));
       setDesignPressure(designPressure / 6.89476); // kPa → psi
       setPipes((prev) =>
@@ -97,7 +102,7 @@ export default function B31_3Calculator() {
       );
     } else {
       setTemperature(fToC(temperature));
-      setStress(psiToMpa(stress));
+      setStress(psiToMpa(stress ?? 0));
       setCA(inchToMm(ca));
       setDesignPressure(designPressure * 6.89476); // psi → kPa
       setPipes((prev) =>
@@ -153,17 +158,7 @@ export default function B31_3Calculator() {
       <Typography variant="h4" fontWeight="bold" align="left" gutterBottom>
         B31.3 Pipe Thickness Calculator
       </Typography>
-
-      <ToggleButtonGroup
-        value={units}
-        exclusive
-        onChange={handleUnitsChange}
-        sx={{ mb: 3 }}
-      >
-        <ToggleButton value="imperial">Imperial</ToggleButton>
-        <ToggleButton value="metric">Metric</ToggleButton>
-      </ToggleButtonGroup>
-
+      <UnitsToggle units={units} onChange={handleUnitsChange} />
       <Box
         sx={{
           display: "flex",
@@ -189,7 +184,7 @@ export default function B31_3Calculator() {
         </TextField>
 
         <TextField
-          label={`Design Pressure (${units === "imperial" ? "psi" : "kPa"})`}
+          label={`Design Pressure P (${units === "imperial" ? "psi" : "kPa"})`}
           type="number"
           value={
             units === "imperial"
@@ -216,7 +211,7 @@ export default function B31_3Calculator() {
         />
 
         <TextField
-          label={`Corrosion Allowance (${units === "imperial" ? "in" : "mm"})`}
+          label={`Corrosion Allowance CA (${units === "imperial" ? "in" : "mm"})`}
           type="number"
           value={
             units === "imperial" ? ca : Math.round(inchToMm(ca) * 100) / 100
@@ -227,11 +222,11 @@ export default function B31_3Calculator() {
           sx={{ minWidth: 180 }}
         />
         <TextField
-          label={`Allowable Stress (${units === "imperial" ? "psi" : "MPa"})`}
+          label={`Allowable Stress S (${units === "imperial" ? "psi" : "MPa"})`}
           value={
             units === "imperial"
-              ? stress.toFixed(2)
-              : (stress * 0.00689476).toFixed(2)
+              ? (stress ?? 0).toFixed(2)
+              : ((stress ?? 0) * 0.00689476).toFixed(2)
           }
           size="small"
           disabled
@@ -240,41 +235,37 @@ export default function B31_3Calculator() {
 
         {/* New fields for E, W, and gamma */}
         <TextField
-          label="Weld Joint Efficiency (E)"
+          label="Weld Joint Efficiency E"
           type="number"
           value={e}
           disabled
           size="small"
-          inputProps={{ step: 0.01, min: 0, max: 1 }}
           sx={{ minWidth: 180 }}
         />
 
         <TextField
-          label="Weld Strength Reduction Factor (W)"
+          label="Weld Strength Reduction Factor W"
           type="number"
           value={w}
           disabled
           size="small"
-          inputProps={{ step: 0.01, min: 0, max: 1 }}
           sx={{ minWidth: 180 }}
         />
 
         <TextField
-          label="Temperature Coefficient (γ)"
+          label="Temperature Coefficient γ"
           type="number"
           value={gamma}
           disabled
           size="small"
-          inputProps={{ step: 0.01, min: 0 }}
           sx={{ minWidth: 180 }}
         />
       </Box>
-
       <Box sx={{ backgroundColor: "#f9f9f9", p: 2, borderRadius: 1, mb: 3 }}>
         <Typography variant="body2" color="text.secondary">
           <strong>Required Thickness (ASME B31.3):</strong>{" "}
           <Typography variant="body2" component="span">
-            t =
+            tᵣ =
           </Typography>
           <Box
             sx={{
@@ -293,9 +284,36 @@ export default function B31_3Calculator() {
           </Typography>
         </Typography>
       </Box>
-
+      <Box sx={{ backgroundColor: "#f9f9f9", p: 2, borderRadius: 1, mb: 3 }}>
+        <Typography variant="body2" color="text.secondary">
+          <strong>Required Thickness (ASME B31.3):</strong>{" "}
+          <Typography variant="body2" component="span">
+            tᵣ =
+          </Typography>
+          <Box
+            sx={{
+              display: "inline-flex",
+              flexDirection: "column",
+              alignItems: "center",
+              fontSize: "0.875rem",
+              lineHeight: 1,
+            }}
+          >
+            <Box sx={{ borderBottom: "1px solid #000", px: 0.5 }}>
+              ({designPressure} × D)
+            </Box>
+            <Box sx={{ px: 0.5 }}>
+              [2(({stress})({e})({w}) + ({designPressure})({gamma}))]
+            </Box>
+          </Box>
+          <Typography variant="body2" component="span">
+            + {ca}
+          </Typography>
+        </Typography>
+      </Box>
       <Button
-        variant="contained"
+        startIcon={<AddCircleOutlineIcon />}
+        variant="outlined"
         onClick={() => {
           setPipes((prev) => [
             ...prev,
@@ -309,9 +327,8 @@ export default function B31_3Calculator() {
         }}
         sx={{ mb: 4 }}
       >
-        ➕ Add Pipe
+        Add Pipe
       </Button>
-
       {pipesForDisplay.map((pipe) => (
         <PipeCard
           key={pipe.id}
@@ -324,6 +341,8 @@ export default function B31_3Calculator() {
           units={units}
         />
       ))}
+
+      <PdfExport units={units} />
     </Container>
   );
 }
