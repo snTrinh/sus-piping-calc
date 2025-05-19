@@ -1,12 +1,16 @@
 "use client";
 
 import { Box, Card, CardContent, TextField, Typography } from "@mui/material";
+import LabeledInput from "../common/LabeledInput";
+import { Units } from "@/types/units";
+import { unitLabels } from "@/utils/unitConversions";
 
 type CalculatedValueCardProps = {
   Pt: number;
   P: number;
   St: number;
   S: number;
+  units: Units;
 };
 
 export default function CalculatedValueCard({
@@ -14,12 +18,18 @@ export default function CalculatedValueCard({
   P,
   St,
   S,
+  units,
 }: CalculatedValueCardProps) {
+  const pressureUnit = unitLabels[units].pressure;
+  const temperatureUnit =
+    units === Units.Imperial
+      ? `100 ${unitLabels[units].temperature}`
+      : `38 ${unitLabels[units].temperature}`;
   return (
     <Card sx={{ height: "100%" }}>
       <CardContent>
         <Typography variant="h6" gutterBottom>
-          Calculated Value as per B31.3 345.4.2
+          Calculated Value as per B31.3 - 345.4.2
         </Typography>
         {/* Formula Display */}
         <Box>
@@ -39,10 +49,6 @@ export default function CalculatedValueCard({
               <Box sx={{ borderBottom: "1px solid #000", px: 0.5 }}>Sₜ*</Box>
               <Box sx={{ px: 0.5 }}>S</Box>
             </Box>
-            <Typography variant="body2" component="span">
-              * Typically test temp is &lt; 38 &deg;C
-              <br />
-            </Typography>
           </Box>
 
           {/* Formula with actual values */}
@@ -64,19 +70,30 @@ export default function CalculatedValueCard({
             </Box>
           </Box>
         </Box>
-        <Box sx={{ display: "flex", gap: 2 }}>
-          <TextField
-            label="Test Gauge Pressure P"
-            type="number"
-            fullWidth
-            value={Pt}
+
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1 }}>
+          <Typography variant="body2" component="span">
+            * Typically test temp is &lt; {temperatureUnit}
+          </Typography>
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 2,
+            mt: 7,
+            justifyContent: "flex-start",
+          }}
+        >
+          <LabeledInput
+            label="Test Gauge Pressure"
+            symbol="P"
+            unit={pressureUnit}
+            value={Number(Pt.toFixed(2))}
+            onChange={() => {}}
             disabled
-            sx={{
-              // Match styles from InputValuesCard
-              mt: 4, // Adjust margin-top if needed
-            }}
+            fullWidth
           />
-          {/* y is calculated in parent, so no need here */}
         </Box>
       </CardContent>
     </Card>

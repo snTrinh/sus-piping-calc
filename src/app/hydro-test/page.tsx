@@ -59,11 +59,18 @@ export default function HydroTestPage() {
             setP={setP}
             setSt={setSt}
             setS={setS}
+            units={units}
           />
         </Box>
 
         <Box sx={{ flex: 1, minWidth: 450, height: 300 }}>
-          <CalculatedValueCard Pt={calculatedPressure} P={P} St={St} S={S} />
+          <CalculatedValueCard
+            Pt={calculatedPressure}
+            P={P}
+            St={St}
+            S={S}
+            units={units}
+          />
         </Box>
       </Box>
     </Box>

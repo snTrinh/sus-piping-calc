@@ -1,4 +1,5 @@
 "use client";
+import React, { useState, useEffect } from "react";
 import { TextField } from "@mui/material";
 
 type LabeledInputProps = {
@@ -12,6 +13,8 @@ type LabeledInputProps = {
   min?: number;
   max?: number;
   sx?: object;
+  fullWidth?: boolean;
+  percentage?: boolean;
 };
 
 export default function LabeledInput({
@@ -25,21 +28,44 @@ export default function LabeledInput({
   min,
   max,
   sx = {},
+  fullWidth = false,
+  percentage = false,
 }: LabeledInputProps) {
-  const symbolText = symbol ? `, ${symbol}` : "";
-  const unitText = unit ? ` (${unit})` : "";
-  const fullLabel = `${label}${symbolText}${unitText}`;
+  const formatValue = (val: number) =>
+    percentage ? `${(val * 100).toFixed(2)}%` : val.toString();
+
+  const [inputValue, setInputValue] = useState(formatValue(value));
+
+  useEffect(() => {
+    setInputValue(formatValue(value));
+  }, [value, percentage]);
+
+  const commitChange = () => {
+    const numeric = parseFloat(inputValue.replace(/[^0-9.-]/g, ""));
+    if (!isNaN(numeric)) {
+      onChange(percentage ? numeric / 100 : numeric);
+    } else {
+      setInputValue(formatValue(value)); // revert to previous valid value
+    }
+  };
 
   return (
     <TextField
-      label={fullLabel}
-      type="number"
-      value={value}
-      onChange={(e) => onChange(Number(e.target.value))}
+      label={`${label}${symbol ? `, ${symbol}` : ""}${unit ? ` (${unit})` : ""}`}
+      value={inputValue}
+      onChange={(e) => setInputValue(e.target.value)}
+      onBlur={commitChange}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          commitChange();
+          (e.target as HTMLInputElement).blur();
+        }
+      }}
       size="small"
       disabled={disabled}
       inputProps={{ step, min, max }}
       sx={{ minWidth: 180, ...sx }}
+      fullWidth={fullWidth}
     />
   );
 }

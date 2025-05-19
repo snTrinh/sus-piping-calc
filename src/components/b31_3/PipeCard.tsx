@@ -10,13 +10,17 @@ import {
 } from "@mui/material";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import { Units } from "@/types/units";
-import { unitConversions } from "@/utils/unitConversions";
-
+import {
+  npsToMmMap,
+  unitConversions,
+} from "@/utils/unitConversions";
+import pipeData from "@/utils/pipeData.json";
 type Pipe = {
   id: string;
   nps: string;
   schedule: string;
-  tRequired: number; // Already converted to display units by parent
+  tRequired: number;
+  t: number;
 };
 
 type PipeCardProps = {
@@ -27,7 +31,6 @@ type PipeCardProps = {
   units: Units;
 };
 
-const npsOptions = ["0.5", "1", "2", "4", "6", "8", "10", "12"];
 const scheduleOptions = ["5", "10", "40", "80"];
 
 export default function PipeCard({
@@ -38,11 +41,12 @@ export default function PipeCard({
   units,
 }: PipeCardProps) {
   const rawThickness = thicknessByNpsSchedule[pipe.nps]?.[pipe.schedule] ?? 0;
-
-  // Use centralized unit conversion
   const thicknessConversion = unitConversions.thickness[units];
   const displayedThickness = thicknessConversion.to(rawThickness);
   const unitLabel = thicknessConversion.unit;
+  const outerDiameter =
+    pipeData[units]?.columns?.find((col) => col.NPS === pipe.nps)?.OD || 0;
+
 
   return (
     <Card
@@ -74,9 +78,9 @@ export default function PipeCard({
             sx={{ minWidth: 120 }}
             size="small"
           >
-            {npsOptions.map((nps) => (
-              <MenuItem key={nps} value={nps}>
-                {nps}
+            {Object.entries(npsToMmMap).map(([Imperial, Metric]) => (
+              <MenuItem key={Imperial} value={Imperial}>
+                {units === Units.Metric ? Metric : Imperial}
               </MenuItem>
             ))}
           </TextField>
@@ -95,9 +99,15 @@ export default function PipeCard({
               </MenuItem>
             ))}
           </TextField>
-
           <TextField
-            label={`Provided Thickness (${unitLabel})`}
+            label={`Outer Diameter, D (${unitLabel})`}
+            value={outerDiameter.toFixed(2)}
+            size="small"
+            disabled
+            sx={{ minWidth: 120 }}
+          />
+          <TextField
+            label={`Provided Thickness, t (${unitLabel})`}
             value={displayedThickness.toFixed(2)}
             size="small"
             disabled
@@ -105,13 +115,15 @@ export default function PipeCard({
           />
 
           <TextField
-            label={`Required Thickness tᵣ (${unitLabel})`}
+            label={`Required Thickness, tᵣ (${unitLabel})`}
             value={pipe.tRequired.toFixed(2)}
             size="small"
             disabled
             sx={{ minWidth: 120 }}
           />
         </Box>
+
+
 
         <Typography sx={{ mb: 2 }}>
           <strong>Result:</strong>{" "}

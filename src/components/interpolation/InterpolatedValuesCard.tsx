@@ -78,7 +78,7 @@ export default function InterpolatedValueCard({
             label="y"
             type="number"
             fullWidth
-            value={y}
+            value={y.toFixed(2)}
             disabled
             sx={{
               // Match styles from InputValuesCard

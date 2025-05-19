@@ -9,31 +9,42 @@ import {
   TextField,
   Typography,
   Container,
-  ToggleButton,
-  ToggleButtonGroup,
 } from "@mui/material";
 import { materialStressLookup } from "./../../utils/materialStressLookup";
 import stressData from "@/data/stressValues.json";
 import thicknessByNpsSchedule from "@/data/thicknessByNpsSchedule.json";
+import pipeData from "./../../utils/pipeData.json";
 import PipeCard from "./PipeCard";
-import PdfExport from "../PdfExport";
+import PdfExport from "./PdfExport";
 import UnitsToggle from "./../common/UnitsToggle";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import LabeledInput from "../common/LabeledInput";
 import { Units } from "@/types/units";
-import { convertDesignInputs, unitConversions } from "@/utils/unitConversions";
+import {
+  convertDesignInputs,
+  PipeSchedule,
+  ThicknessData,
+} from "@/utils/unitConversions";
+import FormulaDisplay from "./FormulaDisplay";
+import DesignInputs from "./DesignInputs";
 
 type Pipe = {
   id: string;
   nps: string;
-  schedule: string;
+  schedule: PipeSchedule;
   tRequired: number;
+  t: number;
+};
+type PipeThicknessInfo = {
+  nps: string;
+  schedule: string;
+  thickness: number;
 };
 
 export default function B31_3Calculator() {
   const [units, setUnits] = useState<Units>(Units.Imperial);
 
-  const [material, setMaterial] = useState("A333 Grade 6");
+  const [material, setMaterial] = useState("A333-6");
   const [temperature, setTemperature] = useState(100); // °F internally
   const [stress, setStress] = useState(
     materialStressLookup(units, "A312TP316L", temperature)
@@ -44,7 +55,7 @@ export default function B31_3Calculator() {
   const [e, setE] = useState(1); // Weld joint efficiency
   const [w, setW] = useState(1); // Weld strength reduction factor
   const [gamma, setGamma] = useState(0.4); // Gamma coefficient
-
+  const [millTol, setMillTol] = useState(0.125); // Gamma coefficient
   const [designPressure, setDesignPressure] = useState(1414); // psi
 
   const [pipes, setPipes] = useState<Pipe[]>([
@@ -53,6 +64,7 @@ export default function B31_3Calculator() {
       nps: "4",
       schedule: "40",
       tRequired: 0,
+      t: 0,
     },
   ]);
 
@@ -73,43 +85,32 @@ export default function B31_3Calculator() {
         const denominator =
           2 * ((stress ?? 0) * e * w + designPressure * gamma);
         const tRequired = denominator !== 0 ? numerator / denominator + ca : 0;
+
         return { ...pipe, tRequired };
       })
     );
   }, [designPressure, stress, e, w, gamma, ca]);
 
-  // Unit toggle and conversions
+  // Units toggle - only update label state, no conversion of values
   const handleUnitsChange = (
     event: React.MouseEvent<HTMLElement>,
     newUnits: Units
   ) => {
     if (!newUnits || newUnits === units) return;
-
-    setTemperature(unitConversions.temperature[newUnits].from(temperature));
-    setStress(unitConversions.pressure[newUnits].from(stress ?? 0));
-    setCA(unitConversions.thickness[newUnits].from(ca));
-    setDesignPressure(unitConversions.pressure[newUnits].from(designPressure));
-
-    setPipes((prev) =>
-      prev.map((pipe) => ({
-        ...pipe,
-        tRequired: unitConversions.thickness[newUnits].from(pipe.tRequired),
-      }))
-    );
-
     setUnits(newUnits);
   };
 
+  // Handlers - just set value as entered, no conversions
   const handleTemperatureChange = (value: number) => {
-    setTemperature(unitConversions.temperature[units].from(value));
+    setTemperature(value);
   };
 
   const handleCAChange = (value: number) => {
-    setCA(unitConversions.thickness[units].from(value));
+    setCA(value);
   };
 
   const handleDesignPressureChange = (value: number) => {
-    setDesignPressure(unitConversions.pressure[units].from(value));
+    setDesignPressure(value);
   };
 
   const updatePipe = (id: string, key: keyof Pipe, value: any) => {
@@ -118,12 +119,13 @@ export default function B31_3Calculator() {
     );
   };
 
-  const pipesForDisplay = pipes.map((pipe) => ({
-    ...pipe,
-    tRequired: unitConversions.thickness[units].to(pipe.tRequired),
-  }));
+  // No conversion on tRequired for display — show internal value as is
+  const pipesForDisplay = pipes.map((pipe) => ({ ...pipe }));
 
+  // Material list for select options
   const materials = [...new Set(stressData.map((d) => d.material))];
+
+  // Use convertDesignInputs only for label display, not for actual values
   const {
     temperatureDisplay,
     stressDisplay,
@@ -140,12 +142,24 @@ export default function B31_3Calculator() {
     ca,
     designPressure,
   });
+
+  const designParams = {
+    units,
+    pressure: pressureDisplay,
+    temperature: temperatureDisplay,
+    corrosionAllowance: caDisplay,
+    allowableStress: stressDisplay,
+    gamma,
+  };
+
   return (
-    <Container maxWidth="md" sx={{ pb: 8 }}>
+    <Container maxWidth="lg" sx={{ pb: 8 }}>
       <Typography variant="h4" fontWeight="bold" align="left" gutterBottom>
         B31.3 Pipe Thickness Calculator
       </Typography>
+
       <UnitsToggle units={units} onChange={handleUnitsChange} />
+
       <Box
         sx={{
           display: "flex",
@@ -155,130 +169,53 @@ export default function B31_3Calculator() {
           justifyContent: "flex-start",
         }}
       >
-        <TextField
-          select
-          label="Material"
-          value={material}
-          onChange={(e) => setMaterial(e.target.value)}
-          sx={{ minWidth: 200 }}
-          size="small"
-        >
-          {materials.map((mat) => (
-            <MenuItem key={mat} value={mat}>
-              {mat}
-            </MenuItem>
-          ))}
-        </TextField>
-        <LabeledInput
-          label="Design Pressure"
-          symbol="P"
-          unit={pressureUnit}
-          value={pressureDisplay}
-          onChange={handleDesignPressureChange}
-        />
-
-        <LabeledInput
-          label="Temperature"
-          symbol="T"
-          unit={tempUnit}
-          value={temperatureDisplay}
-          onChange={handleTemperatureChange}
-        />
-
-        <LabeledInput
-          label="Corrosion Allowance"
-          symbol="CA"
-          unit={caUnit}
-          value={caDisplay}
-          onChange={handleCAChange}
-        />
-
-        <LabeledInput
-          label="Allowable Stress"
-          symbol="S"
-          unit={stressUnit}
-          value={stressDisplay}
-          onChange={() => {}}
-          disabled
-        />
-
-        <LabeledInput
-          label="Weld Joint Efficiency"
-          symbol="E"
-          unit=""
-          value={e}
-          onChange={() => {}}
-          disabled
-        />
-
-        <LabeledInput
-          label="Weld Strength Reduction Factor"
-          symbol="W"
-          unit=""
-          value={w}
-          onChange={() => {}}
-          disabled
-        />
-
-        <LabeledInput
-          label="Temperature Coefficient"
-          symbol="γ"
-          unit=""
-          value={gamma}
-          onChange={() => {}}
-          disabled
+        <DesignInputs
+          units={units}
+          materials={materials}
+          material={material}
+          temperatureDisplay={temperatureDisplay}
+          stressDisplay={stressDisplay}
+          caDisplay={caDisplay}
+          pressureDisplay={pressureDisplay}
+          pressureUnit={pressureUnit}
+          caUnit={caUnit}
+          stressUnit={stressUnit}
+          tempUnit={tempUnit}
+          e={e}
+          w={w}
+          gamma={gamma}
+          millTol={millTol}
+          onUnitsChange={handleUnitsChange}
+          onMaterialChange={setMaterial}
+          onTemperatureChange={handleTemperatureChange}
+          onCAChange={handleCAChange}
+          onDesignPressureChange={handleDesignPressureChange}
         />
       </Box>
-      <Box sx={{ backgroundColor: "#f9f9f9", p: 2, borderRadius: 1, mb: 3 }}>
-        <Typography variant="body2" color="text.secondary">
-          <strong>Required Thickness (ASME B31.3):</strong>{" "}
-          <Typography variant="body2" component="span">
-            tᵣ =
-          </Typography>
-          <Box
-            sx={{
-              display: "inline-flex",
-              flexDirection: "column",
-              alignItems: "center",
-              fontSize: "0.875rem",
-              lineHeight: 1,
-            }}
-          >
-            <Box sx={{ borderBottom: "1px solid #000", px: 0.5 }}>(P × D)</Box>
-            <Box sx={{ px: 0.5 }}>[2(SEW + Pγ)]</Box>
-          </Box>
-          <Typography variant="body2" component="span">
-            + CA
-          </Typography>
-        </Typography>
-      </Box>
-      <Box sx={{ backgroundColor: "#f9f9f9", p: 2, borderRadius: 1, mb: 3 }}>
-        <Typography variant="body2" color="text.secondary">
-          <strong>Required Thickness (ASME B31.3):</strong>{" "}
-          <Typography variant="body2" component="span">
-            tᵣ =
-          </Typography>
-          <Box
-            sx={{
-              display: "inline-flex",
-              flexDirection: "column",
-              alignItems: "center",
-              fontSize: "0.875rem",
-              lineHeight: 1,
-            }}
-          >
-            <Box sx={{ borderBottom: "1px solid #000", px: 0.5 }}>
-              ({designPressure} × D)
-            </Box>
-            <Box sx={{ px: 0.5 }}>
-              [2(({stress})({e})({w}) + ({designPressure})({gamma}))]
-            </Box>
-          </Box>
-          <Typography variant="body2" component="span">
-            + {ca}
-          </Typography>
-        </Typography>
-      </Box>
+      <FormulaDisplay
+        designPressure={pressureDisplay}
+        stress={stressDisplay}
+        e={e}
+        w={w}
+        gamma={gamma}
+        ca={caDisplay}
+        millTolerance={millTol}
+        diameter={Number(pipes[0]?.nps ?? 0)}
+        units={units}
+      />
+      <FormulaDisplay
+        showValues
+        designPressure={pressureDisplay}
+        stress={stressDisplay}
+        e={e}
+        w={w}
+        gamma={gamma}
+        ca={caDisplay}
+        millTolerance={millTol}
+        diameter={Number(pipes[0]?.nps ?? 0)}
+        units={units}
+      />
+
       <Button
         startIcon={<AddCircleOutlineIcon />}
         variant="outlined"
@@ -290,6 +227,7 @@ export default function B31_3Calculator() {
               nps: "2",
               schedule: "40",
               tRequired: 0,
+              t: 0,
             },
           ]);
         }}
@@ -297,6 +235,7 @@ export default function B31_3Calculator() {
       >
         Add Pipe
       </Button>
+
       {pipesForDisplay.map((pipe) => (
         <PipeCard
           key={pipe.id}
@@ -310,7 +249,12 @@ export default function B31_3Calculator() {
         />
       ))}
 
-      <PdfExport units={units} />
+      <PdfExport
+        units={units}
+        material={material}
+        designParams={designParams}
+        pipes={pipesForDisplay}
+      />
     </Container>
   );
 }

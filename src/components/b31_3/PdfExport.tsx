@@ -2,18 +2,40 @@
 import html2pdf from "html2pdf.js";
 import { useRef, useState } from "react";
 import { Box, TextField, Button } from "@mui/material";
+import { DesignParameters, Units } from "@/types/units";
+import PdfContent from "./PdfContent";
 
 type PdfExportProps = {
-  units: string;
+  units: Units;
+  material: string;
+  designParams: DesignParameters;
+  pipes: {
+    id: string;
+    nps: string;
+    schedule: string;
+    tRequired: number;
+    t: number;
+  }[];
+  
 };
 
-export default function PdfExport({ units }: PdfExportProps) {
+export default function PdfExport({
+
+  material,
+
+  pipes,
+  designParams,
+}: PdfExportProps) {
+  const { units, pressure, corrosionAllowance, allowableStress, e, w, gamma } =
+    designParams;
   const printRef = useRef<HTMLDivElement>(null);
 
   const [drawingNumber, setDrawingNumber] = useState("");
-  const [drawingRevision, setDrawingRevision] = useState("");
-  const [calculationRevision, setCalculationRevision] = useState("");
-  const [date, setDate] = useState("");
+  const [drawingRevision, setDrawingRevision] = useState("0");
+  const [calculationRevision, setCalculationRevision] = useState("0");
+  const [date, setDate] = useState(
+    () => new Date().toISOString().split("T")[0]
+  );
 
   const handleDownloadPdf = () => {
     if (!printRef.current) return;
@@ -77,24 +99,18 @@ export default function PdfExport({ units }: PdfExportProps) {
         variant="outlined"
         InputLabelProps={{ shrink: true }}
       />
-      <div ref={printRef} style={{ padding: 20, maxWidth: 600 }}>
-        Drawing Number: {drawingNumber} Revision: {drawingRevision} <br />
-        Calulation Revision: {calculationRevision} <br />
-        Date: {date}
-        <br />
-        Unit:{units}
-        <br />
-        Design Pressure:
-        <br />
-        Design Temperature:
-        <br />
-        Corrosion Allowance:
-        <br />
-        Temperature Coefficient, γ:
-        <br />
-        Maximum allowable Stress, S:
-        <br />
-      </div>
+      <PdfContent
+        ref={printRef}
+        drawingNumber={drawingNumber}
+        drawingRevision={drawingRevision}
+        calculationRevision={calculationRevision}
+        date={date}
+        designParams={designParams}
+       
+        material={material}
+        pipes={pipes}
+       
+      />
 
       <Button variant="contained" onClick={handleDownloadPdf} sx={{ mt: 2 }}>
         Download PDF

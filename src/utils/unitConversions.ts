@@ -1,5 +1,57 @@
 import { Units } from "@/types/units";
 
+export const unitLabels = {
+    [Units.Metric]: {
+      pressure: "kPa",
+      temperature: "°C",
+      length: "mm",
+
+    },
+    [Units.Imperial]: {
+      pressure: "psi",
+      temperature: "°F",
+      length: "in",
+    },
+  };
+
+  export type PipeSchedule =
+  | "5s" | "5" | "10" | "10s" | "20" | "30" | "40S" | "STD" | "40"
+  | "60" | "80S" | "XH" | "80" | "100" | "120" | "140" | "160" | "XXH";
+
+  export type ThicknessData = {
+    [key in PipeSchedule]: (number | null)[];
+  };
+  
+  export const npsToMmMap: Record<string, number> = {
+    "1/8": 10,
+    "1/4": 13,
+    "3/8": 17,
+    "1/2": 21,
+    "3/4": 27,
+    "1": 33,
+    "1 1/4": 42,
+    "1 1/2": 48,
+    "2": 60,
+    "2 1/2": 73,
+    "3": 89,
+    "4": 114,
+    "5": 141,
+    "6": 168,
+    "8": 219,
+    "10": 273,
+    "12": 324,
+    "14": 356,
+    "16": 406,
+    "18": 457,
+    "20": 508,
+    "24": 610,
+  };
+
+  export const mmToNpsMap: Record<number, string> = Object.fromEntries(
+    Object.entries(npsToMmMap).map(([key, value]) => [value, key])
+  );
+  
+
 export const unitConversions = {
   pressure: {
     [Units.Imperial]: {
@@ -37,6 +89,28 @@ export const unitConversions = {
       unit: "°C",
     },
   },
+  nps: {
+    [Units.Imperial]: {
+      to: (value: number) => value, // NPS inch to inch (no change)
+      from: (value: number) => value,
+      unit: "in",
+    },
+    [Units.Metric]: {
+      to: (value: number) => {
+        // Convert inch NPS to approximate metric NPS in mm
+        return npsToMmMap[value] ?? NaN; // Return NaN if not found
+      },
+      from: (value: number) => {
+        // Convert metric mm NPS back to inch NPS (approximate)
+        // Find key by value (reverse lookup)
+        const inchNps = Object.entries(npsToMmMap).find(
+          ([, mm]) => mm === value
+        );
+        return inchNps ? Number(inchNps[0]) : NaN;
+      },
+      unit: "mm",
+    },
+  },
 };
 
 export function convertDesignInputs({
@@ -69,5 +143,6 @@ export function convertDesignInputs({
     caUnit: unitConversions.thickness[units].unit,
     stressUnit: unitConversions.pressure[units].unit,
     tempUnit: unitConversions.temperature[units].unit,
+    diameterUnit: unitConversions.thickness[units].unit,
   };
 }
