@@ -4,7 +4,7 @@ import { Units } from "@/types/units";
   export type PipeSchedule =
   | "5s" | "5" | "10" | "10s" | "20" | "30" | "40S" | "STD" | "40"
   | "60" | "80S" | "XH" | "80" | "100" | "120" | "140" | "160" | "XXH";
-
+  
   export type ThicknessData = {
     [key in PipeSchedule]: (number | null)[];
   };
@@ -33,10 +33,6 @@ import { Units } from "@/types/units";
     "20": 508,
     "24": 610,
   };
-
-  export const mmToNpsMap: Record<number, string> = Object.fromEntries(
-    Object.entries(npsToMmMap).map(([key, value]) => [value, key])
-  );
   
 
 export const unitConversions = {
@@ -103,33 +99,28 @@ export const unitConversions = {
 export function convertDesignInputs({
   units,
   temperature,
-  stress,
-  ca,
-  designPressure,
+  allowableStress,
+  corrosionAllowance,
+  pressure,
 }: {
   units: Units;
   temperature: number; // Stored in F internally
-  stress: number;
-  ca: number;
-  designPressure: number; // Stored in psi internally
+  allowableStress: number;
+  corrosionAllowance: number;
+  pressure: number; // Stored in psi internally
 }) {
   return {
     temperatureDisplay: Number(
       unitConversions.temperature[units].to(temperature).toFixed(2)
     ),
-    stressDisplay: Number(
-      unitConversions.pressure[units].to(stress).toFixed(2)
+    allowableStressDisplay: Number(
+      unitConversions.pressure[units].to(allowableStress).toFixed(2)
     ),
-    caDisplay: Number(
-      unitConversions.length[units].to(ca).toFixed(2)
+    corrosionAllowanceDisplay: Number(
+      unitConversions.length[units].to(corrosionAllowance).toFixed(2)
     ),
     pressureDisplay: Number(
-      unitConversions.pressure[units].to(designPressure).toFixed(2)
+      unitConversions.pressure[units].to(pressure).toFixed(2)
     ),
-    pressureUnit: unitConversions.pressure[units].unit,
-    caUnit: unitConversions.length[units].unit,
-    stressUnit: unitConversions.pressure[units].unit,
-    tempUnit: unitConversions.temperature[units].unit,
-    diameterUnit: unitConversions.length[units].unit,
   };
 }

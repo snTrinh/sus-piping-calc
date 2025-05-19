@@ -2,31 +2,21 @@
 import React, { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
-import {
-  Box,
-  Button,
-  MenuItem,
-  TextField,
-  Typography,
-  Container,
-} from "@mui/material";
+import { Box, Button, Typography, Container } from "@mui/material";
 import { materialStressLookup } from "./../../utils/materialStressLookup";
 import stressData from "@/data/stressValues.json";
 import thicknessByNpsSchedule from "@/data/thicknessByNpsSchedule.json";
-import pipeData from "./../../utils/pipeData.json";
+import pipeData from "@/utils/pipeData.json";
 import PipeCard from "./PipeCard";
 import PdfExport from "./PdfExport";
 import UnitsToggle from "./../common/UnitsToggle";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import LabeledInput from "../common/LabeledInput";
+import { getPipeDimensions } from "@/utils/pipeDimensions";
 import { Units } from "@/types/units";
-import {
-  convertDesignInputs,
-  PipeSchedule,
-  ThicknessData,
-} from "@/utils/unitConversions";
+import { convertDesignInputs, PipeSchedule } from "@/utils/unitConversions";
 import FormulaDisplay from "./FormulaDisplay";
 import DesignInputs from "./DesignInputs";
+import { get } from "http";
 
 type Pipe = {
   id: string;
@@ -35,28 +25,47 @@ type Pipe = {
   tRequired: number;
   t: number;
 };
-type PipeThicknessInfo = {
-  nps: string;
-  schedule: string;
-  thickness: number;
+type ThicknessData = {
+  [key in PipeSchedule]: (number | null)[];
 };
+
+type PipeDataByUnit = {
+  [unit in Units]: {
+    label: string;
+    columns: { od: number; [key: string]: any }[];
+    schedules: ThicknessData;
+  };
+};
+
+interface PipeEntry {
+  NPS: number;
+  OD: number;
+}
+
+interface MetricScheduleData {
+  Metric: {
+    label: string;
+    columns: PipeEntry[];
+    schedules: Record<string, (number | null)[]>;
+  };
+}
 
 export default function B31_3Calculator() {
   const [units, setUnits] = useState<Units>(Units.Imperial);
 
   const [material, setMaterial] = useState("A333-6");
   const [temperature, setTemperature] = useState(100); // °F internally
-  const [stress, setStress] = useState(
+  const [allowableStress, setAllowableStress] = useState(
     materialStressLookup(units, "A312TP316L", temperature)
   ); // psi internally
-  const [ca, setCA] = useState(0); // inches
+  const [corrosionAllowance, setCorrosionAllowance] = useState(0); // inches
 
   // New variables for the formula
   const [e, setE] = useState(1); // Weld joint efficiency
   const [w, setW] = useState(1); // Weld strength reduction factor
   const [gamma, setGamma] = useState(0.4); // Gamma coefficient
   const [millTol, setMillTol] = useState(0.125); // Gamma coefficient
-  const [designPressure, setDesignPressure] = useState(1414); // psi
+  const [pressure, setPressure] = useState(1414); // psi
 
   const [pipes, setPipes] = useState<Pipe[]>([
     {
@@ -73,7 +82,7 @@ export default function B31_3Calculator() {
     const match = stressData.find(
       (item) => item.material === material && item.temp === temperature
     );
-    if (match) setStress(match.stress);
+    if (match) setAllowableStress(match.stress);
   }, [material, temperature]);
 
   // Calculate thickness with new formula
@@ -81,15 +90,21 @@ export default function B31_3Calculator() {
     setPipes((prev) =>
       prev.map((pipe) => {
         const diameterInches = Number(pipe.nps);
-        const numerator = designPressure * diameterInches;
+        const numerator = pressure * diameterInches;
         const denominator =
-          2 * ((stress ?? 0) * e * w + designPressure * gamma);
-        const tRequired = denominator !== 0 ? numerator / denominator + ca : 0;
+          2 * ((allowableStress ?? 0) * e * w + pressure * gamma);
+        const tRequired =
+          denominator !== 0 ? numerator / denominator + corrosionAllowance : 0;
+
+        const columns = pipeData[units].columns;
+        const rowIndex = columns.findIndex(
+          (col: any) => Number(col.od) === Number(pipe.nps)
+        );
 
         return { ...pipe, tRequired };
       })
     );
-  }, [designPressure, stress, e, w, gamma, ca]);
+  }, [pressure, allowableStress, e, w, gamma, corrosionAllowance]);
 
   // Units toggle - only update label state, no conversion of values
   const handleUnitsChange = (
@@ -106,11 +121,11 @@ export default function B31_3Calculator() {
   };
 
   const handleCAChange = (value: number) => {
-    setCA(value);
+    setCorrosionAllowance(value);
   };
 
   const handleDesignPressureChange = (value: number) => {
-    setDesignPressure(value);
+    setPressure(value);
   };
 
   const updatePipe = (id: string, key: keyof Pipe, value: any) => {
@@ -126,21 +141,25 @@ export default function B31_3Calculator() {
   const materials = [...new Set(stressData.map((d) => d.material))];
 
   // Use convertDesignInputs only for label display, not for actual values
-  const { temperatureDisplay, stressDisplay, caDisplay, pressureDisplay } =
-    convertDesignInputs({
-      units,
-      temperature,
-      stress: stress ?? 0,
-      ca,
-      designPressure,
-    });
+  const {
+    temperatureDisplay,
+    allowableStressDisplay,
+    corrosionAllowanceDisplay,
+    pressureDisplay,
+  } = convertDesignInputs({
+    units,
+    temperature,
+    allowableStress: allowableStress ?? 0,
+    corrosionAllowance,
+    pressure,
+  });
 
   const designParams = {
     units,
     pressure: pressureDisplay,
     temperature: temperatureDisplay,
-    corrosionAllowance: caDisplay,
-    allowableStress: stressDisplay,
+    corrosionAllowance: corrosionAllowanceDisplay,
+    allowableStress: allowableStressDisplay,
     gamma,
     millTol,
     e,
@@ -201,7 +220,8 @@ export default function B31_3Calculator() {
         <PipeCard
           key={pipe.id}
           pipe={pipe}
-          thicknessByNpsSchedule={thicknessByNpsSchedule}
+          // thicknessByNpsSchedule={thicknessByNpsSchedule}
+          thicknessByNpsSchedule={"0"}
           updatePipe={updatePipe}
           removePipe={(id) => {
             setPipes((prev) => prev.filter((p) => p.id !== id));

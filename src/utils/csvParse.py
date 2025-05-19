@@ -1,150 +1,46 @@
-import math
-
-
-raw_imperial_data = """
-1/8	0.405		0.035	0.049	0.049			0.068	0.068	0.068		0.095	0.095	0.095							
-1/4	0.540		0.049	0.065	0.065			0.088	0.088	0.088		0.119	0.119	0.119							
-3/8	0.675		0.049	0.065	0.065			0.091	0.091	0.091		0.126	0.126	0.126							
-1/2	0.840	0.065	0.065	0.083	0.083			0.109	0.109	0.109		0.147	0.147	0.147				0.188	0.294		
-3/4	1.050	0.065	0.065	0.083	0.083			0.113	0.113	0.113		0.154	0.154	0.154				0.219	0.308		
-1	1.315	0.065	0.065	0.109	0.109			0.133	0.133	0.133		0.179	0.179	0.179				0.25	0.358		
-1-1/4	1.660	0.065	0.065	0.109	0.109			0.14	0.14	0.14		0.191	0.191	0.191				0.25	0.382		
-1-1/2	1.900	0.065	0.065	0.109	0.109			0.145	0.145	0.145		0.2	0.2	0.2				0.281	0.4		
-2	2.375	0.065	0.065	0.109	0.109			0.154	0.154	0.154		0.218	0.218	0.218				0.344	0.436		
-2-1/2	2.875	0.083	0.083	0.12	0.12			0.203	0.203	0.203		0.276	0.276	0.276				0.375	0.552		
-3	3.500	0.083	0.083	0.12	0.12			0.216	0.216	0.216		0.3	0.3	0.3				0.438	0.6		
-3-1/2	4.000	0.083	0.083	0.12	0.12			0.226	0.226	0.226		0.318	0.318	0.318					0.636		
-4	4.500	0.083	0.083	0.12	0.12			0.237	0.237	0.237	0.281	0.337	0.337	0.337		0.438		0.531	0.674		
-5	5.563	0.109	0.109	0.134	0.134			0.258	0.258	0.258		0.375	0.375	0.375		0.5		0.625	0.75		
-6	6.625	0.109	0.109	0.134	0.134			0.28	0.28	0.28		0.432	0.432	0.432		0.562		0.719	0.864		
-8	8.625	0.109	0.109	0.148	0.148	0.25	0.277	0.322	0.322	0.322	0.406	0.5	0.5	0.5	0.594	0.719	0.812	0.906	0.875		
-10	10.750	0.134	0.134	0.165	0.165	0.25	0.307	0.365	0.365	0.365	0.5	0.5	0.5	0.594	0.719	0.844	1	1.125	1		
-12	12.75	0.156	0.165	0.18	0.18	0.25	0.33	0.375	0.375	0.406	0.562	0.5	0.5	0.688	0.844	1	1.125	1.312			
-14	14.00	0.156		0.25	0.188	0.312	0.375	0.375	0.375	0.438	0.594	0.5	0.5	0.75	0.938	1.094	1.25	1.406			
-16	16.00	0.165		0.25	0.188	0.312	0.375	0.375	0.375	0.5	0.656	0.5	0.5	0.844	1.031	1.218	1.437	1.594			
-18	18.00	0.165		0.25	0.188	0.312	0.438	0.375	0.375	0.562	0.75	0.5	0.5	0.938	1.156	1.375	1.562	1.781			
-20	20.00	0.188		0.25	0.218	0.375	0.5	0.375	0.375	0.594	0.812	0.5	0.5	1.031	1.281	1.5	1.75	1.969			
-24	24.00	0.218		0.25	0.25	0.375	0.562	0.375	0.375	0.688	0.969	0.5	0.5	1.219	1.531	1.812	2.062	2.344			
-26	26.00				0.312	0.5		0.375	0.375			0.5	0.5								
-28	28.00				0.312	0.5	0.625	0.375	0.375												
-30	30.00	0.25		0.312	0.312	0.5	0.625	0.375	0.375			0.5	0.5								
-32	32.00				0.312	0.5	0.625	0.375	0.375	0.688		0.5	0.5								
-34	34.00				0.312	0.5	0.625	0.375	0.375	0.688											
-36	36.00				0.312		0.625	0.375	0.375	0.75		0.5	0.5								
-
-"""
-
-raw_metric_data = """
-OD mm	5s	5	10	10s	20	30	40S	STD	40	60	80S	XH	80	100	120	140	160	XXH
-10.29		0.889	1.245	1.245			1.727	1.727	1.727		2.413	2.413	2.413							
-13.72		1.245	1.651	1.651			2.235	2.235	2.235		3.023	3.023	3.023							
-17.15		1.245	1.651	1.651			2.311	2.311	2.311		3.201	3.201	3.201							
-21.34	1.651	1.651	2.108	2.108			2.774	2.774	2.774		3.734	3.734	3.734				4.775	7.468		
-26.67	1.651	1.651	2.108	2.108			2.870	2.870	2.870		3.912	3.912	3.912				5.563	7.823		
-33.40	1.651	1.651	2.769	2.769			3.378	3.378	3.378		4.547	4.547	4.547				6.350	9.093		
-42.16	1.651	1.651	2.769	2.769			3.556	3.556	3.556		4.851	4.851	4.851				6.350	9.703		
-48.26	1.651	1.651	2.769	2.769			3.683	3.683	3.683		5.080	5.080	5.080				7.137	10.160		
-60.33	1.651	1.651	2.769	2.769	6.350	3.912	5.537	5.537	5.537	6.350	6.350	6.350	6.350	8.712	8.712	8.712	11.074	11.074		
-73.03	2.108	2.108	3.048	3.048	6.350	5.156	7.010	7.010	7.010	7.620	7.620	7.620	7.620	9.525	9.525	9.525	14.021	14.021		
-88.90	2.108	2.108	3.048	3.048	6.350	5.486	7.620	7.620	7.620	7.620	7.620	7.620	7.620	11.125	11.125	11.125	15.240	15.240		
-101.60	2.108	2.108	3.048	3.048	6.350	5.740	8.077	8.077	8.077	8.077	8.077	8.077	8.077	16.154	16.154	16.154			
-114.30	2.108	2.108	3.048	3.048	6.350	6.020	8.560	8.560	8.560	8.560	8.560	8.560	8.560	16.660	16.660	16.660	19.050	19.050		
-141.30	2.769	2.769	3.404	3.404	6.350	6.550	9.530	9.530	9.530	9.530	9.530	9.530	9.530	15.090	15.090	15.090	22.230	22.230		
-168.28	2.769	2.769	3.404	3.404	6.350	7.110	10.970	10.970	10.970	10.970	10.970	10.970	10.970	18.260	18.260	18.260	25.400	25.400		
-219.08	2.769	2.769	3.759	3.759	6.350	8.180	12.700	12.700	12.700	12.700	12.700	12.700	12.700	23.010	23.010	23.010	28.580	28.580		
-273.05	3.404	3.404	4.191	4.191	6.350	9.270	15.090	15.090	15.090	15.090	15.090	15.090	15.090	28.580	28.580	28.580	31.750	31.750		
-323.85	3.962	4.191	4.572	4.572	6.350	9.530	15.090	15.090	15.090	15.090	15.090	15.090	15.090	34.930	34.930	34.930	37.490	37.490		
-355.60	3.962		6.350	4.775	7.920	9.530	15.090	15.090	15.090	15.090	15.090	15.090	15.090	38.100	38.100	38.100	39.670	39.670		
-406.40	4.191		6.350	4.775	7.920	9.530	15.090	15.090	15.090	15.090	15.090	15.090	15.090	40.890	40.890	40.890	41.910	41.910		
-457.20	4.191		6.350	4.775	7.920	11.130	15.090	15.090	15.090	15.090	15.090	15.090	15.090	45.240	45.240	45.240	47.630	47.630		
-508.00	4.775		6.350	5.537	9.530	12.700	15.090	15.090	15.090	15.090	15.090	15.090	15.090	50.800	50.800	50.800	55.560	55.560		
-610.00	5.537		6.350	6.350	9.530	14.270	15.090	15.090	15.090	15.090	15.090	15.090	15.090	59.530	59.530	59.530	59.530	59.530		
-660.00				7.920	12.700		15.090	15.090			15.090	15.090								
-711.00				7.920	12.700	15.880	15.090	15.090												
-762.00	6.350		7.920	7.920	12.700	15.880	15.090	15.090			15.090	15.090								
-813.00				7.920	12.700	15.880	15.090	15.090	17.480		15.090	15.090								
-864.00				7.920	12.700	15.880	15.090	15.090	17.480											
-914.00				7.920		15.880	15.090	15.090	19.050		15.090	15.090								
-"""
-
-
-
-def parse_imperial_schedule(raw_data, unit_label):
-    lines = [line.strip() for line in raw_data.strip().splitlines() if line.strip()]
-    max_fields = max(len(line.split('\t')) for line in lines)
-# We'll have first two fields: NPS, OD, rest are thickness values
-    schedule_names = [f"sch{i}" for i in range(1, max_fields - 2 + 1)]
-
-    columns = []
-    schedules = {name: [] for name in schedule_names}
-
-    for line in lines:
-        parts = line.split('\t')
-        nps = parts[0]
-        od = float(parts[1])
-        columns.append({"NPS": nps, "OD": od})
-
-        thickness_values = parts[2:]
-        # Pad thickness_values if shorter than schedule names
-        thickness_values += [''] * (len(schedule_names) - len(thickness_values))
-
-        for name, value in zip(schedule_names, thickness_values):
-            if value == '':
-                schedules[name].append(None)
-            else:
-                try:
-                    schedules[name].append(float(value))
-                except:
-                    schedules[name].append(None)
-
-    return {
-        "label": unit_label,
-        "columns": columns,
-        "schedules": schedules
-    }
-
-
-def parse_pipe_schedule(raw_data, unit_label):
-    lines = [line.strip() for line in raw_data.strip().splitlines() if line.strip()]
-    header = lines[0].split('\t')
-    schedule_names = header[1:]
-
-    columns = []
-    schedules = {name: [] for name in schedule_names}
-
-    for line in lines[1:]:
-        parts = line.split('\t')
-        od = float(parts[0])
-        
-        # Apply the special rounding rule
-        if od == 101.60:
-            nps = 102  # round up only for 101.60
-        else:
-            nps = int(od)  # round down (floor) for all others
-
-        columns.append({"NPS": nps, "OD": od})
-
-        thickness_values = parts[1:]
-        for name, value in zip(schedule_names, thickness_values):
-            if value == '':
-                schedules[name].append(None)
-            else:
-                schedules[name].append(float(value))
-
-    return {
-        "label": unit_label,
-        "columns": columns,
-        "schedules": schedules
-    }
-
-pipe_schedule_data = {
-    "Metric": parse_pipe_schedule(raw_metric_data, "OD in mm"),
-    "Imperial": parse_imperial_schedule(raw_imperial_data, "OD in inch (decimal)"),
-}
-
 import json
 
-with open("pipeData.json", "w") as json_file:
-    json.dump(pipe_schedule_data, json_file, indent=2)
+def transform_pipe_data(data):
+    transformed = {}
 
-print("pipeData.json has been created.")
+    for unit_system, unit_data in data.items():
+        columns = unit_data.get("columns", [])
+        schedules = unit_data.get("schedules", {})
+
+        # For each column entry (NPS + OD), create an entry keyed by NPS
+        nps_dict = {}
+
+        for i, entry in enumerate(columns):
+            nps = str(entry.get("NPS"))
+            od = entry.get("OD")
+
+            # Collect thickness for each schedule at index i
+            schedule_thicknesses = {}
+            for schedule_name, thicknesses in schedules.items():
+                if i < len(thicknesses):
+                    thickness = thicknesses[i]
+                    if thickness is not None:
+                        schedule_thicknesses[schedule_name] = thickness
+
+            nps_dict[nps] = {
+                "OD": od,
+                "schedules": schedule_thicknesses
+            }
+
+        transformed[unit_system] = nps_dict
+
+    return transformed
+
+if __name__ == "__main__":
+    file_path = "pipeData.json"
+
+    with open(file_path, "r") as f:
+        data = json.load(f)
+
+    transformed_data = transform_pipe_data(data)
+
+    # Write to JSON
+    with open("transformed_pipeData.json", "w") as f:
+        json.dump(transformed_data, f, indent=2)
+
+    print("Transformation complete, saved to transformed_pipeData.json")
