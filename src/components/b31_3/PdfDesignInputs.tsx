@@ -1,6 +1,6 @@
 import React from "react";
-import { DesignParameters, Units } from "@/types/units";
-import { unitLabels } from "@/utils/unitConversions";
+import { DesignParameters } from "@/types/units";
+import { unitConversions } from "@/utils/unitConversions";
 
 type PdfDesignInputsProps = {
   drawingNumber: string;
@@ -44,8 +44,6 @@ const PdfDesignInputs: React.FC<PdfDesignInputsProps> = ({
   designParams,
 }) => {
     const { units, pressure, temperature, corrosionAllowance, allowableStress, gamma } = designParams;
- 
-  const unit = unitLabels[units];
 
   return (
     <div style={{ marginBottom: 16 }}>
@@ -84,22 +82,22 @@ const PdfDesignInputs: React.FC<PdfDesignInputsProps> = ({
           <tr>
             <td style={labelStyle}>Design Pressure:</td>
             <td style={valueStyle}>{pressure}</td>
-            <td style={unitStyle}>{unit.pressure}</td>
+            <td style={unitStyle}>{unitConversions.pressure[designParams.units].unit}</td>
           </tr>
           <tr>
             <td style={labelStyle}>Design Temperature:</td>
             <td style={valueStyle}>{temperature}</td>
-            <td style={unitStyle}>{unit.temperature}</td>
+            <td style={unitStyle}>{unitConversions.temperature[designParams.units].unit}</td>
           </tr>
           <tr>
             <td style={labelStyle}>Corrosion Allowance:</td>
             <td style={valueStyle}>{corrosionAllowance}</td>
-            <td style={unitStyle}>{unit.length}</td>
+            <td style={unitStyle}>{unitConversions.length[designParams.units].unit}</td>
           </tr>
           <tr>
             <td style={labelStyle}>Maximum Allowable Stress:</td>
             <td style={valueStyle}>{allowableStress}</td>
-            <td style={unitStyle}>{unit.pressure}</td>
+            <td style={unitStyle}>{unitConversions.pressure[designParams.units].unit}</td>
           </tr>
           <tr>
             <td style={labelStyle}>Temperature Coefficient, γ:</td>

@@ -1,9 +1,9 @@
 "use client";
 
-import { Box, Card, CardContent, TextField, Typography } from "@mui/material";
+import { Box, Card, CardContent, Typography } from "@mui/material";
 import LabeledInput from "../common/LabeledInput";
 import { Units } from "@/types/units";
-import { unitLabels } from "@/utils/unitConversions";
+import { unitConversions } from "@/utils/unitConversions";
 
 type CalculatedValueCardProps = {
   Pt: number;
@@ -20,11 +20,11 @@ export default function CalculatedValueCard({
   S,
   units,
 }: CalculatedValueCardProps) {
-  const pressureUnit = unitLabels[units].pressure;
+  const pressureUnit = unitConversions.pressure[units].unit;
   const temperatureUnit =
     units === Units.Imperial
-      ? `100 ${unitLabels[units].temperature}`
-      : `38 ${unitLabels[units].temperature}`;
+      ? `100 ${unitConversions.temperature[units].unit}`
+      : `38 ${unitConversions.temperature[units].unit}`;
   return (
     <Card sx={{ height: "100%" }}>
       <CardContent>

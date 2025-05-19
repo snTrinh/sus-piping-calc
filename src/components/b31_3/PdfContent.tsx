@@ -32,15 +32,6 @@ const PdfContent = forwardRef<HTMLDivElement, PdfContentProps>(
     },
     ref
   ) => {
-    const {
-      units,
-      pressure,
-      corrosionAllowance,
-      allowableStress,
-      e,
-      w,
-      gamma,
-    } = designParams;
     const labelStyle: React.CSSProperties = {
       fontWeight: "bold",
       marginRight: 5,

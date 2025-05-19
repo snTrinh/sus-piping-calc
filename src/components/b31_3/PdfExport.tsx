@@ -6,7 +6,6 @@ import { DesignParameters, Units } from "@/types/units";
 import PdfContent from "./PdfContent";
 
 type PdfExportProps = {
-  units: Units;
   material: string;
   designParams: DesignParameters;
   pipes: {
@@ -20,14 +19,11 @@ type PdfExportProps = {
 };
 
 export default function PdfExport({
-
   material,
-
   pipes,
   designParams,
 }: PdfExportProps) {
-  const { units, pressure, corrosionAllowance, allowableStress, e, w, gamma } =
-    designParams;
+
   const printRef = useRef<HTMLDivElement>(null);
 
   const [drawingNumber, setDrawingNumber] = useState("");
@@ -106,7 +102,6 @@ export default function PdfExport({
         calculationRevision={calculationRevision}
         date={date}
         designParams={designParams}
-       
         material={material}
         pipes={pipes}
        

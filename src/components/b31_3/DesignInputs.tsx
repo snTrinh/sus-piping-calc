@@ -2,25 +2,13 @@
 import React from "react";
 import { MenuItem, TextField, Box } from "@mui/material";
 import LabeledInput from "../common/LabeledInput";
-import UnitsToggle from "../common/UnitsToggle";
-import { Units } from "@/types/units";
+import { DesignParameters, Units } from "@/types/units";
+import { unitConversions } from "@/utils/unitConversions";
 
 type DesignInputsProps = {
-  units: Units;
   materials: string[];
   material: string;
-  temperatureDisplay: number;
-  stressDisplay: number;
-  caDisplay: number;
-  pressureDisplay: number;
-  pressureUnit: string;
-  caUnit: string;
-  stressUnit: string;
-  tempUnit: string;
-  e: number;
-  w: number;
-  gamma: number;
-  millTol: number;
+  designParams: DesignParameters;
 
   onUnitsChange: (
     event: React.MouseEvent<HTMLElement>,
@@ -33,27 +21,25 @@ type DesignInputsProps = {
 };
 
 export default function DesignInputs({
-  units,
   materials,
   material,
-  temperatureDisplay,
-  stressDisplay,
-  caDisplay,
-  pressureDisplay,
-  pressureUnit,
-  caUnit,
-  stressUnit,
-  tempUnit,
-  e,
-  w,
-  gamma,
-  millTol,
+  designParams,
   onUnitsChange,
   onMaterialChange,
   onTemperatureChange,
   onCAChange,
   onDesignPressureChange,
 }: DesignInputsProps) {
+  const {
+    pressure,
+    temperature,
+    corrosionAllowance,
+    allowableStress,
+    e,
+    w,
+    gamma,
+    millTol,
+  } = designParams;
   return (
     <>
       <Box
@@ -83,32 +69,32 @@ export default function DesignInputs({
         <LabeledInput
           label="Design Pressure"
           symbol="P"
-          unit={pressureUnit}
-          value={pressureDisplay}
+          unit={unitConversions.pressure[designParams.units].unit}
+          value={pressure}
           onChange={onDesignPressureChange}
         />
 
         <LabeledInput
           label="Temperature"
           symbol="T"
-          unit={tempUnit}
-          value={temperatureDisplay}
+          unit={unitConversions.temperature[designParams.units].unit}
+          value={temperature}
           onChange={onTemperatureChange}
         />
 
         <LabeledInput
           label="Corrosion Allowance"
           symbol="CA"
-          unit={caUnit}
-          value={caDisplay}
+          unit={unitConversions.length[designParams.units].unit}
+          value={corrosionAllowance}
           onChange={onCAChange}
         />
 
         <LabeledInput
           label="Allowable Stress"
           symbol="S"
-          unit={stressUnit}
-          value={stressDisplay}
+          unit={unitConversions.pressure[designParams.units].unit}
+          value={allowableStress}
           onChange={() => {}}
           disabled
         />

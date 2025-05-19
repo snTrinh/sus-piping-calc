@@ -1,8 +1,8 @@
 // components/PdfPipeOutputs.tsx
 
 import React from "react";
-import { DesignParameters, Units } from "@/types/units";
-import { unitConversions, unitLabels } from "@/utils/unitConversions";
+import { DesignParameters } from "@/types/units";
+import { unitConversions } from "@/utils/unitConversions";
 
 type Pipe = {
   id: string;
@@ -17,7 +17,6 @@ type PdfPipeOutputsProps = {
   designParams: DesignParameters;
 
   material: string;
-  
 };
 
 const labelStyle: React.CSSProperties = {
@@ -54,11 +53,11 @@ const denominatorStyle: React.CSSProperties = {
 
 const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
   pipes,
-  material,designParams,
+  material,
+  designParams,
 }) => {
-    const { units, pressure, corrosionAllowance, allowableStress, e, w, gamma } =
-        designParams;
-  const unit = unitLabels[units];
+  const { units, pressure, corrosionAllowance, allowableStress, e, w, gamma } =
+    designParams;
   return (
     <>
       {pipes.map((pipe, index) => (
@@ -72,62 +71,58 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
         >
           <div style={valueStyle}>
             <strong>Pipe {index + 1}</strong> — For {pipe.nps}
-            {unitLabels[units].length} SCH {pipe.schedule} {material} (t = {pipe.t.toFixed(2)}):
-          </div>
-          <div style={valueStyle}>
-            <span style={labelStyle}>Required Thickness (tᵣ):</span>{" "}
-            {pipe.tRequired.toFixed(2)} {unitConversions.thickness[units].unit}
+            {unitConversions.length[designParams.units].unit} SCH {pipe.schedule} {material} (t ={" "}
+            {pipe.t.toFixed(2)}):
           </div>
 
-          {/* Formula */}
-          <div style={{ marginTop: 8 }}>
+          {/* Indented formula */}
+          <div style={{ marginTop: 8, marginLeft: 24 }}>
             <div>
               <span>tᵣ = (</span>
-
               <span style={fractionStyle}>
                 <span style={numeratorStyle}>P × D</span>
                 <span style={denominatorStyle}>2(SEW + Pγ)</span>
               </span>
               <span>+ CA ) × </span>
-
               <span style={fractionStyle}>
                 <span style={numeratorStyle}>1</span>
                 <span style={denominatorStyle}>(1 - Mill Tolerance)</span>
               </span>
             </div>
-          </div>
-
-          {/* Formula */}
-          <div style={{ marginTop: 8 }}>
             <div>
               <span>tᵣ = (</span>
-
               <span style={fractionStyle}>
-                <span style={numeratorStyle}>{pressure}{unitLabels[units].pressure} × D</span>
-                <span style={denominatorStyle}>2(({allowableStress}{unitLabels[units].pressure})({e})({w}) + ({pressure}{unitLabels[units].pressure})({gamma}))</span>
+                <span style={numeratorStyle}>
+                  {pressure}
+                  {unitConversions.pressure[designParams.units].unit} × D
+                </span>
+                <span style={denominatorStyle}>
+                  2(({allowableStress}
+                  {unitConversions.pressure[designParams.units].unit})({e})({w}) + ({pressure}
+                  {unitConversions.pressure[designParams.units].unit})({gamma}))
+                </span>
               </span>
-
-              <span>+ {corrosionAllowance} {unitLabels[units].length}) × </span>
-
+              <span>
+                + {corrosionAllowance} {unitConversions.length[designParams.units].unit}) ×{" "}
+              </span>
               <span style={fractionStyle}>
                 <span style={numeratorStyle}>1</span>
-                <span style={denominatorStyle}>(1 - Mill Tolerance)</span>
+                <span style={denominatorStyle}>(1 - {designParams.millTol})</span>
               </span>
             </div>
           </div>
 
-          <div style={{ marginTop: 8 }}>
+          <div style={{ marginTop: 8, marginLeft: 24 }}>
             <div>
-              <span>tᵣ = {pipe.tRequired.toFixed(2)} {unitConversions.thickness[units].unit}</span>
-
-             
+              <span>
+                tᵣ = {pipe.tRequired.toFixed(2)}{" "}
+                {unitConversions.length[designParams.units].unit}
+              </span>
             </div>
           </div>
           <div style={{ marginTop: 8 }}>
             <div>
-              <span>tᵣ &lt; t ∴ </span>
-
-             
+              <span>t {'>'} tᵣ ∴ </span>
             </div>
           </div>
         </div>

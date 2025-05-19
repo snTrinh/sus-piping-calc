@@ -6,7 +6,7 @@ type LabeledInputProps = {
   label: string;
   symbol?: string;
   unit?: string;
-  value: number;
+  value?: number;
   onChange: (value: number) => void;
   disabled?: boolean;
   step?: number;
@@ -31,8 +31,8 @@ export default function LabeledInput({
   fullWidth = false,
   percentage = false,
 }: LabeledInputProps) {
-  const formatValue = (val: number) =>
-    percentage ? `${(val * 100).toFixed(2)}%` : val.toString();
+  const formatValue = (val: number | undefined) =>
+      percentage ? `${((val ?? 0) * 100).toFixed(2)}%` : (val ?? 0).toString();
 
   const [inputValue, setInputValue] = useState(formatValue(value));
 
@@ -45,7 +45,7 @@ export default function LabeledInput({
     if (!isNaN(numeric)) {
       onChange(percentage ? numeric / 100 : numeric);
     } else {
-      setInputValue(formatValue(value)); // revert to previous valid value
+      setInputValue(formatValue(value ?? 0)); // revert to previous valid value
     }
   };
 

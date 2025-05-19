@@ -10,11 +10,9 @@ import {
 } from "@mui/material";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import { Units } from "@/types/units";
-import {
-  npsToMmMap,
-  unitConversions,
-} from "@/utils/unitConversions";
+import { npsToMmMap, unitConversions } from "@/utils/unitConversions";
 import pipeData from "@/utils/pipeData.json";
+import pipeDimensions from "@/utils/transformed_pipeData.json";
 type Pipe = {
   id: string;
   nps: string;
@@ -40,13 +38,16 @@ export default function PipeCard({
   removePipe,
   units,
 }: PipeCardProps) {
-  const rawThickness = thicknessByNpsSchedule[pipe.nps]?.[pipe.schedule] ?? 0;
-  const thicknessConversion = unitConversions.thickness[units];
+  // const rawThickness = thicknessByNpsSchedule[pipe.nps]?.[pipe.schedule] ?? 0;
+
+  const rawThickness =
+    pipeDimensions[units][pipe.nps]?.schedules[pipe.schedule];
+
+  const thicknessConversion = unitConversions.length[units];
   const displayedThickness = thicknessConversion.to(rawThickness);
   const unitLabel = thicknessConversion.unit;
   const outerDiameter =
     pipeData[units]?.columns?.find((col) => col.NPS === pipe.nps)?.OD || 0;
-
 
   return (
     <Card
@@ -108,7 +109,7 @@ export default function PipeCard({
           />
           <TextField
             label={`Provided Thickness, t (${unitLabel})`}
-            value={displayedThickness.toFixed(2)}
+            value={displayedThickness.toFixed(3)}
             size="small"
             disabled
             sx={{ minWidth: 120 }}
@@ -122,8 +123,6 @@ export default function PipeCard({
             sx={{ minWidth: 120 }}
           />
         </Box>
-
-
 
         <Typography sx={{ mb: 2 }}>
           <strong>Result:</strong>{" "}

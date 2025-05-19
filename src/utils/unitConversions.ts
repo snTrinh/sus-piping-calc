@@ -1,18 +1,5 @@
 import { Units } from "@/types/units";
 
-export const unitLabels = {
-    [Units.Metric]: {
-      pressure: "kPa",
-      temperature: "°C",
-      length: "mm",
-
-    },
-    [Units.Imperial]: {
-      pressure: "psi",
-      temperature: "°F",
-      length: "in",
-    },
-  };
 
   export type PipeSchedule =
   | "5s" | "5" | "10" | "10s" | "20" | "30" | "40S" | "STD" | "40"
@@ -65,7 +52,7 @@ export const unitConversions = {
       unit: "kPa",
     },
   },
-  thickness: {
+  length: {
     [Units.Imperial]: {
       to: (value: number) => value, // inch to inch
       from: (value: number) => value,
@@ -134,15 +121,15 @@ export function convertDesignInputs({
       unitConversions.pressure[units].to(stress).toFixed(2)
     ),
     caDisplay: Number(
-      unitConversions.thickness[units].to(ca).toFixed(2)
+      unitConversions.length[units].to(ca).toFixed(2)
     ),
     pressureDisplay: Number(
       unitConversions.pressure[units].to(designPressure).toFixed(2)
     ),
     pressureUnit: unitConversions.pressure[units].unit,
-    caUnit: unitConversions.thickness[units].unit,
+    caUnit: unitConversions.length[units].unit,
     stressUnit: unitConversions.pressure[units].unit,
     tempUnit: unitConversions.temperature[units].unit,
-    diameterUnit: unitConversions.thickness[units].unit,
+    diameterUnit: unitConversions.length[units].unit,
   };
 }

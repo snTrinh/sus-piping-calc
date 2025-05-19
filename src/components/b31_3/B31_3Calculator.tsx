@@ -126,22 +126,14 @@ export default function B31_3Calculator() {
   const materials = [...new Set(stressData.map((d) => d.material))];
 
   // Use convertDesignInputs only for label display, not for actual values
-  const {
-    temperatureDisplay,
-    stressDisplay,
-    caDisplay,
-    pressureDisplay,
-    pressureUnit,
-    caUnit,
-    stressUnit,
-    tempUnit,
-  } = convertDesignInputs({
-    units,
-    temperature,
-    stress: stress ?? 0,
-    ca,
-    designPressure,
-  });
+  const { temperatureDisplay, stressDisplay, caDisplay, pressureDisplay } =
+    convertDesignInputs({
+      units,
+      temperature,
+      stress: stress ?? 0,
+      ca,
+      designPressure,
+    });
 
   const designParams = {
     units,
@@ -150,6 +142,9 @@ export default function B31_3Calculator() {
     corrosionAllowance: caDisplay,
     allowableStress: stressDisplay,
     gamma,
+    millTol,
+    e,
+    w,
   };
 
   return (
@@ -170,21 +165,9 @@ export default function B31_3Calculator() {
         }}
       >
         <DesignInputs
-          units={units}
+          designParams={designParams}
           materials={materials}
           material={material}
-          temperatureDisplay={temperatureDisplay}
-          stressDisplay={stressDisplay}
-          caDisplay={caDisplay}
-          pressureDisplay={pressureDisplay}
-          pressureUnit={pressureUnit}
-          caUnit={caUnit}
-          stressUnit={stressUnit}
-          tempUnit={tempUnit}
-          e={e}
-          w={w}
-          gamma={gamma}
-          millTol={millTol}
           onUnitsChange={handleUnitsChange}
           onMaterialChange={setMaterial}
           onTemperatureChange={handleTemperatureChange}
@@ -192,29 +175,7 @@ export default function B31_3Calculator() {
           onDesignPressureChange={handleDesignPressureChange}
         />
       </Box>
-      <FormulaDisplay
-        designPressure={pressureDisplay}
-        stress={stressDisplay}
-        e={e}
-        w={w}
-        gamma={gamma}
-        ca={caDisplay}
-        millTolerance={millTol}
-        diameter={Number(pipes[0]?.nps ?? 0)}
-        units={units}
-      />
-      <FormulaDisplay
-        showValues
-        designPressure={pressureDisplay}
-        stress={stressDisplay}
-        e={e}
-        w={w}
-        gamma={gamma}
-        ca={caDisplay}
-        millTolerance={millTol}
-        diameter={Number(pipes[0]?.nps ?? 0)}
-        units={units}
-      />
+      <FormulaDisplay />
 
       <Button
         startIcon={<AddCircleOutlineIcon />}
@@ -250,7 +211,6 @@ export default function B31_3Calculator() {
       ))}
 
       <PdfExport
-        units={units}
         material={material}
         designParams={designParams}
         pipes={pipesForDisplay}

@@ -13,4 +13,5 @@ export type DesignParameters = {
   e?: number;
   w?: number;
   gamma?: number;
+  millTol?: number;
 };
