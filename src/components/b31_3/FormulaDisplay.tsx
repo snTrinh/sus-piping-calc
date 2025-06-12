@@ -2,28 +2,49 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 
 export default function FormulaDisplay() {
-
-
   return (
-    <Box sx={{ backgroundColor: "#f9f9f9", p: 2, borderRadius: 1, mb: 3 }}>
+    <Box
+      sx={{
+        backgroundColor: "#f9f9f9",
+        p: 2,
+        borderRadius: 1,
+        mb: 3,
+        overflowX: "auto",
+      }}
+    >
+      {/* Label */}
       <Typography
         variant="body2"
         color="text.secondary"
-        sx={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}
+        sx={{ fontWeight: "bold", mb: 1 }}
       >
-        <strong>Required Thickness (ASME B31.3):</strong>{" "}
-        <Typography variant="body2" component="span" sx={{ ml: 1 }}>
+        Required Thickness (ASME B31.3):
+      </Typography>
+
+      {/* Formula */}
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          gap: 0.5,
+          fontSize: { xs: "0.8rem", sm: "0.875rem" },
+        }}
+      >
+        <Typography variant="body2" component="span" sx={{ whiteSpace: "nowrap" }}>
           tᵣ = (
         </Typography>
+
         {/* Main Fraction */}
         <Box
           sx={{
             display: "inline-flex",
             flexDirection: "column",
             alignItems: "center",
-            fontSize: "0.875rem",
+            fontSize: { xs: "0.75rem", sm: "0.875rem" },
             lineHeight: 1,
-            ml: 1,
           }}
         >
           {/* Numerator */}
@@ -32,52 +53,61 @@ export default function FormulaDisplay() {
               borderBottom: "1px solid #000",
               px: 0.5,
               textAlign: "center",
+              whiteSpace: "nowrap",
             }}
           >
-            {"(P × D)"}
+            (P × D)
           </Box>
 
           {/* Denominator */}
           <Box
             sx={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
               px: 0.5,
               mt: 0.2,
+              whiteSpace: "nowrap",
+              textAlign: "center",
             }}
           >
-            <Box sx={{ textAlign: "center" }}>
-              {"[2(SEW + Pγ)]"}
-            </Box>
+            [2(SEW + Pγ)]
           </Box>
         </Box>
+
         {/* CA */}
-        <Typography
-          variant="body2"
-          component="span"
-          sx={{ ml: 0.5, whiteSpace: "nowrap" }}
-        >
-          { "+ CA ) x"}
+        <Typography variant="body2" component="span" sx={{ whiteSpace: "nowrap" }}>
+          + CA )
         </Typography>
 
-        {/* Mill tolerance as fraction */}
-        <Typography variant="body2" component="span" sx={{ ml: 1, display: "inline-flex", flexDirection: "column", alignItems: "center", fontSize: "0.875rem", lineHeight: 1 }}>
-          
+        {/* Multiplier "x" */}
+        <Typography variant="body2" component="span" sx={{ whiteSpace: "nowrap" }}>
+          ×
+        </Typography>
+
+        {/* Mill tolerance fraction */}
+        <Box
+          sx={{
+            display: "inline-flex",
+            flexDirection: "column",
+            alignItems: "center",
+            fontSize: { xs: "0.75rem", sm: "0.875rem" },
+            lineHeight: 1,
+            whiteSpace: "nowrap",
+            ml: 1,
+          }}
+        >
           <Box
             sx={{
               borderBottom: "1px solid #000",
               px: 0.5,
-              textAlign: "center",
               mt: 0.3,
+              textAlign: "center",
             }}
           >
             1
           </Box>
           <Box sx={{ px: 0.5, mt: 0.2, textAlign: "center" }}>
-            {"(1 - Mill Tolerance)"}
+            (1 - Mill Tolerance)
           </Box>
-        </Typography>
+        </Box>
       </Typography>
     </Box>
   );

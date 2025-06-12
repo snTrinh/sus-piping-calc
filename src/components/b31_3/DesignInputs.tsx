@@ -42,12 +42,13 @@ export default function DesignInputs({
   } = designParams;
   return (
     <>
+      {/* Editable Inputs */}
       <Box
         sx={{
           display: "flex",
           flexWrap: "wrap",
           gap: 2,
-          mb: 4,
+          mb: 2,
           justifyContent: "flex-start",
         }}
       >
@@ -56,7 +57,7 @@ export default function DesignInputs({
           label="Material"
           value={material}
           onChange={(e) => onMaterialChange(e.target.value)}
-          sx={{ minWidth: 200 }}
+          sx={{ minWidth: 200, flexGrow: 1, flexBasis: "200px" }}
           size="small"
         >
           {materials.map((mat) => (
@@ -72,6 +73,7 @@ export default function DesignInputs({
           unit={unitConversions.pressure[designParams.units].unit}
           value={pressure}
           onChange={onDesignPressureChange}
+          sx={{ minWidth: 140, flexGrow: 1, flexBasis: "140px" }}
         />
 
         <LabeledInput
@@ -80,6 +82,7 @@ export default function DesignInputs({
           unit={unitConversions.temperature[designParams.units].unit}
           value={temperature}
           onChange={onTemperatureChange}
+          sx={{ minWidth: 140, flexGrow: 1, flexBasis: "140px" }}
         />
 
         <LabeledInput
@@ -88,8 +91,19 @@ export default function DesignInputs({
           unit={unitConversions.length[designParams.units].unit}
           value={corrosionAllowance}
           onChange={onCAChange}
+          sx={{ minWidth: 140, flexGrow: 1, flexBasis: "140px" }}
         />
+      </Box>
 
+      {/* Disabled Inputs */}
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 2,
+          justifyContent: "flex-start",
+        }}
+      >
         <LabeledInput
           label="Allowable Stress"
           symbol="S"
@@ -97,6 +111,7 @@ export default function DesignInputs({
           value={allowableStress}
           onChange={() => {}}
           disabled
+          sx={{ minWidth: 140, flexGrow: 1, flexBasis: "140px" }}
         />
 
         <LabeledInput
@@ -106,6 +121,7 @@ export default function DesignInputs({
           value={e}
           onChange={() => {}}
           disabled
+          sx={{ minWidth: 140, flexGrow: 1, flexBasis: "140px" }}
         />
 
         <LabeledInput
@@ -115,6 +131,7 @@ export default function DesignInputs({
           value={w}
           onChange={() => {}}
           disabled
+          sx={{ minWidth: 140, flexGrow: 1, flexBasis: "140px" }}
         />
 
         <LabeledInput
@@ -124,6 +141,7 @@ export default function DesignInputs({
           value={gamma}
           onChange={() => {}}
           disabled
+          sx={{ minWidth: 140, flexGrow: 1, flexBasis: "140px" }}
         />
 
         <LabeledInput
@@ -134,6 +152,7 @@ export default function DesignInputs({
           onChange={() => {}}
           disabled
           percentage
+          sx={{ minWidth: 140, flexGrow: 1, flexBasis: "140px" }}
         />
       </Box>
     </>

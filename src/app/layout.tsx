@@ -41,23 +41,6 @@ export default function RootLayout({
               minHeight: "100vh",
             }}
           >
-            {/* Top Header */}
-            <Box
-              component="header"
-              sx={{
-                height: 56,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "flex-end",
-                px: 2,
-                borderBottom: "1px solid #e0e0e0",
-                backgroundColor: "#fff",
-              }}
-            >
-              <IconButton edge="end" color="default" aria-label="settings">
-                <SettingsIcon />
-              </IconButton>
-            </Box>
 
             {/* Page Content */}
             <Box component="main" sx={{ flexGrow: 1, padding: 2 }}>

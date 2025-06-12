@@ -37,18 +37,23 @@ export default function HydroTestPage() {
         backgroundColor: "white",
         p: 4,
         maxWidth: 1200,
+        // mx: "auto", // optional: centers the whole container
       }}
     >
       <Typography variant="h4" fontWeight="bold" align="left" gutterBottom>
         Hydro Test Pressure
       </Typography>
+
       <UnitsToggle units={units} onChange={handleUnitsChange} />
+
+      {/* Two-column layout */}
       <Box
         sx={{
           display: "flex",
           flexDirection: { xs: "column", md: "row" },
           gap: 4,
           alignItems: "stretch",
+          mb: 4, // space before PDF export
         }}
       >
         <Box sx={{ flex: 1, minWidth: 450, height: 300 }}>
@@ -73,6 +78,9 @@ export default function HydroTestPage() {
           />
         </Box>
       </Box>
+
+      {/* Full-width row for PDF Export */}
+      <Box sx={{ width: "100%" }}>{/* <PdfExport /> */}</Box>
     </Box>
   );
 }

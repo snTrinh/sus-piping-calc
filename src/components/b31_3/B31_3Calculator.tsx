@@ -1,58 +1,43 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import {
+  Box,
+  Button,
+  Typography,
+  Container,
+  Card,
+  Tabs,
+  Tab,
+} from "@mui/material";
 
-import { Box, Button, Typography, Container } from "@mui/material";
 import { materialStressLookup } from "./../../utils/materialStressLookup";
 import stressData from "@/data/stressValues.json";
-import thicknessByNpsSchedule from "@/data/thicknessByNpsSchedule.json";
-import pipeData from "@/utils/pipeData.json";
 import PipeCard from "./PipeCard";
-import PdfExport from "./PdfExport";
 import UnitsToggle from "./../common/UnitsToggle";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import { getPipeDimensions } from "@/utils/pipeDimensions";
 import { Units } from "@/types/units";
-import { convertDesignInputs, PipeSchedule } from "@/utils/unitConversions";
+import {
+  convertDesignInputs,
+  npsToMmMap,
+  PipeSchedule,
+} from "@/utils/unitConversions";
 import FormulaDisplay from "./FormulaDisplay";
 import DesignInputs from "./DesignInputs";
-import { get } from "http";
+import pipeData from "@/utils/pipeData.json";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import PdfExport from "./pdfExport/PdfExport";
 
 type Pipe = {
   id: string;
   nps: string;
+  od: string;
   schedule: PipeSchedule;
   tRequired: number;
   t: number;
 };
-type ThicknessData = {
-  [key in PipeSchedule]: (number | null)[];
-};
-
-type PipeDataByUnit = {
-  [unit in Units]: {
-    label: string;
-    columns: { od: number; [key: string]: any }[];
-    schedules: ThicknessData;
-  };
-};
-
-interface PipeEntry {
-  NPS: number;
-  OD: number;
-}
-
-interface MetricScheduleData {
-  Metric: {
-    label: string;
-    columns: PipeEntry[];
-    schedules: Record<string, (number | null)[]>;
-  };
-}
 
 export default function B31_3Calculator() {
   const [units, setUnits] = useState<Units>(Units.Imperial);
-
   const [material, setMaterial] = useState("A333-6");
   const [temperature, setTemperature] = useState(100); // °F internally
   const [allowableStress, setAllowableStress] = useState(
@@ -60,22 +45,25 @@ export default function B31_3Calculator() {
   ); // psi internally
   const [corrosionAllowance, setCorrosionAllowance] = useState(0); // inches
 
-  // New variables for the formula
-  const [e, setE] = useState(1); // Weld joint efficiency
-  const [w, setW] = useState(1); // Weld strength reduction factor
-  const [gamma, setGamma] = useState(0.4); // Gamma coefficient
-  const [millTol, setMillTol] = useState(0.125); // Gamma coefficient
+  const [e, setE] = useState(1);
+  const [w, setW] = useState(1);
+  const [gamma, setGamma] = useState(0.4);
+  const [millTol, setMillTol] = useState(0.125);
   const [pressure, setPressure] = useState(1414); // psi
 
   const [pipes, setPipes] = useState<Pipe[]>([
     {
       id: uuidv4(),
       nps: "4",
+      od: "4.5",
       schedule: "40",
       tRequired: 0,
       t: 0,
     },
   ]);
+
+  // Active tab index state
+  const [tabIndex, setTabIndex] = useState(0);
 
   // Update stress based on material and temperature
   useEffect(() => {
@@ -85,28 +73,29 @@ export default function B31_3Calculator() {
     if (match) setAllowableStress(match.stress);
   }, [material, temperature]);
 
-  // Calculate thickness with new formula
+  // Recalculate thickness
   useEffect(() => {
     setPipes((prev) =>
       prev.map((pipe) => {
-        const diameterInches = Number(pipe.nps);
-        const numerator = pressure * diameterInches;
+        const targetNps =
+          units === Units.Metric ? npsToMmMap[pipe.nps] : pipe.nps;
+        const outerDiameter =
+          pipeData[units]?.columns?.find((col) => col.NPS === targetNps)?.OD ||
+          0;
+        const numerator = pressure * outerDiameter;
         const denominator =
           2 * ((allowableStress ?? 0) * e * w + pressure * gamma);
         const tRequired =
-          denominator !== 0 ? numerator / denominator + corrosionAllowance : 0;
-
-        const columns = pipeData[units].columns;
-        const rowIndex = columns.findIndex(
-          (col: any) => Number(col.od) === Number(pipe.nps)
-        );
+          denominator !== 0
+            ? (numerator / denominator + corrosionAllowance) *
+              (1 / (1 - millTol))
+            : 0;
 
         return { ...pipe, tRequired };
       })
     );
-  }, [pressure, allowableStress, e, w, gamma, corrosionAllowance]);
+  }, [pressure, allowableStress, e, w, gamma, corrosionAllowance, units]);
 
-  // Units toggle - only update label state, no conversion of values
   const handleUnitsChange = (
     event: React.MouseEvent<HTMLElement>,
     newUnits: Units
@@ -115,7 +104,6 @@ export default function B31_3Calculator() {
     setUnits(newUnits);
   };
 
-  // Handlers - just set value as entered, no conversions
   const handleTemperatureChange = (value: number) => {
     setTemperature(value);
   };
@@ -134,13 +122,10 @@ export default function B31_3Calculator() {
     );
   };
 
-  // No conversion on tRequired for display — show internal value as is
   const pipesForDisplay = pipes.map((pipe) => ({ ...pipe }));
 
-  // Material list for select options
   const materials = [...new Set(stressData.map((d) => d.material))];
 
-  // Use convertDesignInputs only for label display, not for actual values
   const {
     temperatureDisplay,
     allowableStressDisplay,
@@ -174,67 +159,157 @@ export default function B31_3Calculator() {
 
       <UnitsToggle units={units} onChange={handleUnitsChange} />
 
-      <Box
-        sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 2,
-          mb: 4,
-          justifyContent: "flex-start",
-        }}
+      {/* Tabs */}
+      <Tabs
+        value={tabIndex}
+        onChange={(_, newValue) => setTabIndex(newValue)}
+        textColor="primary"
+        indicatorColor="primary"
+        variant="scrollable"
+        scrollButtons="auto"
+        sx={{ mt: 2 }}
       >
-        <DesignInputs
-          designParams={designParams}
-          materials={materials}
-          material={material}
-          onUnitsChange={handleUnitsChange}
-          onMaterialChange={setMaterial}
-          onTemperatureChange={handleTemperatureChange}
-          onCAChange={handleCAChange}
-          onDesignPressureChange={handleDesignPressureChange}
-        />
-      </Box>
-      <FormulaDisplay />
+        <Tab label="Single Pressure" />
+        <Tab label="Multiple Pressures" />
+      </Tabs>
 
-      <Button
-        startIcon={<AddCircleOutlineIcon />}
-        variant="outlined"
-        onClick={() => {
-          setPipes((prev) => [
-            ...prev,
-            {
-              id: uuidv4(),
-              nps: "2",
-              schedule: "40",
-              tRequired: 0,
-              t: 0,
-            },
-          ]);
-        }}
-        sx={{ mb: 4 }}
-      >
-        Add Pipe
-      </Button>
+      {/* Tab Panels */}
+      {tabIndex === 0 && (
+        <>
+          {/* Two Columns: Inputs on left, Formula on right */}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: { xs: "column", md: "row" },
+              gap: 4,
+              alignItems: "stretch",
+              mt: 4,
+            }}
+          >
+            {/* Left Column: Inputs */}
+            <Card
+              sx={{
+                flex: 1,
+                minWidth: 450,
+                display: "flex",
+                flexDirection: "column",
+                p: 2,
+                gap: 2,
+                height: "100%",
+              }}
+            >
+              <DesignInputs
+                designParams={designParams}
+                materials={materials}
+                material={material}
+                onUnitsChange={handleUnitsChange}
+                onMaterialChange={setMaterial}
+                onTemperatureChange={handleTemperatureChange}
+                onCAChange={handleCAChange}
+                onDesignPressureChange={handleDesignPressureChange}
+              />
 
-      {pipesForDisplay.map((pipe) => (
-        <PipeCard
-          key={pipe.id}
-          pipe={pipe}
-          // thicknessByNpsSchedule={thicknessByNpsSchedule}
-          thicknessByNpsSchedule={"0"}
-          updatePipe={updatePipe}
-          removePipe={(id) => {
-            setPipes((prev) => prev.filter((p) => p.id !== id));
-          }}
-          units={units}
-        />
-      ))}
+              <Button
+                startIcon={<AddCircleOutlineIcon />}
+                variant="outlined"
+                onClick={() =>
+                  setPipes((prev) => [
+                    ...prev,
+                    {
+                      id: uuidv4(),
+                      nps: "2",
+                      od: "2.375",
+                      schedule: "40",
+                      tRequired: 0,
+                      t: 0,
+                    },
+                  ])
+                }
+                fullWidth
+              >
+                Add Pipe
+              </Button>
+            </Card>
 
-      <PdfExport
-        material={material}
-        designParams={designParams}
-        pipes={pipesForDisplay}
-      />
+            {/* Right Column: Formula */}
+            <Card
+              sx={{
+                flex: 1,
+                minWidth: 450,
+                display: "flex",
+                flexDirection: "column",
+                p: 2,
+                gap: 2,
+                height: "100%",
+              }}
+            >
+              <FormulaDisplay />
+            </Card>
+          </Box>
+
+          {/* Full-width: Pipe Cards */}
+          <Box sx={{ mt: 4, display: "flex", flexDirection: "column", gap: 2 }}>
+            {pipesForDisplay.map((pipe) => (
+              <PipeCard
+                key={pipe.id}
+                pipe={pipe}
+                updatePipe={updatePipe}
+                removePipe={(id) =>
+                  setPipes((prev) => prev.filter((p) => p.id !== id))
+                }
+                units={units}
+              />
+            ))}
+          </Box>
+
+          {/* Bottom: PDF Export */}
+          <Box sx={{ mt: 6 }}>
+            <PdfExport
+              material={material}
+              designParams={designParams}
+              pipes={pipesForDisplay}
+            />
+          </Box>
+        </>
+      )}
+
+      {tabIndex === 1 && (
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="h6" gutterBottom>
+            Material Info
+          </Typography>
+          <Typography variant="body1" sx={{ mt: 1 }}>
+            Selected Material: <strong>{material}</strong>
+          </Typography>
+          <Typography variant="body1">
+            Temperature: <strong>{temperatureDisplay}</strong>
+          </Typography>
+          <Typography variant="body1">
+            Allowable Stress: <strong>{allowableStressDisplay}</strong>
+          </Typography>
+        </Box>
+      )}
+
+      {tabIndex === 2 && (
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="h6" gutterBottom>
+            Settings
+          </Typography>
+          <Typography variant="body1" sx={{ mt: 1 }}>
+            Mill Tolerance: <strong>{millTol}</strong>
+          </Typography>
+          <Typography variant="body1">
+            Weld Joint Efficiency (E): <strong>{e}</strong>
+          </Typography>
+          <Typography variant="body1">
+            Strength Reduction Factor (W): <strong>{w}</strong>
+          </Typography>
+          <Typography variant="body1">
+            Gamma: <strong>{gamma}</strong>
+          </Typography>
+          {/* Optionally add inputs or controls here to adjust these */}
+        </Box>
+      )}
     </Container>
   );
 }
