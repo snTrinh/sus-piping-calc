@@ -43,7 +43,7 @@ export default function PipeCard({
   const thicknessConversion = unitConversions.length[units];
   const unitLabel = thicknessConversion.unit;
 
-  const displayedTRequired = thicknessConversion.to(pipe.tRequired);
+  const displayedTRequired = unitConversions.length[units].to(pipe.tRequired);
   const displayedScheduleThickness = thicknessConversion.to(rawThickness);
 
   const targetNps = units === Units.Metric ? npsToMmMap[pipe.nps] : pipe.nps;

@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Drawer,
   List,
@@ -19,8 +21,6 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import ContactMailIcon from "@mui/icons-material/ContactMail";
 import WaterDropIcon from "@mui/icons-material/WaterDrop";
-import Link from "next/link";
-import { useState } from "react";
 
 const drawerWidth = 240;
 const collapsedWidth = 72;
@@ -28,10 +28,9 @@ const collapsedWidth = 72;
 export default function Sidebar() {
   const [open, setOpen] = useState(true);
   const theme = useTheme();
+  const router = useRouter();
 
-  const toggleDrawer = () => {
-    setOpen(!open);
-  };
+  const toggleDrawer = () => setOpen(!open);
 
   const navItems = [
     { label: "B31.3 Calculator", icon: <CalculateIcon />, href: "/" },
@@ -44,7 +43,6 @@ export default function Sidebar() {
   return (
     <Drawer
       variant="permanent"
-      open={open}
       sx={{
         width: open ? drawerWidth : collapsedWidth,
         flexShrink: 0,
@@ -61,6 +59,7 @@ export default function Sidebar() {
           backgroundColor: theme.palette.background.paper,
         },
       }}
+      open={open}
     >
       <Toolbar
         sx={{
@@ -77,37 +76,39 @@ export default function Sidebar() {
       <List>
         {navItems.map(({ label, icon, href }) => (
           <ListItem key={label} disablePadding sx={{ display: "block" }}>
-            <Link href={href} passHref legacyBehavior>
-              <ListItemButton
-                component="a"
+            <ListItemButton
+              onClick={() => router.push(href)}
+              sx={{
+                display: "flex",
+                justifyContent: open ? "initial" : "center",
+                alignItems: "center",
+                px: 2.5,
+                py: 1.25,
+                borderRadius: 2,
+                mx: 1,
+                my: 0.5,
+                transition: "background-color 0.2s",
+                "&:hover": {
+                  backgroundColor: theme.palette.action.hover,
+                },
+                cursor: "pointer",
+                color: "inherit",       // ensure inherits text color
+                textDecoration: "none", // no underline
+                fontFamily: "Roboto, Arial, sans-serif", // or your preferred font
+              }}
+            >
+              <ListItemIcon
                 sx={{
-                  display: "flex",
-                  justifyContent: open ? "initial" : "center",
-                  alignItems: "center",
-                  px: 2.5,
-                  py: 1.25,
-                  borderRadius: 2,
-                  mx: 1,
-                  my: 0.5,
-                  transition: "background-color 0.2s",
-                  "&:hover": {
-                    backgroundColor: theme.palette.action.hover,
-                  },
+                  minWidth: 0,
+                  mr: open ? 2 : "auto",
+                  justifyContent: "center",
+                  color: "text.secondary",
                 }}
               >
-                <ListItemIcon
-                  sx={{
-                    minWidth: 0,
-                    mr: open ? 2 : "auto",
-                    justifyContent: "center",
-                    color: "text.secondary",
-                  }}
-                >
-                  {icon}
-                </ListItemIcon>
-                {open && <ListItemText primary={label} sx={{ opacity: 1 }} />}
-              </ListItemButton>
-            </Link>
+                {icon}
+              </ListItemIcon>
+              {open && <ListItemText primary={label} sx={{ opacity: 1 }} />}
+            </ListItemButton>
           </ListItem>
         ))}
       </List>

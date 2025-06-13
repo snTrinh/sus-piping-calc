@@ -1,8 +1,8 @@
 import React from "react";
-import { DesignParameters } from "@/types/units";
+import { DesignParameters, Units } from "@/types/units";
 import pipeDimensions from "@/utils/transformed_pipeData.json";
-import { unitConversions } from "@/utils/unitConversions";
-
+import { npsToMmMap, unitConversions } from "@/utils/unitConversions";
+import pipeData from "@/utils/pipeData.json";
 type Pipe = {
   od: string;
   nps: string;
@@ -64,10 +64,13 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
         const thicknessConversion = unitConversions.length[units];
 
         const displayedScheduleThickness = thicknessConversion.to(rawThickness);
+        const targetNps =
+          units === Units.Metric ? npsToMmMap[pipe.nps] : pipe.nps;
+        const outerDiameter =
+          pipeData[units]?.columns?.find((col) => col.NPS === targetNps)?.OD ||
+          0;
 
-        const numerator =
-          pressure *
-          unitConversions.length[designParams.units].to(Number(pipe.od));
+        const numerator = pressure * outerDiameter;
         const denominator =
           2 * (allowableStress * (e ?? 1) * (w ?? 1) + pressure * (gamma ?? 1));
         return (
@@ -80,14 +83,11 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
             }}
           >
             <div style={valueStyle}>
-              <strong>Pipe {index + 1}</strong> — For {pipe.nps}
-              {unitConversions.length[designParams.units].unit} SCH{" "}
+              <strong>Pipe {index + 1}</strong> — For NPS {pipe.nps} SCH{" "}
               {pipe.schedule} {material} (D=
-              {unitConversions.length[designParams.units]
-                .to(Number(pipe.od))
-                .toFixed(2)}
+              {outerDiameter}
               {unitConversions.length[designParams.units].unit}, t ={" "}
-              {displayedScheduleThickness}
+              {displayedScheduleThickness.toFixed(3)}
               {unitConversions.length[designParams.units].unit}):
             </div>
 
@@ -112,9 +112,7 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
                   <span style={numeratorStyle}>
                     {pressure}
                     {unitConversions.pressure[designParams.units].unit} ×{" "}
-                    {unitConversions.length[designParams.units]
-                      .to(Number(pipe.od))
-                      .toFixed(2)}
+                    {outerDiameter}
                     {unitConversions.length[designParams.units].unit}
                   </span>
                   <span style={denominatorStyle}>
@@ -158,10 +156,7 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
             <div style={{ marginTop: 8, marginLeft: 24 }}>
               <div>
                 <span>
-                  tᵣ ={" "}
-                  {unitConversions.length[designParams.units]
-                    .to(pipe.tRequired)
-                    .toFixed(3)}{" "}
+                  tᵣ = {numerator / denominator * 1/ millTolDenominator}{" "}
                   {unitConversions.length[designParams.units].unit}
                 </span>
               </div>

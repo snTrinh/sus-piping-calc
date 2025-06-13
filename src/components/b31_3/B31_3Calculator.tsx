@@ -20,6 +20,7 @@ import {
   convertDesignInputs,
   npsToMmMap,
   PipeSchedule,
+  unitConversions,
 } from "@/utils/unitConversions";
 import FormulaDisplay from "./FormulaDisplay";
 import DesignInputs from "./DesignInputs";
@@ -79,22 +80,31 @@ export default function B31_3Calculator() {
       prev.map((pipe) => {
         const targetNps =
           units === Units.Metric ? npsToMmMap[pipe.nps] : pipe.nps;
-        const outerDiameter =
+  
+        let outerDiameter =
           pipeData[units]?.columns?.find((col) => col.NPS === targetNps)?.OD ||
           0;
-        const numerator = pressure * outerDiameter;
+  
+        const conversion = unitConversions.length[units];
+        const outerDiameterInches = conversion.from(outerDiameter);
+        const corrosionAllowanceInches = unitConversions.length[units].from(
+          corrosionAllowance
+        );
+  
+        const numerator = pressure * outerDiameterInches;
         const denominator =
           2 * ((allowableStress ?? 0) * e * w + pressure * gamma);
         const tRequired =
           denominator !== 0
-            ? (numerator / denominator + corrosionAllowance) *
+            ? (numerator / denominator + corrosionAllowanceInches) *
               (1 / (1 - millTol))
             : 0;
-
+  
         return { ...pipe, tRequired };
       })
     );
   }, [pressure, allowableStress, e, w, gamma, corrosionAllowance, units]);
+  
 
   const handleUnitsChange = (
     event: React.MouseEvent<HTMLElement>,

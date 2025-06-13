@@ -23,6 +23,7 @@ export default function FormulaDisplay() {
 
       {/* Formula */}
       <Typography
+        component="div"
         variant="body2"
         color="text.secondary"
         sx={{
@@ -33,7 +34,11 @@ export default function FormulaDisplay() {
           fontSize: { xs: "0.8rem", sm: "0.875rem" },
         }}
       >
-        <Typography variant="body2" component="span" sx={{ whiteSpace: "nowrap" }}>
+        <Typography
+          variant="body2"
+          component="span"
+          sx={{ whiteSpace: "nowrap" }}
+        >
           tᵣ = (
         </Typography>
 
@@ -73,12 +78,20 @@ export default function FormulaDisplay() {
         </Box>
 
         {/* CA */}
-        <Typography variant="body2" component="span" sx={{ whiteSpace: "nowrap" }}>
+        <Typography
+          variant="body2"
+          component="span"
+          sx={{ whiteSpace: "nowrap" }}
+        >
           + CA )
         </Typography>
 
         {/* Multiplier "x" */}
-        <Typography variant="body2" component="span" sx={{ whiteSpace: "nowrap" }}>
+        <Typography
+          variant="body2"
+          component="span"
+          sx={{ whiteSpace: "nowrap" }}
+        >
           ×
         </Typography>
 
