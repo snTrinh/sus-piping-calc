@@ -3,9 +3,7 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
 import Sidebar from "../components/Sidebar";
-import {
-  Box,
-} from "@mui/material";
+import { Box } from "@mui/material";
 import ThemeContextProvider from "./ThemeContext";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -28,7 +26,7 @@ export default function RootLayout({
               minHeight: "100vh",
             }}
           >
-            <Box component="main" sx={{ flexGrow: 1, padding: 2 }}>
+            <Box component="main" sx={{ flexGrow: 1 }}>
               {children}
             </Box>
           </Box>

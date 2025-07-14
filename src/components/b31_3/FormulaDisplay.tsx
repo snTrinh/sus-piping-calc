@@ -1,18 +1,30 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 
-export default function FormulaDisplay() {
+import { DesignParameters, Units } from "@/types/units"; 
+
+
+interface FormulaDisplayProps {
+  designParams?: DesignParameters; 
+}
+
+export default function FormulaDisplay({ designParams }: FormulaDisplayProps) {
+
+  const e = designParams?.e ?? 1;
+  const w = designParams?.w ?? 1;
+  const gamma = designParams?.gamma ?? 0.4;
+  const millTol = designParams?.millTol ?? 0.125; 
+
   return (
     <Box
       sx={{
         backgroundColor: "#f9f9f9",
         p: 2,
         borderRadius: 1,
-        mb: 3,
         overflowX: "auto",
       }}
     >
-      {/* Label */}
+
       <Typography
         variant="body2"
         color="text.secondary"
@@ -21,7 +33,7 @@ export default function FormulaDisplay() {
         Required Thickness (ASME B31.3):
       </Typography>
 
-      {/* Formula */}
+
       <Typography
         component="div"
         variant="body2"
@@ -42,7 +54,7 @@ export default function FormulaDisplay() {
           tᵣ = (
         </Typography>
 
-        {/* Main Fraction */}
+
         <Box
           sx={{
             display: "inline-flex",
@@ -52,7 +64,7 @@ export default function FormulaDisplay() {
             lineHeight: 1,
           }}
         >
-          {/* Numerator */}
+
           <Box
             sx={{
               borderBottom: "1px solid #000",
@@ -64,7 +76,7 @@ export default function FormulaDisplay() {
             (P × D)
           </Box>
 
-          {/* Denominator */}
+
           <Box
             sx={{
               px: 0.5,
@@ -77,7 +89,7 @@ export default function FormulaDisplay() {
           </Box>
         </Box>
 
-        {/* CA */}
+
         <Typography
           variant="body2"
           component="span"
@@ -86,7 +98,7 @@ export default function FormulaDisplay() {
           + CA )
         </Typography>
 
-        {/* Multiplier "x" */}
+
         <Typography
           variant="body2"
           component="span"
@@ -95,7 +107,7 @@ export default function FormulaDisplay() {
           ×
         </Typography>
 
-        {/* Mill tolerance fraction */}
+
         <Box
           sx={{
             display: "inline-flex",
@@ -121,6 +133,99 @@ export default function FormulaDisplay() {
             (1 - Mill Tolerance)
           </Box>
         </Box>
+      </Typography>
+
+      {/* Label */}
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        sx={{ fontWeight: "bold", mb: 1, mt: 2 }} 
+      >
+        Assumptions:
+      </Typography>
+
+      <Typography
+        component="div"
+        variant="body2"
+        color="text.secondary"
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          gap: 0.5,
+          fontSize: { xs: "0.8rem", sm: "0.875rem" },
+        }}
+      >
+        <Typography
+          variant="body2"
+          component="span"
+          sx={{ whiteSpace: "nowrap" }}
+        >
+          Weld Joint Efficiency, E = <strong>{e}</strong>
+        </Typography>
+      </Typography>
+
+      <Typography
+        component="div"
+        variant="body2"
+        color="text.secondary"
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          gap: 0.5,
+          fontSize: { xs: "0.8rem", sm: "0.875rem" },
+        }}
+      >
+        <Typography
+          variant="body2"
+          component="span"
+          sx={{ whiteSpace: "nowrap" }}
+        >
+          Weld Strength Reduction Factor, W = <strong>{w}</strong>
+        </Typography>
+      </Typography>
+
+      <Typography
+        component="div"
+        variant="body2"
+        color="text.secondary"
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          gap: 0.5,
+          fontSize: { xs: "0.8rem", sm: "0.875rem" },
+        }}
+      >
+        <Typography
+          variant="body2"
+          component="span"
+          sx={{ whiteSpace: "nowrap" }}
+        >
+          Temperature Coefficient, &gamma; = <strong>{gamma}</strong>
+        </Typography>
+      </Typography>
+
+      <Typography
+        component="div"
+        variant="body2"
+        color="text.secondary"
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          gap: 0.5,
+          fontSize: { xs: "0.8rem", sm: "0.875rem" },
+        }}
+      >
+        <Typography
+          variant="body2"
+          component="span"
+          sx={{ whiteSpace: "nowrap" }}
+        >
+          Mill Tolerance Factor, % = <strong>{millTol * 100}%</strong>
+        </Typography>
       </Typography>
     </Box>
   );

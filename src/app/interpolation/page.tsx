@@ -35,7 +35,7 @@ export default function InterpolationPage() {
     >
       <Typography variant="h4" fontWeight="bold" align="left" gutterBottom>
         Linear Interpolation
-      </Typography>	
+      </Typography>
       <Box
         sx={{
           display: "flex",

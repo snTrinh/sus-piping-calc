@@ -1,10 +1,16 @@
 import B31_3Calculator from "../components/b31_3/B31_3Calculator";
-
+import { Box } from "@mui/material";
 
 export default function HomePage() {
   return (
-    <main className="font-sans flex flex-col justify-center">
+    <Box
+      sx={{
+        minHeight: "100vh",
+        backgroundColor: "white",
+        padding: 4,
+      }}
+    >
       <B31_3Calculator />
-    </main>
+    </Box>
   );
 }

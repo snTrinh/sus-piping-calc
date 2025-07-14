@@ -63,10 +63,8 @@ export default function B31_3Calculator() {
     },
   ]);
 
-  // Active tab index state
   const [tabIndex, setTabIndex] = useState(0);
 
-  // Update stress based on material and temperature
   useEffect(() => {
     const match = stressData.find(
       (item) => item.material === material && item.temp === temperature
@@ -74,23 +72,21 @@ export default function B31_3Calculator() {
     if (match) setAllowableStress(match.stress);
   }, [material, temperature]);
 
-  // Recalculate thickness
   useEffect(() => {
     setPipes((prev) =>
       prev.map((pipe) => {
         const targetNps =
           units === Units.Metric ? npsToMmMap[pipe.nps] : pipe.nps;
-  
+
         let outerDiameter =
           pipeData[units]?.columns?.find((col) => col.NPS === targetNps)?.OD ||
           0;
-  
+
         const conversion = unitConversions.length[units];
         const outerDiameterInches = conversion.from(outerDiameter);
-        const corrosionAllowanceInches = unitConversions.length[units].from(
-          corrosionAllowance
-        );
-  
+        const corrosionAllowanceInches =
+          unitConversions.length[units].from(corrosionAllowance);
+
         const numerator = pressure * outerDiameterInches;
         const denominator =
           2 * ((allowableStress ?? 0) * e * w + pressure * gamma);
@@ -99,12 +95,11 @@ export default function B31_3Calculator() {
             ? (numerator / denominator + corrosionAllowanceInches) *
               (1 / (1 - millTol))
             : 0;
-  
+
         return { ...pipe, tRequired };
       })
     );
   }, [pressure, allowableStress, e, w, gamma, corrosionAllowance, units]);
-  
 
   const handleUnitsChange = (
     event: React.MouseEvent<HTMLElement>,
@@ -162,14 +157,13 @@ export default function B31_3Calculator() {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ pb: 8 }}>
+    <Box sx={{ width: "100%", ml: 0 }}>
       <Typography variant="h4" fontWeight="bold" align="left" gutterBottom>
         B31.3 Pipe Thickness Calculator
       </Typography>
 
       <UnitsToggle units={units} onChange={handleUnitsChange} />
 
-      {/* Tabs */}
       <Tabs
         value={tabIndex}
         onChange={(_, newValue) => setTabIndex(newValue)}
@@ -183,10 +177,8 @@ export default function B31_3Calculator() {
         <Tab label="Multiple Pressures" />
       </Tabs>
 
-      {/* Tab Panels */}
       {tabIndex === 0 && (
         <>
-          {/* Two Columns: Inputs on left, Formula on right */}
           <Box
             sx={{
               display: "flex",
@@ -208,8 +200,9 @@ export default function B31_3Calculator() {
                 height: "100%",
               }}
             >
+              
               <DesignInputs
-                designParams={designParams}
+                designParams={designParams} 
                 materials={materials}
                 material={material}
                 onUnitsChange={handleUnitsChange}
@@ -241,7 +234,6 @@ export default function B31_3Calculator() {
               </Button>
             </Card>
 
-            {/* Right Column: Formula */}
             <Card
               sx={{
                 flex: 1,
@@ -253,11 +245,10 @@ export default function B31_3Calculator() {
                 height: "100%",
               }}
             >
-              <FormulaDisplay />
+              <FormulaDisplay designParams={designParams} />
             </Card>
           </Box>
 
-          {/* Full-width: Pipe Cards */}
           <Box sx={{ mt: 4, display: "flex", flexDirection: "column", gap: 2 }}>
             {pipesForDisplay.map((pipe) => (
               <PipeCard
@@ -272,7 +263,6 @@ export default function B31_3Calculator() {
             ))}
           </Box>
 
-          {/* Bottom: PDF Export */}
           <Box sx={{ mt: 6 }}>
             <PdfExport
               material={material}
@@ -320,6 +310,6 @@ export default function B31_3Calculator() {
           {/* Optionally add inputs or controls here to adjust these */}
         </Box>
       )}
-    </Container>
+    </Box>
   );
 }

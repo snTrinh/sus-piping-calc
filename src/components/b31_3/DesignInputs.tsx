@@ -24,7 +24,6 @@ export default function DesignInputs({
   materials,
   material,
   designParams,
-  onUnitsChange,
   onMaterialChange,
   onTemperatureChange,
   onCAChange,
@@ -35,20 +34,23 @@ export default function DesignInputs({
     temperature,
     corrosionAllowance,
     allowableStress,
-    e,
-    w,
-    gamma,
-    millTol,
   } = designParams;
+
   return (
-    <>
-      {/* Editable Inputs */}
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column", 
+        gap: 2, 
+        width: "100%", 
+      }}
+    >
+
       <Box
         sx={{
           display: "flex",
-          flexWrap: "wrap",
           gap: 2,
-          mb: 2,
+          flexWrap: "wrap",
           justifyContent: "flex-start",
         }}
       >
@@ -57,7 +59,7 @@ export default function DesignInputs({
           label="Material"
           value={material}
           onChange={(e) => onMaterialChange(e.target.value)}
-          sx={{ minWidth: 200, flexGrow: 1, flexBasis: "200px" }}
+          sx={{ minWidth: 200, flexGrow: 1, flexBasis: "200px" }} 
           size="small"
         >
           {materials.map((mat) => (
@@ -66,14 +68,23 @@ export default function DesignInputs({
             </MenuItem>
           ))}
         </TextField>
+      </Box>
 
+      <Box
+        sx={{
+          display: "flex",
+          gap: 2,
+          flexWrap: "wrap",
+          justifyContent: "flex-start",
+        }}
+      >
         <LabeledInput
           label="Design Pressure"
           symbol="P"
           unit={unitConversions.pressure[designParams.units].unit}
           value={pressure}
           onChange={onDesignPressureChange}
-          sx={{ minWidth: 140, flexGrow: 1, flexBasis: "140px" }}
+          sx={{ minWidth: 140, flex: 1 }} 
         />
 
         <LabeledInput
@@ -82,28 +93,27 @@ export default function DesignInputs({
           unit={unitConversions.temperature[designParams.units].unit}
           value={temperature}
           onChange={onTemperatureChange}
-          sx={{ minWidth: 140, flexGrow: 1, flexBasis: "140px" }}
+          sx={{ minWidth: 140, flex: 1 }} 
         />
+      </Box>
 
+      <Box
+        sx={{
+          display: "flex",
+          gap: 2,
+          flexWrap: "wrap",
+          justifyContent: "flex-start",
+        }}
+      >
         <LabeledInput
           label="Corrosion Allowance"
           symbol="CA"
           unit={unitConversions.length[designParams.units].unit}
           value={corrosionAllowance}
           onChange={onCAChange}
-          sx={{ minWidth: 140, flexGrow: 1, flexBasis: "140px" }}
+          sx={{ minWidth: 140, flex: 1 }} 
         />
-      </Box>
 
-      {/* Disabled Inputs */}
-      <Box
-        sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 2,
-          justifyContent: "flex-start",
-        }}
-      >
         <LabeledInput
           label="Allowable Stress"
           symbol="S"
@@ -111,50 +121,9 @@ export default function DesignInputs({
           value={allowableStress}
           onChange={() => {}}
           disabled
-          sx={{ minWidth: 140, flexGrow: 1, flexBasis: "140px" }}
-        />
-
-        <LabeledInput
-          label="Weld Joint Efficiency"
-          symbol="E"
-          unit=""
-          value={e}
-          onChange={() => {}}
-          disabled
-          sx={{ minWidth: 140, flexGrow: 1, flexBasis: "140px" }}
-        />
-
-        <LabeledInput
-          label="Weld Strength Reduction Factor"
-          symbol="W"
-          unit=""
-          value={w}
-          onChange={() => {}}
-          disabled
-          sx={{ minWidth: 140, flexGrow: 1, flexBasis: "140px" }}
-        />
-
-        <LabeledInput
-          label="Temperature Coefficient"
-          symbol="γ"
-          unit=""
-          value={gamma}
-          onChange={() => {}}
-          disabled
-          sx={{ minWidth: 140, flexGrow: 1, flexBasis: "140px" }}
-        />
-
-        <LabeledInput
-          label="Mill Tolerance"
-          symbol=""
-          unit=""
-          value={millTol}
-          onChange={() => {}}
-          disabled
-          percentage
-          sx={{ minWidth: 140, flexGrow: 1, flexBasis: "140px" }}
+          sx={{ minWidth: 140, flex: 1 }}
         />
       </Box>
-    </>
+    </Box>
   );
 }

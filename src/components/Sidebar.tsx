@@ -8,106 +8,87 @@ import {
   ListItem,
   ListItemButton,
   ListItemIcon,
-  ListItemText,
-  Toolbar,
+
   Divider,
-  IconButton,
+
   useTheme,
 } from "@mui/material";
 import CalculateIcon from "@mui/icons-material/Calculate";
 import FunctionsIcon from "@mui/icons-material/Functions";
-import MenuIcon from "@mui/icons-material/Menu";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+
 import AssessmentIcon from "@mui/icons-material/Assessment";
-import ContactMailIcon from "@mui/icons-material/ContactMail";
+import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import WaterDropIcon from "@mui/icons-material/WaterDrop";
 
-const drawerWidth = 240;
-const collapsedWidth = 72;
+
+const collapsedWidth = 56; 
 
 export default function Sidebar() {
-  const [open, setOpen] = useState(true);
+
   const theme = useTheme();
   const router = useRouter();
 
-  const toggleDrawer = () => setOpen(!open);
 
   const navItems = [
-    { label: "B31.3 Calculator", icon: <CalculateIcon />, href: "/" },
-    { label: "Z662 Calculator", icon: <AssessmentIcon />, href: "/z662" },
-    { label: "Interpolation", icon: <FunctionsIcon />, href: "/interpolation" },
-    { label: "Hydro Test Pressure", icon: <WaterDropIcon />, href: "/hydro-test" },
-    { label: "Contact Us", icon: <ContactMailIcon />, href: "/contact" },
+    { icon: <CalculateIcon />, href: "/" },
+    { icon: <AssessmentIcon />, href: "/z662" },
+    { icon: <FunctionsIcon />, href: "/interpolation" },
+    { icon: <WaterDropIcon />, href: "/hydro-test" },
+    {  icon: <AlternateEmailIcon />, href: "/contact" },
   ];
 
   return (
     <Drawer
       variant="permanent"
       sx={{
-        width: open ? drawerWidth : collapsedWidth,
+        width: collapsedWidth,
         flexShrink: 0,
         whiteSpace: "nowrap",
         "& .MuiDrawer-paper": {
-          width: open ? drawerWidth : collapsedWidth,
-          transition: theme.transitions.create("width", {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-          }),
+          width: collapsedWidth, 
           boxSizing: "border-box",
           overflowX: "hidden",
           borderRight: `1px solid ${theme.palette.divider}`,
           backgroundColor: theme.palette.background.paper,
         },
       }}
-      open={open}
+      open={true} 
     >
-      <Toolbar
-        sx={{
-          display: "flex",
-          justifyContent: open ? "flex-end" : "center",
-          px: 1,
-        }}
-      >
-        <IconButton onClick={toggleDrawer}>
-          {open ? <ChevronLeftIcon /> : <MenuIcon />}
-        </IconButton>
-      </Toolbar>
-      <Divider />
+
+      <Divider /> 
       <List>
-        {navItems.map(({ label, icon, href }) => (
-          <ListItem key={label} disablePadding sx={{ display: "block" }}>
+        {navItems.map(({  icon, href }) => (
+          <ListItem key={href} disablePadding sx={{ display: "block" }}>
             <ListItemButton
               onClick={() => router.push(href)}
               sx={{
-                display: "flex",
-                justifyContent: open ? "initial" : "center",
-                alignItems: "center",
-                px: 2.5,
-                py: 1.25,
+                minHeight: 48, 
+                justifyContent: "center", 
+                px: 0, 
                 borderRadius: 2,
-                mx: 1,
+                mx: 0.5, 
                 my: 0.5,
                 transition: "background-color 0.2s",
                 "&:hover": {
                   backgroundColor: theme.palette.action.hover,
                 },
                 cursor: "pointer",
-                color: "inherit",       // ensure inherits text color
-                textDecoration: "none", // no underline
-                fontFamily: "Roboto, Arial, sans-serif", // or your preferred font
+                color: "inherit",
+                textDecoration: "none",
+                fontFamily: "Roboto, Arial, sans-serif",
               }}
             >
               <ListItemIcon
                 sx={{
-                  minWidth: 0,
-                  mr: open ? 2 : "auto",
-                  justifyContent: "center",
+                  minWidth: 0, 
+                  justifyContent: "center", 
+                  alignItems: "center", 
+                  padding: theme.spacing(1.5), 
                   color: "text.secondary",
                 }}
               >
                 {icon}
               </ListItemIcon>
-              {open && <ListItemText primary={label} sx={{ opacity: 1 }} />}
             </ListItemButton>
           </ListItem>
         ))}
