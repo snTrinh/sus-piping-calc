@@ -32,7 +32,6 @@ export default function Sidebar() {
     { icon: <CalculateIcon />, href: "/", label: "Calculations" },
     { icon: <AssessmentIcon />, href: "/z662", label: "Z662 Code" },
     { icon: <FunctionsIcon />, href: "/interpolation", label: "Interpolation" },
-    { icon: <AlternateEmailIcon />, href: "/contact", label: "Contact" },
   ];
 
   const themeToggleItem = {
