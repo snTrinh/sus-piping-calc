@@ -1,20 +1,23 @@
 "use client";
 import { useRef, useState } from "react";
 import { Box, TextField, Button } from "@mui/material";
-import { DesignParameters, Units } from "@/types/units";
+import { DesignParams, Units } from "@/types/units"; // Assuming DesignParams is from types/units
 import PdfContent from "./PdfContent";
+import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
+
+type Pipe = {
+  id: string;
+  nps: string;
+  od: string;
+  schedule: string;
+  tRequired: number;
+  t: number;
+};
 
 type PdfExportProps = {
   material: string;
-  designParams: DesignParameters;
-  pipes: {
-    id: string;
-    nps: string;
-    od: string;
-    schedule: string;
-    tRequired: number;
-    t: number;
-  }[];
+  designParams: DesignParams;
+  pipes: Pipe[];
 };
 
 export default function PdfExport({
@@ -34,16 +37,20 @@ export default function PdfExport({
   const handleDownloadPdf = () => {
     if (!printRef.current) return;
 
-    html2pdf()
-      .set({
-        margin: 1,
-        filename: "document.pdf",
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: {},
-        jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
-      })
-      .from(printRef.current)
-      .save();
+    if (typeof window !== 'undefined' && (window as any).html2pdf) {
+      (window as any).html2pdf()
+        .set({
+          margin: 1,
+          filename: "document.pdf",
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: {},
+          jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+        })
+        .from(printRef.current)
+        .save();
+    } else {
+      console.error("html2pdf.js not loaded.");
+    }
   };
 
   const drawingInfo = {
@@ -51,6 +58,13 @@ export default function PdfExport({
     drawingRevision,
     calculationRevision,
     date,
+  };
+
+  // Define the common responsive flex style for all inputs and the button
+  const responsiveFlex = {
+    xs: '1 1 100%', // Full width on extra-small screens (mobile)
+    sm: '1 1 calc(50% - 8px)', // Two columns on small screens (tablet) - 8px accounts for half the 16px gap
+    md: '1 1 0%', // Single row, distributed evenly on medium screens and up (desktop)
   };
 
   return (
@@ -67,8 +81,8 @@ export default function PdfExport({
       <Box
         sx={{
           display: "flex",
-          flexWrap: "wrap",
-          gap: 2,
+          flexWrap: "wrap", // Allows items to wrap to the next line if space is insufficient
+          gap: 2, // Space between items (16px)
           mb: 2,
         }}
       >
@@ -77,7 +91,7 @@ export default function PdfExport({
           value={drawingNumber}
           onChange={(e) => setDrawingNumber(e.target.value)}
           size="small"
-          sx={{ minWidth: 180 }}
+          sx={{ flex: responsiveFlex, minWidth: 180 }} // Apply responsive flex
           variant="outlined"
           InputLabelProps={{ shrink: true }}
         />
@@ -86,7 +100,7 @@ export default function PdfExport({
           value={drawingRevision}
           onChange={(e) => setDrawingRevision(e.target.value)}
           size="small"
-          sx={{ minWidth: 180 }}
+          sx={{ flex: responsiveFlex, minWidth: 180 }} // Apply responsive flex
           variant="outlined"
           InputLabelProps={{ shrink: true }}
         />
@@ -95,7 +109,7 @@ export default function PdfExport({
           value={calculationRevision}
           onChange={(e) => setCalculationRevision(e.target.value)}
           size="small"
-          sx={{ minWidth: 180 }}
+          sx={{ flex: responsiveFlex, minWidth: 180 }} // Apply responsive flex
           variant="outlined"
           InputLabelProps={{ shrink: true }}
         />
@@ -105,10 +119,18 @@ export default function PdfExport({
           value={date}
           onChange={(e) => setDate(e.target.value)}
           size="small"
-          sx={{ minWidth: 180 }}
+          sx={{ flex: responsiveFlex, minWidth: 180 }} // Apply responsive flex
           variant="outlined"
           InputLabelProps={{ shrink: true }}
         />
+        <Button
+          variant="outlined"
+          startIcon={<ArrowCircleDownIcon/>}
+          onClick={handleDownloadPdf}
+          sx={{ flex: responsiveFlex, minWidth: 180 }} // Apply responsive flex
+        >
+          Download PDF
+        </Button>
       </Box>
 
       <PdfContent
@@ -118,10 +140,6 @@ export default function PdfExport({
         material={material}
         pipes={pipes}
       />
-
-      <Button variant="contained" onClick={handleDownloadPdf} sx={{ mt: 2 }}>
-        Download PDF
-      </Button>
     </Box>
   );
 }

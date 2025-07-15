@@ -51,14 +51,15 @@ export default function InputValuesCard({
   }, [units]);
 
   return (
-    <Card sx={{ height: "100%" }}>
+    <Card sx={{ height: "100%", border: "1px solid #ddd" }}
+    elevation={0}>
       <CardContent>
         <Typography variant="h6" gutterBottom>
           Input Values
         </Typography>
 
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          <Box>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
+          <Box sx={{ display: "flex", gap: 2 }}>
             <LabeledInput
               label="Internal Design Gauge Pressure"
               symbol="P"

@@ -1,5 +1,5 @@
 import React from "react";
-import { DesignParameters } from "@/types/units";
+import { DesignParams } from "@/types/units";
 import { unitConversions } from "@/utils/unitConversions";
 import { Box, Typography } from "@mui/material";
 
@@ -12,7 +12,7 @@ export type DrawingInfo = {
 
 type PdfDesignInputsProps = {
   drawingInfo: DrawingInfo;
-  designParams: DesignParameters;
+  designParams: DesignParams;
 };
 
 const rowStyle: React.CSSProperties = {
@@ -63,9 +63,7 @@ const PdfDesignInputs: React.FC<PdfDesignInputsProps> = ({
         }}
       >
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-          <Typography fontWeight="bold">
-            Drawing Number:
-          </Typography>
+          <Typography fontWeight="bold">Drawing Number:</Typography>
           <Typography>{drawingInfo.drawingNumber}</Typography>
           <Typography fontWeight="bold" sx={{ ml: 2 }}>
             Revision:
@@ -95,30 +93,22 @@ const PdfDesignInputs: React.FC<PdfDesignInputsProps> = ({
         <div style={rowStyle}>
           <div style={labelStyle}>Design Pressure:</div>
           <div style={valueStyle}>{pressure}</div>
-          <div style={unitStyle}>
-            {unitConversions.pressure[units].unit}
-          </div>
+          <div style={unitStyle}>{unitConversions.pressure[units].unit}</div>
         </div>
         <div style={rowStyle}>
           <div style={labelStyle}>Design Temperature:</div>
           <div style={valueStyle}>{temperature}</div>
-          <div style={unitStyle}>
-            {unitConversions.temperature[units].unit}
-          </div>
+          <div style={unitStyle}>{unitConversions.temperature[units].unit}</div>
         </div>
         <div style={rowStyle}>
           <div style={labelStyle}>Corrosion Allowance:</div>
           <div style={valueStyle}>{corrosionAllowance}</div>
-          <div style={unitStyle}>
-            {unitConversions.length[units].unit}
-          </div>
+          <div style={unitStyle}>{unitConversions.length[units].unit}</div>
         </div>
         <div style={rowStyle}>
           <div style={labelStyle}>Maximum Allowable Stress:</div>
           <div style={valueStyle}>{allowableStress}</div>
-          <div style={unitStyle}>
-            {unitConversions.pressure[units].unit}
-          </div>
+          <div style={unitStyle}>{unitConversions.pressure[units].unit}</div>
         </div>
         <div style={rowStyle}>
           <div style={labelStyle}>Temperature Coefficient, γ:</div>

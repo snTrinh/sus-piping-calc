@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Container, Card } from "@mui/material";
 import InputValuesCard from "./../../components/interpolation/InputValuesCard";
 import InterpolatedValueCard from "./../../components/interpolation/InterpolatedValuesCard";
 
@@ -26,25 +26,30 @@ export default function InterpolationPage() {
 
   return (
     <Box
+      // This outer Box can still handle minHeight or background for the whole page
       sx={{
         minHeight: "100vh",
-        backgroundColor: "white",
-        p: 4,
-        maxWidth: 1200,
       }}
     >
-      <Typography variant="h4" fontWeight="bold" align="left" gutterBottom>
-        Linear Interpolation
-      </Typography>
-      <Box
+      <Container
+        maxWidth="lg" // Set your desired max width (e.g., "md", "lg", "xl")
+        disableGutters // Remove default horizontal padding from the Container
         sx={{
-          display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          gap: 4,
-          alignItems: "stretch",
+          p: 4,
         }}
       >
-        <Box sx={{ flex: 1, minWidth: 450, height: 300 }}>
+        <Typography variant="h4" fontWeight="bold" align="left" gutterBottom>
+          Linear Interpolation
+        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            gap: 4,
+            alignItems: "stretch", // Ensures cards stretch to equal height
+            mt: 2, // Add some top margin below the title
+          }}
+        >
           <InputValuesCard
             x0={x0}
             y0={y0}
@@ -57,12 +62,10 @@ export default function InterpolationPage() {
             setY1={setY1}
             setX={setX}
           />
-        </Box>
 
-        <Box sx={{ flex: 1, minWidth: 450, height: 300 }}>
           <InterpolatedValueCard x0={x0} y0={y0} x1={x1} y1={y1} x={x} y={y} />
         </Box>
-      </Box>
+      </Container>
     </Box>
   );
 }

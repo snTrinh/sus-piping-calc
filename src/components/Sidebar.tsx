@@ -8,34 +8,40 @@ import {
   ListItem,
   ListItemButton,
   ListItemIcon,
-
   Divider,
-
   useTheme,
+  Tooltip,
 } from "@mui/material";
 import CalculateIcon from "@mui/icons-material/Calculate";
 import FunctionsIcon from "@mui/icons-material/Functions";
-
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
-import WaterDropIcon from "@mui/icons-material/WaterDrop";
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
+
+import { useThemeMode } from '../app/ThemeContext';
 
 
-const collapsedWidth = 56; 
+const collapsedWidth = 56;
+const iconButtonSize = 40; // Consistent size for the circular hover area
 
 export default function Sidebar() {
-
   const theme = useTheme();
   const router = useRouter();
-
+  const { toggleTheme, mode } = useThemeMode();
 
   const navItems = [
-    { icon: <CalculateIcon />, href: "/" },
-    { icon: <AssessmentIcon />, href: "/z662" },
-    { icon: <FunctionsIcon />, href: "/interpolation" },
-    { icon: <WaterDropIcon />, href: "/hydro-test" },
-    {  icon: <AlternateEmailIcon />, href: "/contact" },
+    { icon: <CalculateIcon />, href: "/", label: "Calculations" },
+    { icon: <AssessmentIcon />, href: "/z662", label: "Z662 Code" },
+    { icon: <FunctionsIcon />, href: "/interpolation", label: "Interpolation" },
+    { icon: <AlternateEmailIcon />, href: "/contact", label: "Contact" },
   ];
+
+  const themeToggleItem = {
+    icon: mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />,
+    label: mode === 'dark' ? "Switch to Light Mode" : "Switch to Dark Mode",
+    onClick: toggleTheme,
+  };
 
   return (
     <Drawer
@@ -45,32 +51,72 @@ export default function Sidebar() {
         flexShrink: 0,
         whiteSpace: "nowrap",
         "& .MuiDrawer-paper": {
-          width: collapsedWidth, 
+          width: collapsedWidth,
           boxSizing: "border-box",
           overflowX: "hidden",
           borderRight: `1px solid ${theme.palette.divider}`,
           backgroundColor: theme.palette.background.paper,
+          color: theme.palette.text.primary,
         },
       }}
-      open={true} 
+      open={true}
     >
-
-      <Divider /> 
+      <Divider />
       <List>
-        {navItems.map(({  icon, href }) => (
+        {navItems.map(({ icon, href, label }) => (
           <ListItem key={href} disablePadding sx={{ display: "block" }}>
+            <Tooltip title={label} placement="right">
+              <ListItemButton
+                onClick={() => router.push(href)}
+                sx={{
+                  minHeight: 48,
+                  justifyContent: "center",
+                  px: 0,
+                  transition: "background-color 0.2s",
+                  "&:hover": {
+                    backgroundColor: "transparent", // KEY CHANGE: Hide ListItemButton's hover background
+                  },
+                  cursor: "pointer",
+                  color: "inherit",
+                  textDecoration: "none",
+                  fontFamily: "Roboto, Arial, sans-serif",
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    display: "flex",
+                    width: iconButtonSize,
+                    height: iconButtonSize,
+                    borderRadius: '50%',
+                    margin: theme.spacing(0.5),
+                    transition: "background-color 0.2s",
+                    color: "text.secondary",
+                    "&:hover": {
+                      backgroundColor: theme.palette.action.hover, // Circular hover effect remains here
+                    },
+                  }}
+                >
+                  {icon}
+                </ListItemIcon>
+              </ListItemButton>
+            </Tooltip>
+          </ListItem>
+        ))}
+        <Divider sx={{ my: 1 }} />
+        <ListItem key="theme-toggle" disablePadding sx={{ display: "block" }}>
+          <Tooltip title={themeToggleItem.label} placement="right">
             <ListItemButton
-              onClick={() => router.push(href)}
+              onClick={themeToggleItem.onClick}
               sx={{
-                minHeight: 48, 
-                justifyContent: "center", 
-                px: 0, 
-                borderRadius: 2,
-                mx: 0.5, 
-                my: 0.5,
+                minHeight: 48,
+                justifyContent: "center",
+                px: 0,
                 transition: "background-color 0.2s",
                 "&:hover": {
-                  backgroundColor: theme.palette.action.hover,
+                  backgroundColor: "transparent", // KEY CHANGE: Hide ListItemButton's hover background
                 },
                 cursor: "pointer",
                 color: "inherit",
@@ -80,18 +126,26 @@ export default function Sidebar() {
             >
               <ListItemIcon
                 sx={{
-                  minWidth: 0, 
-                  justifyContent: "center", 
-                  alignItems: "center", 
-                  padding: theme.spacing(1.5), 
+                  minWidth: 0,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  display: "flex",
+                  width: iconButtonSize,
+                  height: iconButtonSize,
+                  borderRadius: '50%',
+                  margin: theme.spacing(0.5),
+                  transition: "background-color 0.2s",
                   color: "text.secondary",
+                  "&:hover": {
+                    backgroundColor: theme.palette.action.hover,
+                  },
                 }}
               >
-                {icon}
+                {themeToggleItem.icon}
               </ListItemIcon>
             </ListItemButton>
-          </ListItem>
-        ))}
+          </Tooltip>
+        </ListItem>
       </List>
     </Drawer>
   );

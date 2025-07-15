@@ -4,7 +4,7 @@ export enum Units {
   Metric = "Metric",
 }
 
-export type DesignParameters = {
+export type DesignParams = {
   units: Units;
   pressure: number;
   temperature: number;

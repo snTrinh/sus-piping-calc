@@ -1,8 +1,10 @@
 import React from "react";
-import { DesignParameters, Units } from "@/types/units";
-import pipeDimensions from "@/utils/transformed_pipeData.json";
+import { DesignParams, Units } from "@/types/units";
+import pipeDimensions from "@/data/transformed_pipeData.json";
 import { npsToMmMap, unitConversions } from "@/utils/unitConversions";
-import pipeData from "@/utils/pipeData.json";
+import pipeData from "@/data/pipeData.json";
+import { useTheme } from "@mui/material/styles"; // Import useTheme
+
 type Pipe = {
   od: string;
   nps: string;
@@ -13,11 +15,12 @@ type Pipe = {
 
 type PdfPipeOutputsProps = {
   pipes: Pipe[];
-  designParams: DesignParameters;
-
+  designParams: DesignParams;
   material: string;
 };
 
+// These styles can remain outside if they don't depend on the theme,
+// or be moved inside if they need theme-specific adjustments.
 const valueStyle: React.CSSProperties = {
   marginBottom: 8,
   display: "block",
@@ -38,22 +41,26 @@ const numeratorStyle: React.CSSProperties = {
   textAlign: "center",
 };
 
-const denominatorStyle: React.CSSProperties = {
-  padding: "0 4px",
-  marginTop: 2,
-  textAlign: "center",
-  borderTop: "1px solid #000",
-};
-
 const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
   pipes,
   material,
   designParams,
 }) => {
+  const theme = useTheme(); // Access the Material-UI theme
+
   const { pressure, corrosionAllowance, allowableStress, e, w, gamma } =
     designParams;
 
   const millTolDenominator = 1 - (designParams.millTol ?? 0);
+
+  // Define denominatorStyle inside the component to use theme colors
+  const denominatorStyle: React.CSSProperties = {
+    padding: "0 4px",
+    marginTop: 2,
+    textAlign: "center",
+    borderTop: `1px solid ${theme.palette.text.primary}`, // Use theme's primary text color for the horizontal line
+  };
+
   return (
     <>
       {pipes.map((pipe, index) => {
@@ -77,7 +84,7 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
           <div
             key={pipe.nps}
             style={{
-              borderTop: "1px solid #ccc",
+              borderTop: `1px solid ${theme.palette.divider}`, // Use theme's divider color for the section border
               paddingTop: 10,
               marginTop: 16,
             }}
@@ -156,7 +163,11 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
             <div style={{ marginTop: 8, marginLeft: 24 }}>
               <div>
                 <span>
-                  tᵣ = {numerator / denominator * 1/ millTolDenominator}{" "}
+                  tᵣ ={" "}
+                  {(
+                    (numerator / denominator + corrosionAllowance) *
+                    (1 / millTolDenominator)
+                  ).toFixed(3)}{" "}
                   {unitConversions.length[designParams.units].unit}
                 </span>
               </div>
@@ -167,9 +178,21 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
                   t {displayedScheduleThickness > pipe.tRequired ? ">" : "<"} tᵣ
                   ∴{" "}
                   {displayedScheduleThickness > pipe.tRequired ? (
-                    "Acceptable"
+                    <span
+                      style={{
+                        color: theme.palette.success.main,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Acceptable
+                    </span>
                   ) : (
-                    <span style={{ color: "red", fontWeight: "bold" }}>
+                    <span
+                      style={{
+                        color: theme.palette.error.main,
+                        fontWeight: "bold",
+                      }}
+                    >
                       Not Acceptable
                     </span>
                   )}

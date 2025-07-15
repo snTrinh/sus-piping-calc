@@ -1,14 +1,14 @@
 "use client";
 import React from "react";
-import { MenuItem, TextField, Box } from "@mui/material";
-import LabeledInput from "../common/LabeledInput";
-import { DesignParameters, Units } from "@/types/units";
+import { MenuItem, TextField, Box, Typography } from "@mui/material"; // Import Typography
+import LabeledInput from "../../common/LabeledInput";
+import { DesignParams, Units } from "@/types/units";
 import { unitConversions } from "@/utils/unitConversions";
 
-type DesignInputsProps = {
+type DesignConstantsProps = {
   materials: string[];
   material: string;
-  designParams: DesignParameters;
+  designParams: DesignParams;
 
   onUnitsChange: (
     event: React.MouseEvent<HTMLElement>,
@@ -20,7 +20,7 @@ type DesignInputsProps = {
   onDesignPressureChange: (value: number) => void;
 };
 
-export default function DesignInputs({
+export default function DesignConstants({
   materials,
   material,
   designParams,
@@ -28,30 +28,32 @@ export default function DesignInputs({
   onTemperatureChange,
   onCAChange,
   onDesignPressureChange,
-}: DesignInputsProps) {
-  const {
-    pressure,
-    temperature,
-    corrosionAllowance,
-    allowableStress,
-  } = designParams;
+}: DesignConstantsProps) {
+  const { pressure, temperature, corrosionAllowance, allowableStress } =
+    designParams;
 
   return (
     <Box
       sx={{
         display: "flex",
-        flexDirection: "column", 
-        gap: 2, 
-        width: "100%", 
+        flexDirection: "column",
+        gap: 2, // This gap will now apply between the Typography and the first input Box
+        width: "100%",
       }}
     >
+      {/* Added Title */}
+      <Typography variant="h6" gutterBottom>
+        Design Parameters
+      </Typography>
 
+      {/* Material TextField - Responsive Flex Direction */}
       <Box
         sx={{
           display: "flex",
           gap: 2,
           flexWrap: "wrap",
           justifyContent: "flex-start",
+          flexDirection: { xs: "column", sm: "row" }, // Added responsive flexDirection
         }}
       >
         <TextField
@@ -59,7 +61,7 @@ export default function DesignInputs({
           label="Material"
           value={material}
           onChange={(e) => onMaterialChange(e.target.value)}
-          sx={{ minWidth: 200, flexGrow: 1, flexBasis: "200px" }} 
+          sx={{ minWidth: 200, flexGrow: 1 }}
           size="small"
         >
           {materials.map((mat) => (
@@ -68,41 +70,17 @@ export default function DesignInputs({
             </MenuItem>
           ))}
         </TextField>
+        
       </Box>
 
+      {/* Corrosion Allowance & Allowable Stress LabeledInputs - Responsive Flex Direction */}
       <Box
         sx={{
           display: "flex",
           gap: 2,
           flexWrap: "wrap",
           justifyContent: "flex-start",
-        }}
-      >
-        <LabeledInput
-          label="Design Pressure"
-          symbol="P"
-          unit={unitConversions.pressure[designParams.units].unit}
-          value={pressure}
-          onChange={onDesignPressureChange}
-          sx={{ minWidth: 140, flex: 1 }} 
-        />
-
-        <LabeledInput
-          label="Temperature"
-          symbol="T"
-          unit={unitConversions.temperature[designParams.units].unit}
-          value={temperature}
-          onChange={onTemperatureChange}
-          sx={{ minWidth: 140, flex: 1 }} 
-        />
-      </Box>
-
-      <Box
-        sx={{
-          display: "flex",
-          gap: 2,
-          flexWrap: "wrap",
-          justifyContent: "flex-start",
+          flexDirection: { xs: "column", sm: "row" }, // Added responsive flexDirection
         }}
       >
         <LabeledInput
@@ -111,19 +89,12 @@ export default function DesignInputs({
           unit={unitConversions.length[designParams.units].unit}
           value={corrosionAllowance}
           onChange={onCAChange}
-          sx={{ minWidth: 140, flex: 1 }} 
-        />
-
-        <LabeledInput
-          label="Allowable Stress"
-          symbol="S"
-          unit={unitConversions.pressure[designParams.units].unit}
-          value={allowableStress}
-          onChange={() => {}}
-          disabled
           sx={{ minWidth: 140, flex: 1 }}
         />
+
+       
       </Box>
+      
     </Box>
   );
 }

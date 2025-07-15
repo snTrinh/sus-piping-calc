@@ -6,7 +6,6 @@ export default function HomePage() {
     <Box
       sx={{
         minHeight: "100vh",
-        backgroundColor: "white",
         padding: 4,
       }}
     >

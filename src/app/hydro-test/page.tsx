@@ -34,10 +34,7 @@ export default function HydroTestPage() {
     <Box
       sx={{
         minHeight: "100vh",
-        backgroundColor: "white",
         p: 4,
-        maxWidth: 1200,
-        // mx: "auto", // optional: centers the whole container
       }}
     >
       <Typography variant="h4" fontWeight="bold" align="left" gutterBottom>
@@ -53,10 +50,9 @@ export default function HydroTestPage() {
           flexDirection: { xs: "column", md: "row" },
           gap: 4,
           alignItems: "stretch",
-          mb: 4, // space before PDF export
         }}
       >
-        <Box sx={{ flex: 1, minWidth: 450, height: 300 }}>
+        <Box sx={{ flex: 1, minWidth: 450, height: 250 }}>
           <InputValuesCard
             P={P}
             St={St}
@@ -68,7 +64,7 @@ export default function HydroTestPage() {
           />
         </Box>
 
-        <Box sx={{ flex: 1, minWidth: 450, height: 300 }}>
+        <Box sx={{ flex: 1, minWidth: 450, height: 250 }}>
           <CalculatedValueCard
             Pt={calculatedPressure}
             P={P}

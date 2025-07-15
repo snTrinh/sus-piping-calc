@@ -1,0 +1,201 @@
+// src/app/b31.3-calculator/SinglePressureTabContent.tsx
+"use client";
+
+import React from "react";
+import { v4 as uuidv4 } from "uuid";
+import { Box, Button, Card, Typography, CardContent } from "@mui/material";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+
+import { Units, PipeSchedule } from "@/types/types";
+import PipeCard from "../PipeCard";
+import FormulaDisplay from "../FormulaDisplay";
+import DesignInputs from "./DesignParameters";
+import PdfExport from "../pdfExport/PdfExport";
+
+type Pipe = {
+  id: string;
+  nps: string;
+  od: string;
+  schedule: PipeSchedule;
+  tRequired: number;
+  t: number;
+};
+
+interface SinglePressureTabContentProps {
+  units: Units;
+  material: string;
+  temperature: number;
+  corrosionAllowance: number;
+  pressure: number;
+  allowableStress: number | null;
+  gamma: number;
+  millTol: number;
+  e: number;
+  w: number;
+  pipesForDisplay: Pipe[];
+  materials: string[];
+  designParams: {
+    units: Units;
+    pressure: number;
+    temperature: number;
+    corrosionAllowance: number;
+    allowableStress: number | null;
+    gamma: number;
+    millTol: number;
+    e: number;
+    w: number;
+  };
+
+  setMaterial: (value: string) => void;
+  setTemperature: (value: number) => void;
+  setCorrosionAllowance: (value: number) => void;
+  setPressure: (value: number) => void;
+  setPipes: (pipes: Pipe[]) => void;
+
+  updatePipe: (id: string, key: keyof Pipe, value: any) => void; // Corrected type for key
+  removePipe: (id: string) => void;
+  handleUnitsChange: (
+    event: React.MouseEvent<HTMLElement>,
+    newUnits: Units
+  ) => void;
+  handleTemperatureChange: (value: number) => void;
+  handleCAChange: (value: number) => void;
+  handleDesignPressureChange: (value: number) => void;
+}
+
+const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
+  units,
+  material,
+  pipesForDisplay,
+  materials,
+  designParams,
+  setMaterial,
+  setPipes,
+  updatePipe,
+  removePipe,
+  handleUnitsChange,
+  handleTemperatureChange,
+  handleCAChange,
+  handleDesignPressureChange,
+}) => {
+  return (
+    <>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          gap: 4,
+          alignItems: "stretch",
+          mt: 4,
+        }}
+      >
+        {/* Left Column: Inputs Card */}
+        <Card
+          sx={{
+            flex: 1,
+            minWidth: 450,
+            display: "flex",
+            flexDirection: "column",
+            height: 305, // Fixed height for consistent alignment
+            border: "1px solid #ddd",
+          }}
+          elevation={0}
+        >
+          <CardContent
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 2, // Ensures 16px gap between DesignInputs and the button
+              height: "100%",
+              p: 2, // Provides 16px padding on all sides, including the bottom
+            }}
+          >
+            <DesignInputs
+              designParams={{
+                ...designParams,
+                allowableStress: designParams.allowableStress ?? 0,
+              }}
+              materials={materials}
+              material={material}
+              onUnitsChange={handleUnitsChange}
+              onMaterialChange={setMaterial}
+              onTemperatureChange={handleTemperatureChange}
+              onCAChange={handleCAChange}
+              onDesignPressureChange={handleDesignPressureChange}
+              sx={{ flexGrow: 1 }}
+            />
+
+            {/* Button container now directly follows DesignInputs */}
+            <Box sx={{ width: "100%", paddingTop:1.5 }}>
+              <Button
+                startIcon={<AddCircleOutlineIcon />}
+                variant="outlined"
+                onClick={() =>
+                  setPipes((prev: Pipe[]) => [
+                    ...prev,
+                    {
+                      id: uuidv4(),
+                      nps: "2",
+                      od: "2.375",
+                      schedule: "40",
+                      tRequired: 0,
+                      t: 0,
+                    },
+                  ])
+                }
+                fullWidth
+              >
+                Add Pipe
+              </Button>
+            </Box>
+          </CardContent>
+        </Card>
+
+        {/* Formula Card */}
+        <Card
+          sx={{
+            flex: 1,
+            minWidth: 450,
+            display: "flex",
+            flexDirection: "column",
+            p: 2,
+            gap: 2,
+            height: 305, // Fixed height for consistent alignment
+            border: "1px solid #ddd",
+          }}
+          elevation={0}
+        >
+          <Typography variant="h6" gutterBottom>
+            Formula
+          </Typography>
+          <FormulaDisplay designParams={designParams} />
+        </Card>
+      </Box>
+
+      <Box sx={{ mt: 4, display: "flex", flexDirection: "column", gap: 2 }}>
+        {pipesForDisplay.map((pipe) => (
+          <PipeCard
+            key={pipe.id}
+            pipe={pipe}
+            updatePipe={updatePipe}
+            removePipe={removePipe}
+            units={units}
+          />
+        ))}
+      </Box>
+
+      <Box sx={{ mt: 4 }}>
+        <PdfExport
+          material={material}
+          designParams={{
+            ...designParams,
+            allowableStress: designParams.allowableStress ?? 0,
+          }}
+          pipes={pipesForDisplay}
+        />
+      </Box>
+    </>
+  );
+};
+
+export default SinglePressureTabContent;

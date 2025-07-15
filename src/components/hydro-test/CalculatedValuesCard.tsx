@@ -26,7 +26,10 @@ export default function CalculatedValueCard({
       ? `100 ${unitConversions.temperature[units].unit}`
       : `38 ${unitConversions.temperature[units].unit}`;
   return (
-    <Card sx={{ height: "100%" }}>
+    <Card sx={{ height: "100%", border: "1px solid #ddd" }}
+    elevation={0}
+
+    >
       <CardContent>
         <Typography variant="h6" gutterBottom>
           Calculated Value as per B31.3 - 345.4.2
@@ -81,7 +84,7 @@ export default function CalculatedValueCard({
             display: "flex",
             flexWrap: "wrap",
             gap: 2,
-            mt: 7,
+            mt: 4,
             justifyContent: "flex-start",
           }}
         >

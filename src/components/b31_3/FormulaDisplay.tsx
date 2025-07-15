@@ -1,30 +1,28 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
 
-import { DesignParameters, Units } from "@/types/units"; 
-
+import { DesignParams, Units } from "@/types/units";
 
 interface FormulaDisplayProps {
-  designParams?: DesignParameters; 
+  designParams?: DesignParams;
 }
 
 export default function FormulaDisplay({ designParams }: FormulaDisplayProps) {
-
+  const theme = useTheme(); // Access the current theme
   const e = designParams?.e ?? 1;
   const w = designParams?.w ?? 1;
   const gamma = designParams?.gamma ?? 0.4;
-  const millTol = designParams?.millTol ?? 0.125; 
+  const millTol = designParams?.millTol ?? 0.125;
 
   return (
     <Box
       sx={{
-        backgroundColor: "#f9f9f9",
+        backgroundColor: theme.palette.background.default,
         p: 2,
         borderRadius: 1,
-        overflowX: "auto",
+        overflow: "hidden",
       }}
     >
-
       <Typography
         variant="body2"
         color="text.secondary"
@@ -32,7 +30,6 @@ export default function FormulaDisplay({ designParams }: FormulaDisplayProps) {
       >
         Required Thickness (ASME B31.3):
       </Typography>
-
 
       <Typography
         component="div"
@@ -54,7 +51,6 @@ export default function FormulaDisplay({ designParams }: FormulaDisplayProps) {
           tᵣ = (
         </Typography>
 
-
         <Box
           sx={{
             display: "inline-flex",
@@ -64,10 +60,10 @@ export default function FormulaDisplay({ designParams }: FormulaDisplayProps) {
             lineHeight: 1,
           }}
         >
-
           <Box
             sx={{
-              borderBottom: "1px solid #000",
+              // Apply !important to ensure this border color overrides any conflicting rules
+              borderBottom: `1px solid ${theme.palette.text.primary} !important`,
               px: 0.5,
               textAlign: "center",
               whiteSpace: "nowrap",
@@ -75,7 +71,6 @@ export default function FormulaDisplay({ designParams }: FormulaDisplayProps) {
           >
             (P × D)
           </Box>
-
 
           <Box
             sx={{
@@ -89,7 +84,6 @@ export default function FormulaDisplay({ designParams }: FormulaDisplayProps) {
           </Box>
         </Box>
 
-
         <Typography
           variant="body2"
           component="span"
@@ -98,7 +92,6 @@ export default function FormulaDisplay({ designParams }: FormulaDisplayProps) {
           + CA )
         </Typography>
 
-
         <Typography
           variant="body2"
           component="span"
@@ -106,7 +99,6 @@ export default function FormulaDisplay({ designParams }: FormulaDisplayProps) {
         >
           ×
         </Typography>
-
 
         <Box
           sx={{
@@ -121,7 +113,8 @@ export default function FormulaDisplay({ designParams }: FormulaDisplayProps) {
         >
           <Box
             sx={{
-              borderBottom: "1px solid #000",
+              // Apply !important to ensure this border color overrides any conflicting rules
+              borderBottom: `1px solid ${theme.palette.text.primary} !important`,
               px: 0.5,
               mt: 0.3,
               textAlign: "center",
@@ -139,7 +132,7 @@ export default function FormulaDisplay({ designParams }: FormulaDisplayProps) {
       <Typography
         variant="body2"
         color="text.secondary"
-        sx={{ fontWeight: "bold", mb: 1, mt: 2 }} 
+        sx={{ fontWeight: "bold", mb: 1, mt: 2 }}
       >
         Assumptions:
       </Typography>

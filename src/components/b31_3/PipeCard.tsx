@@ -1,3 +1,5 @@
+// src/app/b31.3-calculator/PipeCard.tsx
+"use client";
 import React from "react";
 import {
   Box,
@@ -7,12 +9,16 @@ import {
   Button,
   Card,
   CardContent,
+  IconButton, // Import IconButton
 } from "@mui/material";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+import DeleteIcon from "@mui/icons-material/Delete"; // Import DeleteIcon for the corner icon
+import { useTheme } from "@mui/material/styles"; // Import useTheme for theme colors
+
 import { Units } from "@/types/units";
 import { npsToMmMap, unitConversions } from "@/utils/unitConversions";
-import pipeData from "@/utils/pipeData.json";
-import pipeDimensions from "@/utils/transformed_pipeData.json";
+import pipeData from "@/data/pipeData.json";
+import pipeDimensions from "@/data/transformed_pipeData.json";
 
 type Pipe = {
   id: string;
@@ -27,6 +33,7 @@ type PipeCardProps = {
   updatePipe: (id: string, key: keyof Pipe, value: any) => void;
   removePipe: (id: string) => void;
   units: Units;
+  sx?: object; // Added sx prop for consistency with other cards
 };
 
 const scheduleOptions = ["5", "10", "40", "80"];
@@ -36,7 +43,10 @@ export default function PipeCard({
   updatePipe,
   removePipe,
   units,
+  sx // Destructure sx prop
 }: PipeCardProps) {
+  const theme = useTheme(); // Use theme for colors
+
   const rawThickness =
     pipeDimensions["Imperial"][pipe.nps]?.schedules[pipe.schedule] ?? 0;
 
@@ -53,16 +63,42 @@ export default function PipeCard({
   return (
     <Card
       sx={{
-        mb: 4,
         borderRadius: 2,
         border: "1px solid #ddd",
         boxShadow: "none",
+        position: "relative", // Essential for absolute positioning of the icon
+        ...sx // Apply any custom sx prop passed to this Card
       }}
     >
-      <CardContent>
-        <Typography variant="h6" gutterBottom>
-          Pipe — NPS {pipe.nps}, Schedule {pipe.schedule}
-        </Typography>
+      <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}> {/* Added flex properties to CardContent for consistent spacing */}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            // mb: 2, // Removed mb here, let CardContent gap handle spacing
+          }}
+        >
+          <Typography variant="h6" gutterBottom={false}> {/* Set gutterBottom to false to let the Box handle spacing */}
+            Pipe — NPS {pipe.nps}, Schedule {pipe.schedule}
+          </Typography>
+          <IconButton
+            aria-label="remove pipe"
+            onClick={() => removePipe(pipe.id)}
+            sx={{
+              color: theme.palette.error.main, // Use theme error color for the icon
+              p: 0.5, // Smaller padding for the icon button itself
+              // If you want it absolutely positioned *outside* the flow of the header,
+              // uncomment the lines below and adjust top/right as needed.
+              // This current setup places it within the header flex container.
+              // position: 'absolute',
+              // top: 8,
+              // right: 8,
+            }}
+          >
+            <RemoveCircleOutlineIcon />
+          </IconButton>
+        </Box>
 
         <Box
           sx={{
@@ -70,7 +106,7 @@ export default function PipeCard({
             flexWrap: "wrap",
             gap: 2,
             alignItems: "center",
-            mb: 2,
+            // mb: 2, // Removed mb here, let CardContent gap handle spacing
           }}
         >
           <TextField
@@ -123,6 +159,18 @@ export default function PipeCard({
             ))}
           </TextField>
 
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 2,
+            alignItems: "center",
+            // mb: 2, // Removed mb here, let CardContent gap handle spacing
+          }}
+        >
+         
+
           <TextField
             label={`Outer Diameter, D (${unitLabel})`}
             value={outerDiameter.toFixed(2)}
@@ -131,6 +179,20 @@ export default function PipeCard({
             sx={{ minWidth: 120, flexGrow: 1, flexBasis: "120px" }}
           />
 
+          
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 2,
+            alignItems: "center",
+            // mb: 2, // Removed mb here, let CardContent gap handle spacing
+          }}
+        >
+         
+
+         
           <TextField
             label={`Required Thickness, tᵣ (${unitLabel})`}
             value={displayedTRequired.toFixed(3)}
@@ -139,6 +201,20 @@ export default function PipeCard({
             sx={{ minWidth: 120, flexGrow: 1, flexBasis: "120px" }}
           />
 
+
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 2,
+            alignItems: "center",
+            // mb: 2, // Removed mb here, let CardContent gap handle spacing
+          }}
+        >
+         
+
+         
           <TextField
             label={`Schedule Thickness (${unitLabel})`}
             value={displayedScheduleThickness.toFixed(3)}
@@ -146,37 +222,38 @@ export default function PipeCard({
             disabled
             sx={{ minWidth: 120, flexGrow: 1, flexBasis: "120px" }}
           />
-
-          <Button
-            startIcon={<RemoveCircleOutlineIcon />}
-            variant="outlined"
-            color="error"
-            size="small"
-            onClick={() => removePipe(pipe.id)}
-            sx={{
-              whiteSpace: "nowrap",
-              height: "40px",
-              alignSelf: "center",
-              flexShrink: 0,
-              minWidth: 140,
-            }}
-          >
-            Remove Pipe
-          </Button>
         </Box>
 
-        <Typography sx={{ mb: 2, textAlign: "right" }}>
+        <Typography sx={{ textAlign: "right" }}> {/* Removed mb: 2, let CardContent gap handle spacing */}
           <strong>Result:</strong>{" "}
           {displayedScheduleThickness >= displayedTRequired ? (
-            <span style={{ color: "green", fontWeight: "bold" }}>
+            <span style={{ color: theme.palette.success.main, fontWeight: "bold" }}>
               ACCEPTABLE
             </span>
           ) : (
-            <span style={{ color: "red", fontWeight: "bold" }}>
+            <span style={{ color: theme.palette.error.main, fontWeight: "bold" }}>
               NOT ACCEPTABLE
             </span>
           )}
         </Typography>
+
+        {/* The original "Remove Pipe" button. It's now below the main content. */}
+        {/* <Button
+          startIcon={<RemoveCircleOutlineIcon />}
+          variant="outlined"
+          color="error"
+          size="small"
+          onClick={() => removePipe(pipe.id)}
+          sx={{
+            whiteSpace: "nowrap",
+            height: "40px",
+            alignSelf: "flex-end", // Align to the right within the flex column
+            minWidth: 140,
+            // mt: 2, // Removed mt, let CardContent gap handle spacing
+          }}
+        >
+          Remove Pipe
+        </Button> */}
       </CardContent>
     </Card>
   );
