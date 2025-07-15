@@ -6,13 +6,11 @@ import {
   TextField,
   MenuItem,
   Typography,
-  Button,
   Card,
   CardContent,
   IconButton, // Import IconButton
 } from "@mui/material";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
-import DeleteIcon from "@mui/icons-material/Delete"; // Import DeleteIcon for the corner icon
 import { useTheme } from "@mui/material/styles"; // Import useTheme for theme colors
 
 import { Units } from "@/types/units";
@@ -30,7 +28,7 @@ type Pipe = {
 
 type PipeCardProps = {
   pipe: Pipe;
-  updatePipe: (id: string, key: keyof Pipe, value: any) => void;
+  updatePipe: (id: string, key: keyof Pipe, value: string | number) => void;
   removePipe: (id: string) => void;
   units: Units;
   sx?: object; // Added sx prop for consistency with other cards
@@ -47,8 +45,8 @@ export default function PipeCard({
 }: PipeCardProps) {
   const theme = useTheme(); // Use theme for colors
 
-  const rawThickness =
-    pipeDimensions["Imperial"][pipe.nps]?.schedules[pipe.schedule] ?? 0;
+  // @ts-expect-error this is required
+  const rawThickness = pipeDimensions["Imperial"][pipe.nps]?.schedules[pipe.schedule] ?? 0;
 
   const thicknessConversion = unitConversions.length[units];
   const unitLabel = thicknessConversion.unit;

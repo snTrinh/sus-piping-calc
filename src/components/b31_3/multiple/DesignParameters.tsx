@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { MenuItem, TextField, Box, Typography } from "@mui/material"; // Import Typography
+import { Box, Typography } from "@mui/material"; // Import Typography
 import LabeledInput from "../../common/LabeledInput";
 import { DesignParams, Units } from "@/types/units";
 import { unitConversions } from "@/utils/unitConversions";
@@ -21,15 +21,11 @@ type DesignParametersProps = {
 };
 
 export default function DesignParameters({
-  materials,
-  material,
   designParams,
-  onMaterialChange,
   onTemperatureChange,
-  onCAChange,
   onDesignPressureChange,
 }: DesignParametersProps) {
-  const { pressure, temperature, corrosionAllowance, allowableStress } =
+  const { pressure, temperature, allowableStress } =
     designParams;
 
   return (
@@ -63,7 +59,7 @@ export default function DesignParameters({
           value={pressure}
           onChange={onDesignPressureChange}
           sx={{ minWidth: 140, flex: 1 }}
-          type="number" // Re-added for proper arrow key functionality
+          // Removed type="number" as it is not a valid prop for LabeledInput
         />
       </Box>
 
@@ -83,7 +79,7 @@ export default function DesignParameters({
           value={temperature}
           onChange={onTemperatureChange}
           sx={{ minWidth: 140, flex: 1 }}
-          type="number" // Re-added for proper arrow key functionality
+          // type="number" // Re-added for proper arrow key functionality
         />
       </Box>
 
@@ -111,7 +107,7 @@ export default function DesignParameters({
           onChange={() => {}}
           disabled
           sx={{ minWidth: 140, flex: 1 }}
-          type="number" // Re-added for proper arrow key functionality
+          // type="number" // Re-added for proper arrow key functionality
         />
       </Box>
     </Box>

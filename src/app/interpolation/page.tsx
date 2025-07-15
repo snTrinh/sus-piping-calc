@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Box, Typography, Container, Card } from "@mui/material";
+import { Box, Typography, Container} from "@mui/material";
 import InputValuesCard from "./../../components/interpolation/InputValuesCard";
 import InterpolatedValueCard from "./../../components/interpolation/InterpolatedValuesCard";
 

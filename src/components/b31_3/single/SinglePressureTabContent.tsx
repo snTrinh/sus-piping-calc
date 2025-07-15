@@ -6,11 +6,16 @@ import { v4 as uuidv4 } from "uuid";
 import { Box, Button, Card, Typography, CardContent } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
-import { Units, PipeSchedule } from "@/types/types";
+import {
+
+  PipeSchedule,
+
+} from "@/utils/unitConversions";
 import PipeCard from "../PipeCard";
 import FormulaDisplay from "../FormulaDisplay";
 import DesignInputs from "./DesignParameters";
 import PdfExport from "../pdfExport/PdfExport";
+import { Units } from "@/types/units";
 
 type Pipe = {
   id: string;
@@ -52,7 +57,7 @@ interface SinglePressureTabContentProps {
   setPressure: (value: number) => void;
   setPipes: (pipes: Pipe[]) => void;
 
-  updatePipe: (id: string, key: keyof Pipe, value: any) => void; // Corrected type for key
+  updatePipe: (id: string, key: keyof Pipe, value: string | number) => void; // Corrected type for key and value
   removePipe: (id: string) => void;
   handleUnitsChange: (
     event: React.MouseEvent<HTMLElement>,
@@ -122,7 +127,6 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
               onTemperatureChange={handleTemperatureChange}
               onCAChange={handleCAChange}
               onDesignPressureChange={handleDesignPressureChange}
-              sx={{ flexGrow: 1 }}
             />
 
             {/* Button container now directly follows DesignInputs */}
@@ -131,17 +135,16 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
                 startIcon={<AddCircleOutlineIcon />}
                 variant="outlined"
                 onClick={() =>
-                  setPipes((prev: Pipe[]) => [
-                    ...prev,
-                    {
-                      id: uuidv4(),
-                      nps: "2",
-                      od: "2.375",
-                      schedule: "40",
-                      tRequired: 0,
-                      t: 0,
-                    },
-                  ])
+                  setPipes([
+                                    {
+                                      id: uuidv4(),
+                                      nps: "2",
+                                      od: "2.375",
+                                      schedule: "40",
+                                      tRequired: 0,
+                                      t: 0,
+                                    },
+                                  ])
                 }
                 fullWidth
               >

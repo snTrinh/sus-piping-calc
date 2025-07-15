@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 
-import { DesignParams, Units } from "@/types/units";
+import { DesignParams } from "@/types/units";
 
 interface FormulaDisplayProps {
   designParams?: DesignParams;

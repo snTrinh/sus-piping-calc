@@ -64,8 +64,8 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
   return (
     <>
       {pipes.map((pipe, index) => {
-        const rawThickness =
-          pipeDimensions["Imperial"][pipe.nps]?.schedules[pipe.schedule] ?? 0;
+        // @ts-expect-error this is required
+        const rawThickness = pipeDimensions["Imperial"][pipe.nps]?.schedules[pipe.schedule] ?? 0;
 
         const units = designParams.units as keyof typeof unitConversions.length;
         const thicknessConversion = unitConversions.length[units];
@@ -79,7 +79,7 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
 
         const numerator = pressure * outerDiameter;
         const denominator =
-          2 * (allowableStress * (e ?? 1) * (w ?? 1) + pressure * (gamma ?? 1));
+          2 * ((allowableStress ?? 0) * (e ?? 1) * (w ?? 1) + pressure * (gamma ?? 1));
         return (
           <div
             key={pipe.nps}

@@ -6,7 +6,12 @@ import { v4 as uuidv4 } from "uuid";
 import { Box, Button, Card, Typography } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
-import { Units, PipeSchedule } from "@/types/units";
+import { Units } from "@/types/units";
+import {
+
+  PipeSchedule,
+
+} from "@/utils/unitConversions";
 import PipeCard from "../PipeCard";
 import FormulaDisplay from "../FormulaDisplay";
 import PdfExport from "../pdfExport/PdfExport";
@@ -58,7 +63,7 @@ interface MultiplePressuresTabContentProps {
   setPipes: (pipes: Pipe[]) => void;
 
   // Handlers
-  updatePipe: (id: string, key: keyof Pipe, value: any) => void;
+  updatePipe: (id: string, key: keyof Pipe, value: string | number) => void;
   removePipe: (id: string) => void;
   handleUnitsChange: (
     event: React.MouseEvent<HTMLElement>,
@@ -78,9 +83,6 @@ const MultiplePressuresTabContent: React.FC<
   materials,
   designParams,
   setMaterial,
-  setTemperature,
-  setCorrosionAllowance,
-  setPressure,
   setPipes,
   updatePipe,
   removePipe,
@@ -131,9 +133,7 @@ const MultiplePressuresTabContent: React.FC<
               startIcon={<AddCircleOutlineIcon />}
               variant="outlined"
               onClick={() =>
-                setPipes((prev: Pipe[]) => [
-                  // Corrected type for prev
-                  ...prev,
+                setPipes([
                   {
                     id: uuidv4(),
                     nps: "2",

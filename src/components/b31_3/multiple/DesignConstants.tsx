@@ -25,11 +25,9 @@ export default function DesignConstants({
   material,
   designParams,
   onMaterialChange,
-  onTemperatureChange,
   onCAChange,
-  onDesignPressureChange,
 }: DesignConstantsProps) {
-  const { pressure, temperature, corrosionAllowance, allowableStress } =
+  const { corrosionAllowance } =
     designParams;
 
   return (

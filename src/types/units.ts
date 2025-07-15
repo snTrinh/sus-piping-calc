@@ -9,7 +9,7 @@ export type DesignParams = {
   pressure: number;
   temperature: number;
   corrosionAllowance: number;
-  allowableStress: number;
+  allowableStress: number | null | undefined;
   e?: number;
   w?: number;
   gamma?: number;

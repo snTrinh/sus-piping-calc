@@ -1,5 +1,5 @@
 import React, { forwardRef } from "react";
-import { DesignParams, Units } from "@/types/units";
+import { DesignParams} from "@/types/units";
 import PdfDesignInputs, { DrawingInfo } from "./PdfDesignInputs";
 import PdfPipeOutputs from "./PdfPipeOutputs";
 import { useTheme } from "@mui/material/styles"; // Import useTheme

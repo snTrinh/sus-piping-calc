@@ -7,7 +7,7 @@ type LabeledInputProps = {
   label: string;
   symbol?: string;
   unit?: string;
-  value?: number;
+  value?: number | null | undefined;
   onChange: (value: number) => void;
   disabled?: boolean;
   step?: number;
@@ -37,7 +37,7 @@ export default function LabeledInput({
     percentage ? `${((val ?? 0) * 100).toFixed(2)}%` : (val ?? 0).toString();
 
   // Local state to manage the input field's text, allowing for partial/invalid input temporarily
-  const [inputValue, setInputValue] = useState(formatValue(value));
+  const [inputValue, setInputValue] = useState(formatValue(value ?? 0));
 
   // Effect to re-sync local inputValue with the 'value' prop from parent
   // This is crucial if the parent updates 'value' from other sources or after an initial commit.
@@ -46,7 +46,7 @@ export default function LabeledInput({
     // A more robust check might be needed for production, but this is a good start.
     if (parseFloat(inputValue) !== value) {
       // Simple check to prevent unnecessary re-renders during active typing
-      setInputValue(formatValue(value));
+      setInputValue(formatValue(value ?? 0));
     }
   }, [value, percentage]);
 

@@ -76,7 +76,7 @@ export default function B31_3Calculator() {
         const targetNps =
           units === Units.Metric ? npsToMmMap[pipe.nps] : pipe.nps;
 
-        let outerDiameter =
+        const outerDiameter =
           pipeData[units]?.columns?.find((col) => col.NPS === targetNps)?.OD ||
           0;
 
@@ -120,7 +120,7 @@ export default function B31_3Calculator() {
     setPressure(value);
   };
 
-  const updatePipe = (id: string, key: keyof Pipe, value: any) => {
+  const updatePipe = (id: string, key: keyof Pipe, value: Pipe[keyof Pipe]) => {
     setPipes((prev) =>
       prev.map((pipe) => (pipe.id === id ? { ...pipe, [key]: value } : pipe))
     );
