@@ -1,4 +1,3 @@
-// src/app/b31.3-calculator/SinglePressureTabContent.tsx
 "use client";
 
 import React from "react";
@@ -7,9 +6,7 @@ import { Box, Button, Card, Typography, CardContent } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
 import {
-
-  PipeSchedule,
-
+  PipeSchedule, // Ensure PipeSchedule is imported from unitConversions
 } from "@/utils/unitConversions";
 import PipeCard from "../PipeCard";
 import FormulaDisplay from "../FormulaDisplay";
@@ -90,15 +87,17 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
           display: "flex",
           flexDirection: { xs: "column", md: "row" },
           gap: 4,
-          alignItems: "stretch",
+          alignItems: "stretch", // Ensures cards stretch to the same height
+          justifyContent: "center", // Center the cards horizontally on larger screens
           mt: 4,
         }}
       >
         {/* Left Column: Inputs Card */}
         <Card
           sx={{
-            flex: 1,
-            minWidth: 450,
+            // Removed flex: 1 to allow fixed width
+            width: { xs: "100%", md: 584 }, // Set width to 539px on desktop, full width on smaller screens
+            minWidth: { xs: "auto", md: 450 }, // Keep minWidth for smaller desktop sizes if needed, or adjust
             display: "flex",
             flexDirection: "column",
             height: 305, // Fixed height for consistent alignment
@@ -134,18 +133,19 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
               <Button
                 startIcon={<AddCircleOutlineIcon />}
                 variant="outlined"
-                onClick={() =>
-                  setPipes([
-                                    {
-                                      id: uuidv4(),
-                                      nps: "2",
-                                      od: "2.375",
-                                      schedule: "40",
-                                      tRequired: 0,
-                                      t: 0,
-                                    },
-                                  ])
-                }
+                onClick={() => {
+                  // Create the new pipe object
+                  const newPipe: Pipe = { // Explicitly type newPipe as Pipe
+                    id: uuidv4(),
+                    nps: "2",
+                    od: "2.375",
+                    schedule: "40" as PipeSchedule, // Explicitly cast to PipeSchedule
+                    tRequired: 0,
+                    t: 0,
+                  };
+                  // Pass the new array directly to setPipes
+                  setPipes([...pipesForDisplay, newPipe]);
+                }}
                 fullWidth
               >
                 Add Pipe
@@ -157,8 +157,9 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
         {/* Formula Card */}
         <Card
           sx={{
-            flex: 1,
-            minWidth: 450,
+            // Removed flex: 1 to allow fixed width
+            width: { xs: "100%", md: 584 }, // Set width to 539px on desktop, full width on smaller screens
+            minWidth: { xs: "auto", md: 450 }, // Keep minWidth for smaller desktop sizes if needed, or adjust
             display: "flex",
             flexDirection: "column",
             p: 2,

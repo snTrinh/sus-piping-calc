@@ -1,3 +1,4 @@
+// src/app/FormulaDisplay.tsx
 import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 

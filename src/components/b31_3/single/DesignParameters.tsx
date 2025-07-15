@@ -1,4 +1,4 @@
-"use client";
+// src/app/b31.3-calculator/DesignParameters.tsx
 import React from "react";
 import { MenuItem, TextField, Box, Typography } from "@mui/material"; // Import Typography
 import LabeledInput from "../../common/LabeledInput";
