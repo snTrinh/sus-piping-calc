@@ -13,4 +13,4 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Deployed on Git
 
-Open [https://https://sntrinh.github.io/sus-piping-calc/](https://https://sntrinh.github.io/sus-piping-calc/) with your browser to see the result.
+Open [https://sntrinh.github.io/sus-piping-calc/](https://sntrinh.github.io/sus-piping-calc/) with your browser to see the result.
