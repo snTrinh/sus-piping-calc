@@ -62,14 +62,18 @@ export default function Sidebar() {
           <ListItem key={href} disablePadding sx={{ display: "block" }}>
             <Tooltip title={label} placement="right">
               <ListItemButton
-                onClick={() => router.push(href)}
+                onClick={(e) => {
+                  e.preventDefault(); // Prevent default link behavior if any
+                  console.log(`Attempting to navigate to: ${href}`); // Debugging log
+                  router.push(href);
+                }}
                 sx={{
                   minHeight: 48,
                   justifyContent: "center",
                   px: 0,
                   transition: "background-color 0.2s",
                   "&:hover": {
-                    backgroundColor: "transparent", // KEY CHANGE: Hide ListItemButton's hover background
+                    backgroundColor: "transparent", // Hide ListItemButton's hover background
                   },
                   cursor: "pointer",
                   color: "inherit",
@@ -111,7 +115,7 @@ export default function Sidebar() {
                 px: 0,
                 transition: "background-color 0.2s",
                 "&:hover": {
-                  backgroundColor: "transparent", // KEY CHANGE: Hide ListItemButton's hover background
+                  backgroundColor: "transparent", // Hide ListItemButton's hover background
                 },
                 cursor: "pointer",
                 color: "inherit",

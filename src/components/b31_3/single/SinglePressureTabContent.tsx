@@ -10,11 +10,12 @@ import {
 } from "@/utils/unitConversions";
 import PipeCard from "../PipeCard";
 import FormulaDisplay from "../FormulaDisplay";
-import DesignParameters from "./DesignParameters"; // Corrected import path
+
 import PdfExport from "../pdfExport/PdfExport";
 import { Units, DesignParams } from "@/types/units"; // Import DesignParams
 import { MaterialName } from "@/utils/materialsData"; // Import MaterialName
 import { materialStress } from "@/utils/materialStress"; // Corrected import name
+import DesignParameters from "./DesignParameters";
 
 type Pipe = {
   id: string;
@@ -75,27 +76,8 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
   handleCAChange,
   handleDesignPressureChange,
 }) => {
-  // useEffect to automatically calculate allowableStress on relevant input changes
-  useEffect(() => {
-    // Determine the category based on units
-    const category = units === "Imperial" ? "Imperial" : "Metric";
-
-    // Call the materialStressLookup function with the correct number of arguments
-    const stress = materialStress(
-      category,
-      material,
-      temperature,
-      units // Pass the current units state as the fourth argument
-    );
-
-    // Update the allowableStress state
-    setAllowableStress(stress); // Assign stress directly, it can be null
-
-    // Optionally, log a warning if stress is null
-    if (stress === null) {
-      console.warn(`Could not determine allowable stress for material: ${material}, temperature: ${temperature}, units: ${units}. Please check inputs and data range.`);
-    }
-  }, [units, material, temperature, setAllowableStress]); // Dependencies for this effect
+  // REMOVED: useEffect to automatically calculate allowableStress on relevant input changes
+  // This calculation is now handled solely in B31_3Calculator.tsx to prevent infinite loops.
 
   return (
     <>
@@ -154,8 +136,8 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
                     nps: "2",
                     od: "2.375",
                     schedule: "40" as PipeSchedule,
-                    tRequired: 0,
-                    t: 0,
+                    tRequired: 0, // Will be calculated by parent's useEffect
+                    t: 0, // Will be calculated by parent's useEffect
                   };
                   setPipes([...pipesForDisplay, newPipe]);
                 }}
