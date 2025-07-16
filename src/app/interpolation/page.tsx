@@ -22,6 +22,8 @@ import { linearInterpolation } from "./../../utils/interpolation";
 import { materialStress } from "./../../utils/materialStress";
 import { materialsData, UnitCategory, MaterialName } from "./../../utils/materialsData";
 import { Units } from "@/types/units"; // Import Units enum
+import LabeledInput from "@/components/common/LabeledInput";
+import { unitConversions } from "@/utils/unitConversions";
 
 export default function InterpolationPage() {
   // --- State for Generic Linear Interpolation ---
@@ -53,7 +55,7 @@ export default function InterpolationPage() {
 
   // Effect to update material dropdown if selected material is not available in new category
   useEffect(() => {
-    console.log("useEffect: Checking available materials and selected material.");
+
     if (availableMaterials.length === 0) {
       // If no materials are available for the selected category, ensure selectedMaterial is a sensible default
       if (selectedMaterial !== "A106B") { // Only update if it's not already the default
@@ -69,7 +71,7 @@ export default function InterpolationPage() {
 
   // NEW: Effect to trigger material stress lookup on input changes
   useEffect(() => {
-    console.log("useEffect: Triggering material stress lookup.");
+
     setMaterialLookupError(null); // Clear previous errors
     const result = materialStress(
       selectedCategory,
@@ -82,7 +84,7 @@ export default function InterpolationPage() {
       setMaterialLookupError("Could not find stress value for the given inputs. Check console for warnings.");
     }
     setMaterialStressResult(result);
-    console.log(`Material stress lookup result: ${result}`);
+
   }, [selectedCategory, selectedMaterial, inputTemperature, currentUnitsForLookup]); // Dependencies for this effect
 
   return (
@@ -125,104 +127,6 @@ export default function InterpolationPage() {
           />
 
           <InterpolatedValueCard x0={x0} y0={y0} x1={x1} y1={y1} x={x} y={y} />
-        </Box>
-
-        {/* --- Material Stress Lookup Section --- */}
-        <Typography variant="h4" fontWeight="bold" align="left" gutterBottom sx={{ mt: 6 }}>
-          Material Stress Lookup
-        </Typography>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: { xs: "column", md: "row" },
-            gap: 4,
-            alignItems: "stretch",
-            mt: 2,
-          }}
-        >
-          <Card
-            sx={{
-              flex: 1,
-              minWidth: 450,
-              display: "flex",
-              flexDirection: "column",
-              // Adjusted height to accommodate the result display
-              height: 350, // Reduced from 500 as the second card is removed
-              border: "1px solid #ddd",
-            }}
-            elevation={0}
-          >
-            <CardContent sx={{ gap: 2, display: "flex", flexDirection: "column" }}>
-              <Typography variant="h6" gutterBottom>
-                Material Data Inputs
-              </Typography>
-              <FormControl fullWidth size="small">
-                <InputLabel>Unit Category</InputLabel>
-                <Select
-                  value={selectedCategory}
-                  label="Unit Category"
-                  onChange={(e) => setSelectedCategory(e.target.value as UnitCategory)}
-                >
-                  {Object.keys(materialsData).map((cat) => (
-                    <MenuItem key={cat} value={cat}>
-                      {cat}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <FormControl fullWidth size="small">
-                <InputLabel>Material</InputLabel>
-                <Select
-                  value={selectedMaterial}
-                  label="Material"
-                  onChange={(e) => setSelectedMaterial(e.target.value as MaterialName)}
-                >
-                  {availableMaterials.map((mat) => (
-                    <MenuItem key={mat} value={mat}>
-                      {mat}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <TextField
-                label="Temperature"
-                type="number"
-                fullWidth
-                value={inputTemperature}
-                onChange={(e) => setInputTemperature(Number(e.target.value))}
-                size="small"
-                InputProps={{
-                  inputProps: {
-                    step: "1",
-                  },
-                  sx: {
-                    "& input[type=number]::-webkit-inner-spin-button": {
-                      "-webkit-appearance": "none",
-                    },
-                  },
-                }}
-              />
-              {/* Removed the Button as lookup is now automatic */}
-              {materialStressResult !== null ? (
-                <Typography variant="h5" color="primary" sx={{ mt: 2 }}>
-                  Stress Value: <strong>{materialStressResult.toFixed(2)}</strong>
-                </Typography>
-              ) : (
-                <Typography variant="body1" color="text.secondary" sx={{ mt: 2 }}>
-                  Enter inputs to see stress value
-                </Typography>
-              )}
-              {materialLookupError && (
-                <Typography variant="body2" color="error" sx={{ mt: 1 }}>
-                  Error: {materialLookupError}
-                </Typography>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Removed the second Card for Result display */}
         </Box>
       </Container>
     </Box>

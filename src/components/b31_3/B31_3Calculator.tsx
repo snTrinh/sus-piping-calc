@@ -20,6 +20,7 @@ import SinglePressureTabContent from "./single/SinglePressureTabContent";
 import MultiplePressuresTabContent from "./multiple/MultiplePressuresTabContent";
 // Keeping the import name as requested, assuming src/utils/materialStress.ts exports 'materialStress'
 import { materialStress } from "@/utils/materialStress";
+import { calculateTRequired } from "@/utils/pipeCalculations";
 
 type Pipe = {
   id: string;
@@ -136,17 +137,17 @@ export default function B31_3Calculator() {
       // Convert OD to Imperial inches for calculation (as formula expects Imperial)
       const outerDiameterInches = lengthConversion.toImperial(outerDiameter);
       // Convert corrosionAllowance to Imperial inches for calculation
-      const corrosionAllowanceInches = lengthConversion.toImperial(corrosionAllowance);
-
-      const numerator = pressure * outerDiameterInches;
-      const denominator =
-        2 * ((allowableStress ?? 0) * e * w + pressure * gamma);
-
-      const calculatedTRequired =
-        denominator !== 0
-          ? (numerator / denominator + corrosionAllowanceInches) *
-            (1 / (1 - millTol))
-          : 0;
+      // Replace the inline calculation with a call to the new utility function
+      const calculatedTRequired = calculateTRequired({
+        pressure, // Already in psi
+        outerDiameterInches,
+        allowableStress,
+        e,
+        w,
+        gamma,
+        corrosionAllowanceInches: corrosionAllowance, // Already in inches
+        millTol,
+      });
 
       // Calculate actual schedule thickness (pipe.t)
       // This value is stored in Imperial inches in transformed_pipeData.json
