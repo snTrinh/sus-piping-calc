@@ -1,11 +1,12 @@
-// src/app/b31.3-calculator/DesignParameters.tsx
-import React from "react";
-import { MenuItem, TextField, Box, Typography } from "@mui/material";
+"use client";
+import React, { useState, useEffect, useRef } from "react"; // Import useState, useEffect, useRef
+import { MenuItem, TextField, Box, Typography } from "@mui/material"; // Import InputAdornment
+
+import LabeledInputConversion from "../../common/LabeledInput"; // Assuming this is the correct path to LabeledInput
 
 import { DesignParams, Units } from "@/types/units";
 import { unitConversions } from "@/utils/unitConversions";
 import { MaterialName } from "@/utils/materialsData"; // Import MaterialName
-import LabeledInput from "@/components/common/LabeledInput";
 
 type DesignParametersProps = {
   materials: string[];
@@ -34,7 +35,6 @@ export default function DesignParameters({
 }: DesignParametersProps) {
   const { pressure, temperature, corrosionAllowance, allowableStress } =
     designParams;
-    
   return (
     <Box
       sx={{
@@ -82,24 +82,22 @@ export default function DesignParameters({
           flexDirection: { xs: "column", sm: "row" },
         }}
       >
-        <LabeledInput
+        <LabeledInputConversion
           label="Design Pressure"
           symbol="P"
           unit={unitConversions.pressure[designParams.units].unit}
           value={pressure}
           onChange={onDesignPressureChange}
           sx={{ minWidth: 140, flex: 1 }}
-
         />
 
-        <LabeledInput
+        <LabeledInputConversion
           label="Temperature"
           symbol="T"
           unit={unitConversions.temperature[designParams.units].unit}
           value={temperature}
           onChange={onTemperatureChange}
           sx={{ minWidth: 140, flex: 1 }}
-
         />
       </Box>
 
@@ -112,26 +110,24 @@ export default function DesignParameters({
           flexDirection: { xs: "column", sm: "row" },
         }}
       >
-        <LabeledInput
+        <LabeledInputConversion
           label="Corrosion Allowance"
           symbol="CA"
           unit={unitConversions.length[designParams.units].unit}
           value={corrosionAllowance}
           onChange={onCAChange}
           sx={{ minWidth: 140, flex: 1 }}
-
         />
 
-        <LabeledInput
+        <LabeledInputConversion
           label="Allowable Stress"
           symbol="S"
           unit={unitConversions.pressure[designParams.units].unit}
-          // Display the calculated allowableStress
-          value={allowableStress.toFixed(2)}
+          // Pass the numeric value directly. LabeledInputConversion handles toFixed(2) and "N/A".
+          value={allowableStress}
           onChange={() => {}} // Still disabled as it's calculated
           disabled
           sx={{ minWidth: 140, flex: 1 }}
-
         />
       </Box>
     </Box>

@@ -13,8 +13,6 @@ import PipeCard from "../PipeCard";
 import FormulaDisplay from "../FormulaDisplay";
 import PdfExport from "../pdfExport/PdfExport";
 import { MaterialName } from "@/utils/materialsData"; // Import MaterialName
-
-import DesignConstants from "./DesignConstants"; // Assuming this is correct
 import DesignParameters from "./DesignParameters"; // Assuming this is correct
 
 type Pipe = {

@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react"; // Import useState, useEffect, useRef
-import { MenuItem, TextField, Box, Typography, InputAdornment } from "@mui/material"; // Import InputAdornment
+import React from "react"; // Import useState, useEffect, useRef
+import { MenuItem, TextField, Box, Typography } from "@mui/material"; // Import InputAdornment
 
 import LabeledInputConversion from "../../common/LabeledInput"; // Assuming this is the correct path to LabeledInput
 
@@ -36,61 +36,6 @@ export default function DesignParameters({
 }: DesignParametersProps) {
   const { pressure, temperature, corrosionAllowance, allowableStress } =
     designParams;
-
-  // --- Local state for the second Design Pressure TextField ---
-  const [localPressureInput, setLocalPressureInput] = useState(
-    pressure !== null && !isNaN(pressure) ? pressure.toFixed(2) : ""
-  );
-  const isPressureInputFocused = useRef(false);
-
-  // Effect to synchronize localPressureInput with the `pressure` prop
-  // This runs when `pressure` (from designParams.pressureDisplay) changes,
-  // but only if the input field is not currently focused.
-  useEffect(() => {
-    if (!isPressureInputFocused.current) {
-      setLocalPressureInput(
-        pressure !== null && !isNaN(pressure) ? pressure.toFixed(2) : ""
-      );
-    }
-  }, [pressure]);
-
-  // Handlers for the second Design Pressure TextField
-  const handleLocalPressureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rawInput = e.target.value;
-    setLocalPressureInput(rawInput); // Update local string state immediately
-
-    const numericValue = parseFloat(rawInput);
-    if (!isNaN(numericValue)) {
-      onDesignPressureChange(numericValue); // Pass the numerical value (in display units) up
-    }
-    // If NaN, parent's state remains unchanged until valid input or blur
-  };
-
-  const handleLocalPressureBlur = () => {
-    isPressureInputFocused.current = false;
-    const numericValue = parseFloat(localPressureInput);
-    if (!isNaN(numericValue)) {
-      onDesignPressureChange(numericValue); // Commit the value
-      setLocalPressureInput(numericValue.toFixed(2)); // Re-format for clean display
-    } else {
-      // Revert to last valid prop value if input is invalid on blur
-      setLocalPressureInput(
-        pressure !== null && !isNaN(pressure) ? pressure.toFixed(2) : ""
-      );
-    }
-  };
-
-  const handleLocalPressureFocus = () => {
-    isPressureInputFocused.current = true;
-  };
-
-  const handleLocalPressureKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      handleLocalPressureBlur(); // Trigger blur logic on Enter
-      (e.target as HTMLInputElement).blur(); // Optionally blur the input
-    }
-  };
-  // --- End Local state for the second Design Pressure TextField ---
 
 
   return (
