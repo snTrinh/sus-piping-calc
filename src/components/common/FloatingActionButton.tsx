@@ -19,12 +19,12 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import EmailIcon from "@mui/icons-material/Email";
 import { TransitionProps } from "@mui/material/transitions";
-import LabeledInput from "./LabeledInput";
 
 // Define a transition for the dialog to slide up
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
-    children: React.ReactElement<any, any>;
+   
+    children: React.ReactElement;
   },
   ref: React.Ref<unknown>
 ) {

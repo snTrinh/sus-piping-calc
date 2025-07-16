@@ -17,7 +17,8 @@ import pipeData from "@/data/pipeData.json"; // Assuming this is the correct pat
 import UnitsToggle from "../common/UnitsToggle";
 import SinglePressureTabContent from "./single/SinglePressureTabContent";
 import MultiplePressuresTabContent from "./multiple/MultiplePressuresTabContent";
-import { materialStress } from "@/utils/materialStress";
+// Corrected import name from materialStress to materialStressLookup
+import { materialStress } from "@/utils/materialStress"; // Corrected import path/name
 
 type Pipe = {
   id: string;
@@ -54,16 +55,17 @@ export default function B31_3Calculator() {
 
   const [tabIndex, setTabIndex] = useState(0);
 
-  // NEW: Effect to automatically calculate allowableStress on relevant input changes
+
   useEffect(() => {
-    // Determine the category based on units
+
     const category = units === Units.Imperial ? "Imperial" : "Metric";
 
-    // Call the materialStressLookup function
+
     const stress = materialStress(
       category,
-      material, // material state is now MaterialName
-      temperature
+      material, 
+      temperature,
+      units 
     );
 
     // Update the allowableStress state
@@ -134,8 +136,6 @@ export default function B31_3Calculator() {
   };
 
   const handleDesignPressureChange = (value: number) => {
-    // Corrected: Convert the input 'value' from the current display unit
-    // to the internal unit (Imperial) using the 'from' method.
     const convertedValue = unitConversions.pressure[units].from(value);
     setPressure(convertedValue);
   };
@@ -150,20 +150,19 @@ export default function B31_3Calculator() {
     setPipes((prev) => prev.filter((p) => p.id !== id));
   };
 
-  // Derived states and props to pass down using useMemo for optimization
   const pipesForDisplay = useMemo(
     () => pipes.map((pipe) => ({ ...pipe })),
     [pipes]
   );
 
-  // NEW: Derive materials from materialsData
+
   const materials = useMemo(
     () => {
       const metricMaterials = Object.keys(materialsData.Metric.materials);
       const imperialMaterials = Object.keys(materialsData.Imperial.materials);
       return [...new Set([...metricMaterials, ...imperialMaterials])] as MaterialName[];
     },
-    [] // materialsData is static, so no dependencies needed
+    [] 
   );
 
   const {

@@ -82,7 +82,7 @@ export function materialStress(
   if (columns[lowerIndex] === temperatureForLookup) {
     // If exact match, return the value from the table
     // This value is in the table's unit (kPa for Metric, psi for Imperial)
-    let exactStress = values[lowerIndex];
+    const exactStress = values[lowerIndex];
     // --- NEW: Convert exact stress to Imperial (PSI) before returning ---
     if (category === "Metric") {
       return unitConversions.pressure[Units.Metric].toImperial(exactStress);

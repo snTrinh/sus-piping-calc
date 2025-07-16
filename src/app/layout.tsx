@@ -27,7 +27,7 @@ const inter = Inter({ subsets: ["latin"] });
 // Define a transition for the dialog to slide up
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
-    children: React.ReactElement<any, any>;
+    children: React.ReactElement;
   },
   ref: React.Ref<unknown>
 ) {
@@ -108,10 +108,6 @@ export default function RootLayout({
       return;
     }
     setSnackbarOpen(false);
-  };
-
-  const handleOpenDialog = () => {
-    setDialogOpen(true);
   };
 
   const handleCloseDialog = () => {

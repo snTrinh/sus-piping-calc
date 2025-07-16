@@ -1,6 +1,6 @@
 // src/app/b31.3-calculator/DesignParameters.tsx
-import React, { useEffect, useRef, useState } from "react";
-import { MenuItem, TextField, Box, Typography, InputAdornment } from "@mui/material";
+import React from "react";
+import { MenuItem, TextField, Box, Typography } from "@mui/material";
 
 import { DesignParams, Units } from "@/types/units";
 import { unitConversions } from "@/utils/unitConversions";

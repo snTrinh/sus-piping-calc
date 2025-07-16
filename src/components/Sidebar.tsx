@@ -12,8 +12,6 @@ import {
 } from "@mui/material";
 import CalculateIcon from "@mui/icons-material/Calculate";
 import FunctionsIcon from "@mui/icons-material/Functions";
-import AssessmentIcon from "@mui/icons-material/Assessment";
-import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 
