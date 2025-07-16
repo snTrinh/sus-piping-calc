@@ -1,7 +1,7 @@
 "use client";
 
 import { Box, Card, CardContent, Typography } from "@mui/material";
-import LabeledInput from "../common/LabeledInputConversion";
+import LabeledInput from "../common/LabeledInput";
 import { Units } from "@/types/units";
 import { unitConversions } from "@/utils/unitConversions";
 
