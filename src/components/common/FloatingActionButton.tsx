@@ -13,17 +13,20 @@ import {
   DialogTitle,
   IconButton,
   Slide,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import EmailIcon from "@mui/icons-material/Email";
 import { TransitionProps } from "@mui/material/transitions";
+import LabeledInput from "./LabeledInput";
 
 // Define a transition for the dialog to slide up
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
     children: React.ReactElement<any, any>;
   },
-  ref: React.Ref<unknown>,
+  ref: React.Ref<unknown>
 ) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -36,10 +39,13 @@ export default function FloatingActionButton() {
   const [loading, setLoading] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("success");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
   const [dialogOpen, setDialogOpen] = useState(false); // State to control dialog visibility
 
-  const VERCEL_API_ENDPOINT = "https://email-sender-backend-indol.vercel.app/api/send-email";
+  const VERCEL_API_ENDPOINT =
+    "https://email-sender-backend-indol.vercel.app/api/send-email";
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault(); // Prevent default form submission
@@ -56,9 +62,9 @@ export default function FloatingActionButton() {
 
     try {
       const response = await fetch(VERCEL_API_ENDPOINT, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ name, email, message }),
       });
@@ -72,7 +78,9 @@ export default function FloatingActionButton() {
         setDialogOpen(false); // Close dialog on success
       } else {
         const errorData = await response.json();
-        setSnackbarMessage(`Failed to send message: ${errorData.error || response.statusText}`);
+        setSnackbarMessage(
+          `Failed to send message: ${errorData.error || response.statusText}`
+        );
         setSnackbarSeverity("error");
       }
     } catch (error) {
@@ -85,8 +93,11 @@ export default function FloatingActionButton() {
     }
   };
 
-  const handleSnackbarClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
+  const handleSnackbarClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
       return;
     }
     setSnackbarOpen(false);
@@ -129,9 +140,9 @@ export default function FloatingActionButton() {
         PaperProps={{
           sx: {
             borderRadius: 2, // Apply border radius to the dialog paper
-            minWidth: { xs: '90%', sm: '400px', md: '500px' }, // Responsive width
-            maxWidth: '500px', // Max width for the dialog
-          }
+            minWidth: { xs: "90%", sm: "400px", md: "500px" }, // Responsive width
+            maxWidth: "500px", // Max width for the dialog
+          },
         }}
       >
         <DialogTitle id="contact-form-dialog-title" sx={{ m: 0, p: 2 }}>
@@ -142,7 +153,7 @@ export default function FloatingActionButton() {
             aria-label="close"
             onClick={handleCloseDialog}
             sx={{
-              position: 'absolute',
+              position: "absolute",
               right: 8,
               top: 8,
               color: (theme) => theme.palette.grey[500],
@@ -151,18 +162,20 @@ export default function FloatingActionButton() {
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        <DialogContent dividers sx={{ p: 2 }}>
+        <DialogContent sx={{ p: 2 }}>
           <form onSubmit={handleSubmit}>
-            <Box
-              sx={{ display: "flex", flexDirection: "column", gap: 2 }}
-            >
-              <TextField
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}>
+             <TextField
                 label="Your Name"
                 fullWidth
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 size="small"
                 required
+               
+                InputLabelProps={{
+                  shrink: true, // This makes the label always appear on top
+                }}
               />
               <TextField
                 label="Your Email"
@@ -172,21 +185,27 @@ export default function FloatingActionButton() {
                 onChange={(e) => setEmail(e.target.value)}
                 size="small"
                 required
+                InputLabelProps={{
+                  shrink: true, // This makes the label always appear on top
+                }}
               />
               <TextField
-                label="Your Message"
+                label="Something sus?"
                 fullWidth
                 multiline
                 rows={4}
-                placeholder="Something sus? Send us a message to give us feedback"
+                placeholder="Send us a message to give us feedback."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 size="small"
                 required
+                InputLabelProps={{
+                  shrink: true, // This makes the label always appear on top
+                }}
               />
               <Button
                 type="submit"
-                variant="contained"
+                variant="outlined"
                 disabled={loading}
                 sx={{ mt: 2 }}
               >
@@ -196,6 +215,20 @@ export default function FloatingActionButton() {
           </form>
         </DialogContent>
       </Dialog>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 }

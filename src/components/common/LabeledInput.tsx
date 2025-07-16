@@ -18,7 +18,7 @@ type LabeledInputProps = {
   percentage?: boolean;
 };
 
-export default function LabeledInputConversion({
+export default function LabeledInput({
   label,
   symbol,
   unit,

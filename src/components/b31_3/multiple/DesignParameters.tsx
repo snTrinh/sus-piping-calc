@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { Box, Typography } from "@mui/material"; // Import Typography
-import LabeledInput from "../../common/LabeledInputConversion";
+import LabeledInput from "../../common/LabeledInput";
 import { DesignParams, Units } from "@/types/units";
 import { unitConversions } from "@/utils/unitConversions";
 

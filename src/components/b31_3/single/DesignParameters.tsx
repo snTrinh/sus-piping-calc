@@ -5,7 +5,7 @@ import { MenuItem, TextField, Box, Typography, InputAdornment } from "@mui/mater
 import { DesignParams, Units } from "@/types/units";
 import { unitConversions } from "@/utils/unitConversions";
 import { MaterialName } from "@/utils/materialsData"; // Import MaterialName
-import LabeledInputConversion from "@/components/common/LabeledInputConversion";
+import LabeledInput from "@/components/common/LabeledInput";
 
 type DesignParametersProps = {
   materials: string[];
@@ -82,22 +82,24 @@ export default function DesignParameters({
           flexDirection: { xs: "column", sm: "row" },
         }}
       >
-        <LabeledInputConversion
+        <LabeledInput
           label="Design Pressure"
           symbol="P"
           unit={unitConversions.pressure[designParams.units].unit}
           value={pressure}
           onChange={onDesignPressureChange}
           sx={{ minWidth: 140, flex: 1 }}
+
         />
 
-        <LabeledInputConversion
+        <LabeledInput
           label="Temperature"
           symbol="T"
           unit={unitConversions.temperature[designParams.units].unit}
           value={temperature}
           onChange={onTemperatureChange}
           sx={{ minWidth: 140, flex: 1 }}
+
         />
       </Box>
 
@@ -110,16 +112,17 @@ export default function DesignParameters({
           flexDirection: { xs: "column", sm: "row" },
         }}
       >
-        <LabeledInputConversion
+        <LabeledInput
           label="Corrosion Allowance"
           symbol="CA"
           unit={unitConversions.length[designParams.units].unit}
           value={corrosionAllowance}
           onChange={onCAChange}
           sx={{ minWidth: 140, flex: 1 }}
+
         />
 
-        <LabeledInputConversion
+        <LabeledInput
           label="Allowable Stress"
           symbol="S"
           unit={unitConversions.pressure[designParams.units].unit}
@@ -128,6 +131,7 @@ export default function DesignParameters({
           onChange={() => {}} // Still disabled as it's calculated
           disabled
           sx={{ minWidth: 140, flex: 1 }}
+
         />
       </Box>
     </Box>
