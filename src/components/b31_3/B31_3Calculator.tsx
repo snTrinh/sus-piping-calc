@@ -33,7 +33,7 @@ export default function B31_3Calculator() {
   const [units, setUnits] = useState<Units>(Units.Imperial);
   const [material, setMaterial] = useState<MaterialName>("A106B"); // Initialized with a MaterialName
   const [temperature, setTemperature] = useState(100); // °F internally
-  const [allowableStress, setAllowableStress] = useState<number>(0); // Initialize with 0
+  const [allowableStress, setAllowableStress] = useState<number | null>(null); // Changed to number | null
   const [corrosionAllowance, setCorrosionAllowance] = useState(0); // inches
 
   const [e, setE] = useState(1);
@@ -55,21 +55,21 @@ export default function B31_3Calculator() {
 
   const [tabIndex, setTabIndex] = useState(0);
 
-
+  // NEW: Effect to automatically calculate allowableStress on relevant input changes
   useEffect(() => {
-
+    // Determine the category based on units
     const category = units === Units.Imperial ? "Imperial" : "Metric";
 
-
-    const stress = materialStress(
+    // Call the materialStressLookup function with the correct number of arguments
+    const stress = materialStress( // Corrected function name
       category,
-      material, 
+      material, // material state is now MaterialName
       temperature,
-      units 
+      units // Pass the current units state as the fourth argument
     );
 
     // Update the allowableStress state
-    setAllowableStress(stress ?? 0);
+    setAllowableStress(stress); // Assign stress directly, it can be null
 
     // Optionally, log a warning if stress is null
     if (stress === null) {
@@ -150,19 +150,20 @@ export default function B31_3Calculator() {
     setPipes((prev) => prev.filter((p) => p.id !== id));
   };
 
+  // Derived states and props to pass down using useMemo for optimization
   const pipesForDisplay = useMemo(
     () => pipes.map((pipe) => ({ ...pipe })),
     [pipes]
   );
 
-
+  // NEW: Derive materials from materialsData
   const materials = useMemo(
     () => {
       const metricMaterials = Object.keys(materialsData.Metric.materials);
       const imperialMaterials = Object.keys(materialsData.Imperial.materials);
       return [...new Set([...metricMaterials, ...imperialMaterials])] as MaterialName[];
     },
-    [] 
+    [] // materialsData is static, so no dependencies needed
   );
 
   const {
@@ -175,7 +176,7 @@ export default function B31_3Calculator() {
       convertDesignInputs({
         units,
         temperature,
-        allowableStress: allowableStress ?? 0, // Ensure it's a number for conversion
+        allowableStress: allowableStress, // Pass allowableStress directly (can be null)
         corrosionAllowance,
         pressure,
       }),

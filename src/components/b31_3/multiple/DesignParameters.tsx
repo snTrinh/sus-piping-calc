@@ -1,112 +1,190 @@
 "use client";
-import React from "react";
-import { Box, Typography } from "@mui/material"; // Import Typography
-import LabeledInput from "../../common/LabeledInput";
+import React, { useState, useEffect, useRef } from "react"; // Import useState, useEffect, useRef
+import { MenuItem, TextField, Box, Typography, InputAdornment } from "@mui/material"; // Import InputAdornment
+
+import LabeledInputConversion from "../../common/LabeledInput"; // Assuming this is the correct path to LabeledInput
+
 import { DesignParams, Units } from "@/types/units";
 import { unitConversions } from "@/utils/unitConversions";
+import { MaterialName } from "@/utils/materialsData"; // Import MaterialName
+import LabeledInput from "../../common/LabeledInput";
 
 type DesignParametersProps = {
   materials: string[];
-  material: string;
+  material: MaterialName; // Changed type to MaterialName
   designParams: DesignParams;
 
   onUnitsChange: (
     event: React.MouseEvent<HTMLElement>,
     newUnits: Units
   ) => void;
-  onMaterialChange: (value: string) => void;
+  onMaterialChange: (value: MaterialName) => void; // Changed type to MaterialName
   onTemperatureChange: (value: number) => void;
   onCAChange: (value: number) => void;
   onDesignPressureChange: (value: number) => void;
 };
 
+
 export default function DesignParameters({
+  materials,
+  material,
   designParams,
+  onMaterialChange,
   onTemperatureChange,
+  onCAChange,
   onDesignPressureChange,
 }: DesignParametersProps) {
-  const { pressure, temperature, allowableStress } = designParams;
+  const { pressure, temperature, corrosionAllowance, allowableStress } =
+    designParams;
+
+  // --- Local state for the second Design Pressure TextField ---
+  const [localPressureInput, setLocalPressureInput] = useState(
+    pressure !== null && !isNaN(pressure) ? pressure.toFixed(2) : ""
+  );
+  const isPressureInputFocused = useRef(false);
+
+  // Effect to synchronize localPressureInput with the `pressure` prop
+  // This runs when `pressure` (from designParams.pressureDisplay) changes,
+  // but only if the input field is not currently focused.
+  useEffect(() => {
+    if (!isPressureInputFocused.current) {
+      setLocalPressureInput(
+        pressure !== null && !isNaN(pressure) ? pressure.toFixed(2) : ""
+      );
+    }
+  }, [pressure]);
+
+  // Handlers for the second Design Pressure TextField
+  const handleLocalPressureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawInput = e.target.value;
+    setLocalPressureInput(rawInput); // Update local string state immediately
+
+    const numericValue = parseFloat(rawInput);
+    if (!isNaN(numericValue)) {
+      onDesignPressureChange(numericValue); // Pass the numerical value (in display units) up
+    }
+    // If NaN, parent's state remains unchanged until valid input or blur
+  };
+
+  const handleLocalPressureBlur = () => {
+    isPressureInputFocused.current = false;
+    const numericValue = parseFloat(localPressureInput);
+    if (!isNaN(numericValue)) {
+      onDesignPressureChange(numericValue); // Commit the value
+      setLocalPressureInput(numericValue.toFixed(2)); // Re-format for clean display
+    } else {
+      // Revert to last valid prop value if input is invalid on blur
+      setLocalPressureInput(
+        pressure !== null && !isNaN(pressure) ? pressure.toFixed(2) : ""
+      );
+    }
+  };
+
+  const handleLocalPressureFocus = () => {
+    isPressureInputFocused.current = true;
+  };
+
+  const handleLocalPressureKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleLocalPressureBlur(); // Trigger blur logic on Enter
+      (e.target as HTMLInputElement).blur(); // Optionally blur the input
+    }
+  };
+  // --- End Local state for the second Design Pressure TextField ---
+
 
   return (
     <Box
       sx={{
         display: "flex",
         flexDirection: "column",
-        gap: 2, // This gap will now apply between the Typography and the first input Box
-        width: "100%", // Ensures this component fills the width of its parent Card
+        gap: 2,
+        width: "100%",
       }}
     >
-      {/* Added Title */}
       <Typography variant="h6" gutterBottom>
         Design Parameters
       </Typography>
 
-      {/* Design Pressure & Temperature LabeledInputs - Responsive Flex Direction */}
       <Box
         sx={{
           display: "flex",
           gap: 2,
           flexWrap: "wrap",
           justifyContent: "flex-start",
-          flexDirection: { xs: "column", sm: "row" }, // Added responsive flexDirection
+          flexDirection: { xs: "column", sm: "row" },
         }}
       >
-        <LabeledInput
+        <TextField
+          select
+          label="Material"
+          value={material}
+          onChange={(e) => onMaterialChange(e.target.value as MaterialName)} // Cast value to MaterialName
+          sx={{ minWidth: 200, flexGrow: 1 }}
+          size="small"
+        >
+          {materials.map((mat) => (
+            <MenuItem key={mat} value={mat}>
+              {mat}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Box>
+
+      <Box
+        sx={{
+          display: "flex",
+          gap: 2,
+          flexWrap: "wrap",
+          justifyContent: "flex-start",
+          flexDirection: { xs: "column", sm: "row" },
+        }}
+      >
+        <LabeledInputConversion
           label="Design Pressure"
           symbol="P"
           unit={unitConversions.pressure[designParams.units].unit}
           value={pressure}
           onChange={onDesignPressureChange}
           sx={{ minWidth: 140, flex: 1 }}
-          // Removed type="number" as it is not a valid prop for LabeledInput
         />
-      </Box>
 
-      <Box
-        sx={{
-          display: "flex",
-          gap: 2,
-          flexWrap: "wrap",
-          justifyContent: "flex-start",
-          flexDirection: { xs: "column", sm: "row" }, // Added responsive flexDirection
-        }}
-      >
-        <LabeledInput
+        <LabeledInputConversion
           label="Temperature"
           symbol="T"
           unit={unitConversions.temperature[designParams.units].unit}
           value={temperature}
           onChange={onTemperatureChange}
           sx={{ minWidth: 140, flex: 1 }}
-          // type="number" // Re-added for proper arrow key functionality
         />
       </Box>
 
-      {/* Corrosion Allowance (Removed) & Allowable Stress LabeledInputs - Responsive Flex Direction */}
       <Box
         sx={{
           display: "flex",
           gap: 2,
           flexWrap: "wrap",
           justifyContent: "flex-start",
-          flexDirection: { xs: "column", sm: "row" }, // Added responsive flexDirection
+          flexDirection: { xs: "column", sm: "row" },
         }}
       >
-        {/*
-          The Corrosion Allowance LabeledInput was removed from here.
-          If you wish to make the layout visually identical to DesignConstants,
-          you might need to re-include it or adjust the styling
-          of the remaining Allowable Stress field or its container.
-        */}
+        <LabeledInputConversion
+          label="Corrosion Allowance"
+          symbol="CA"
+          unit={unitConversions.length[designParams.units].unit}
+          value={corrosionAllowance}
+          onChange={onCAChange}
+          sx={{ minWidth: 140, flex: 1 }}
+        />
+
         <LabeledInput
           label="Allowable Stress"
           symbol="S"
           unit={unitConversions.pressure[designParams.units].unit}
-          value={allowableStress}
-          onChange={() => {}}
+          value={allowableStress} 
+          onChange={() => {}} 
           disabled
           sx={{ minWidth: 140, flex: 1 }}
-          // type="number" // Re-added for proper arrow key functionality
         />
       </Box>
     </Box>

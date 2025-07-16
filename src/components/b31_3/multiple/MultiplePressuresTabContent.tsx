@@ -1,4 +1,3 @@
-// src/app/b31.3-calculator/MultiplePressuresTabContent.tsx
 "use client";
 
 import React from "react";
@@ -6,18 +5,17 @@ import { v4 as uuidv4 } from "uuid";
 import { Box, Button, Card, Typography } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
-import { Units } from "@/types/units";
+import { Units, DesignParams } from "@/types/units"; // Import DesignParams
 import {
-
   PipeSchedule,
-
 } from "@/utils/unitConversions";
 import PipeCard from "../PipeCard";
 import FormulaDisplay from "../FormulaDisplay";
 import PdfExport from "../pdfExport/PdfExport";
+import { MaterialName } from "@/utils/materialsData"; // Import MaterialName
 
-import DesignConstants from "./DesignConstants";
-import DesignParameters from "./DesignParameters";
+import DesignConstants from "./DesignConstants"; // Assuming this is correct
+import DesignParameters from "./DesignParameters"; // Assuming this is correct
 
 type Pipe = {
   id: string;
@@ -32,7 +30,7 @@ type Pipe = {
 interface MultiplePressuresTabContentProps {
   // State values
   units: Units;
-  material: string;
+  material: MaterialName; // Changed type to MaterialName
   temperature: number;
   corrosionAllowance: number;
   pressure: number;
@@ -42,21 +40,11 @@ interface MultiplePressuresTabContentProps {
   e: number;
   w: number;
   pipesForDisplay: Pipe[];
-  materials: string[];
-  designParams: {
-    units: Units;
-    pressure: number;
-    temperature: number;
-    corrosionAllowance: number;
-    allowableStress: number | null;
-    gamma: number;
-    millTol: number;
-    e: number;
-    w: number;
-  };
+  materials: string[]; // This can remain string[] as it's just for the dropdown options
+  designParams: DesignParams; // Use the DesignParams type
 
   // State setters
-  setMaterial: (value: string) => void;
+  setMaterial: (value: MaterialName) => void; // Changed type to MaterialName
   setTemperature: (value: number) => void;
   setCorrosionAllowance: (value: number) => void;
   setPressure: (value: number) => void;
@@ -116,7 +104,8 @@ const MultiplePressuresTabContent: React.FC<
           }}
           elevation={0}
         >
-          <DesignConstants
+          {/* Assuming DesignConstants is meant to be DesignParameters based on props */}
+          <DesignParameters // Changed from DesignConstants to DesignParameters
             designParams={designParams}
             materials={materials}
             material={material}

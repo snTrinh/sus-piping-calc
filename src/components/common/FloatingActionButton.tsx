@@ -194,7 +194,7 @@ export default function FloatingActionButton() {
                 fullWidth
                 multiline
                 rows={4}
-                placeholder="Send us a message to give us feedback."
+ 
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 size="small"

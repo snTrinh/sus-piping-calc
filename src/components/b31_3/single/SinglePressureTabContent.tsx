@@ -10,11 +10,11 @@ import {
 } from "@/utils/unitConversions";
 import PipeCard from "../PipeCard";
 import FormulaDisplay from "../FormulaDisplay";
-import DesignInputs from "./DesignParameters";
+import DesignParameters from "./DesignParameters"; // Corrected import path
 import PdfExport from "../pdfExport/PdfExport";
 import { Units, DesignParams } from "@/types/units"; // Import DesignParams
 import { MaterialName } from "@/utils/materialsData"; // Import MaterialName
-import { materialStress } from "@/utils/materialStress"; // Import materialStressLookup
+import { materialStress } from "@/utils/materialStress"; // Corrected import name
 
 type Pipe = {
   id: string;
@@ -44,7 +44,7 @@ interface SinglePressureTabContentProps {
   setTemperature: (value: number) => void;
   setCorrosionAllowance: (value: number) => void;
   setPressure: (value: number) => void;
-  setAllowableStress: (value: number | null) => void; // NEW: Added setAllowableStress
+  setAllowableStress: (value: number | null) => void; // Corrected type to allow null
   setPipes: (pipes: Pipe[]) => void;
 
   updatePipe: (id: string, key: keyof Pipe, value: string | number) => void;
@@ -67,7 +67,7 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
   designParams,
   setMaterial,
   setTemperature, // Destructure setTemperature
-  setAllowableStress, // NEW: Destructure setAllowableStress
+  setAllowableStress, // Destructure setAllowableStress
   setPipes,
   updatePipe,
   removePipe,
@@ -80,15 +80,16 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
     // Determine the category based on units
     const category = units === "Imperial" ? "Imperial" : "Metric";
 
-    // Call the materialStressLookup function
+    // Call the materialStressLookup function with the correct number of arguments
     const stress = materialStress(
       category,
       material,
-      temperature
+      temperature,
+      units // Pass the current units state as the fourth argument
     );
 
     // Update the allowableStress state
-    setAllowableStress(stress);
+    setAllowableStress(stress); // Assign stress directly, it can be null
 
     // Optionally, log a warning if stress is null
     if (stress === null) {
@@ -129,7 +130,7 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
               p: 2,
             }}
           >
-            <DesignInputs
+            <DesignParameters
               designParams={{
                 ...designParams,
                 allowableStress: designParams.allowableStress ?? 0, // Ensure it's a number for display
