@@ -11,14 +11,16 @@ import {
   unitConversions,
 } from "@/utils/unitConversions";
 import pipeData from "@/data/pipeData.json"; // Assuming this is the correct path to pipe data
+import pipeDimensions from "@/data/transformed_pipeData.json"; // NEW: Import pipeDimensions for 't' calculation
 
 // Import the new tab content components
 
 import UnitsToggle from "../common/UnitsToggle";
 import SinglePressureTabContent from "./single/SinglePressureTabContent";
 import MultiplePressuresTabContent from "./multiple/MultiplePressuresTabContent";
-// Corrected import name from materialStress to materialStressLookup
-import { materialStress } from "@/utils/materialStress"; // Corrected import path/name
+import { materialStress } from "@/utils/materialStress";
+
+
 
 type Pipe = {
   id: string;
@@ -26,7 +28,7 @@ type Pipe = {
   od: string;
   schedule: PipeSchedule;
   tRequired: number;
-  t: number;
+  t: number; // Actual schedule thickness
 };
 
 export default function B31_3Calculator() {
@@ -48,14 +50,14 @@ export default function B31_3Calculator() {
       nps: "4",
       od: "4.5",
       schedule: "40",
-      tRequired: 0,
-      t: 0,
+      tRequired: 0, // This will be recalculated by the useEffect below
+      t: 0, // This will be recalculated by the useEffect below
     },
   ]);
 
   const [tabIndex, setTabIndex] = useState(0);
 
-  // NEW: Effect to automatically calculate allowableStress on relevant input changes
+  // Effect to automatically calculate allowableStress on relevant input changes
   useEffect(() => {
     // Determine the category based on units
     const category = units === Units.Imperial ? "Imperial" : "Metric";
@@ -77,35 +79,65 @@ export default function B31_3Calculator() {
     }
   }, [units, material, temperature]); // Dependencies for this effect
 
-  // Effect for calculating tRequired (thickness required)
+  // Effect for calculating tRequired (thickness required) and t (actual schedule thickness) for all pipes
   useEffect(() => {
+    console.log("--- Calculating tRequired and t for pipes ---");
     setPipes((prev) =>
       prev.map((pipe) => {
         const targetNps =
           units === Units.Metric ? npsToMmMap[pipe.nps] : pipe.nps;
 
+        // Get outer diameter from pipeData based on current units
         const outerDiameter =
           pipeData[units]?.columns?.find((col) => col.NPS === targetNps)?.OD ||
           0;
+        console.log(`Pipe ${pipe.nps} OD (display units): ${outerDiameter}`);
 
-        const conversion = unitConversions.length[units];
-        const outerDiameterInches = conversion.from(outerDiameter);
-        const corrosionAllowanceInches =
-          unitConversions.length[units].from(corrosionAllowance);
+        const lengthConversion = unitConversions.length[units];
+
+        // Convert OD to Imperial inches for calculation (as formula expects Imperial)
+        const outerDiameterInches = lengthConversion.toImperial(outerDiameter);
+        // Convert corrosionAllowance to Imperial inches for calculation
+        const corrosionAllowanceInches = lengthConversion.toImperial(corrosionAllowance);
+
+        // Pressure is already stored internally in PSI (Imperial)
+        // Allowable stress is already stored internally in PSI (Imperial)
+
+        console.log(`Pressure (internal/PSI): ${pressure}`);
+        console.log(`Allowable Stress (internal/PSI): ${allowableStress}`);
+        console.log(`E: ${e}, W: ${w}, Gamma: ${gamma}`);
+        console.log(`Corrosion Allowance (internal/inches): ${corrosionAllowanceInches}`);
+        console.log(`Mill Tolerance: ${millTol}`);
 
         const numerator = pressure * outerDiameterInches;
         const denominator =
           2 * ((allowableStress ?? 0) * e * w + pressure * gamma);
-        const tRequired =
+
+        console.log(`Numerator: ${numerator}`);
+        console.log(`Denominator: ${denominator}`);
+
+        const calculatedTRequired =
           denominator !== 0
             ? (numerator / denominator + corrosionAllowanceInches) *
               (1 / (1 - millTol))
             : 0;
 
-        return { ...pipe, tRequired };
+        console.log(`Calculated tRequired for pipe ${pipe.nps}: ${calculatedTRequired}`);
+
+        // Calculate actual schedule thickness (pipe.t)
+        // This value is stored in Imperial inches in transformed_pipeData.json
+        // @ts-expect-error transformed_pipeData.json structure needs explicit type assertion if not fully typed
+        const rawScheduleThicknessImperial = pipeDimensions["Imperial"][pipe.nps]?.schedules[pipe.schedule] ?? 0;
+        console.log(`Raw schedule thickness for pipe ${pipe.nps} SCH ${pipe.schedule} (Imperial inches): ${rawScheduleThicknessImperial}`);
+
+        return {
+          ...pipe,
+          tRequired: calculatedTRequired,
+          t: rawScheduleThicknessImperial, // Store actual thickness in Imperial inches
+        };
       })
     );
-  }, [pressure, allowableStress, e, w, gamma, corrosionAllowance, units, millTol]); // Added millTol to dependencies
+  }, [pressure, allowableStress, e, w, gamma, corrosionAllowance, units, millTol, pipes]); // Dependency on 'pipes' array itself
 
   // Handlers
   const handleUnitsChange = (
@@ -114,29 +146,31 @@ export default function B31_3Calculator() {
   ) => {
     if (!newUnits || newUnits === units) return;
 
-    // The internal state (temperature, pressure, corrosionAllowance)
-    // will remain in its original numerical value.
-    // The display conversion will happen in convertDesignInputs.
+    // When units change, the internal state values (temperature, pressure, corrosionAllowance)
+    // remain numerically the same, but their interpretation (and how they are displayed) changes.
+    // The `useEffect` for tRequired and allowableStress will re-run due to `units` dependency.
 
     setUnits(newUnits);
   };
 
   const handleTemperatureChange = (value: number) => {
-    // Corrected: Convert the input 'value' from the current display unit
-    // to the internal unit (Imperial) using the 'from' method.
-    const convertedValue = unitConversions.temperature[units].from(value);
+    // Convert the input 'value' from the current display unit
+    // to the internal unit (Imperial) using the 'toImperial' method for consistency.
+    const convertedValue = unitConversions.temperature[units].toImperial(value);
     setTemperature(convertedValue);
   };
 
   const handleCAChange = (value: number) => {
-    // Corrected: Convert the input 'value' from the current display unit
-    // to the internal unit (Imperial) using the 'from' method.
-    const convertedValue = unitConversions.length[units].from(value);
+    // Convert the input 'value' from the current display unit
+    // to the internal unit (Imperial) using the 'toImperial' method.
+    const convertedValue = unitConversions.length[units].toImperial(value);
     setCorrosionAllowance(convertedValue);
   };
 
   const handleDesignPressureChange = (value: number) => {
-    const convertedValue = unitConversions.pressure[units].from(value);
+    // Convert the input 'value' from the current display unit
+    // to the internal unit (Imperial) using the 'toImperial' method.
+    const convertedValue = unitConversions.pressure[units].toImperial(value);
     setPressure(convertedValue);
   };
 
@@ -152,11 +186,11 @@ export default function B31_3Calculator() {
 
   // Derived states and props to pass down using useMemo for optimization
   const pipesForDisplay = useMemo(
-    () => pipes.map((pipe) => ({ ...pipe })),
+    () => pipes.map((pipe) => ({ ...pipe })), // Create a new array to ensure memoization works
     [pipes]
   );
 
-  // NEW: Derive materials from materialsData
+  // Derive materials from materialsData
   const materials = useMemo(
     () => {
       const metricMaterials = Object.keys(materialsData.Metric.materials);
@@ -213,25 +247,25 @@ export default function B31_3Calculator() {
   // Bundle all props needed by tab content components
   const commonTabContentProps = {
     units,
-    setUnits, // This prop is not used by Single/MultiplePressureTabContent, can be removed if not needed elsewhere
+    setUnits,
     material,
     setMaterial,
     temperature,
     setTemperature,
     allowableStress,
-    setAllowableStress, // Pass the setter for allowableStress
+    setAllowableStress,
     corrosionAllowance,
-    setCorrosionAllowance, // This prop is not used by Single/MultiplePressureTabContent, can be removed if not needed elsewhere
+    setCorrosionAllowance,
     e,
-    setE, // This prop is not used by Single/MultiplePressureTabContent, can be removed if not needed elsewhere
+    setE,
     w,
-    setW, // This prop is not used by Single/MultiplePressureTabContent, can be removed if not needed elsewhere
+    setW,
     gamma,
-    setGamma, // This prop is not used by Single/MultiplePressureTabContent, can be removed if not needed elsewhere
+    setGamma,
     millTol,
-    setMillTol, // This prop is not used by Single/MultiplePressureTabContent, can be removed if not needed elsewhere
+    setMillTol,
     pressure,
-    setPressure, // This prop is not used by Single/MultiplePressureTabContent, can be removed if not needed elsewhere
+    setPressure,
     pipes,
     setPipes,
     pipesForDisplay,

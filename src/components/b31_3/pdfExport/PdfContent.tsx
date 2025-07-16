@@ -4,17 +4,21 @@ import PdfDesignInputs, { DrawingInfo } from "./PdfDesignInputs";
 import PdfPipeOutputs from "./PdfPipeOutputs";
 import { useTheme } from "@mui/material/styles"; // Import useTheme
 
+// Corrected Pipe type to include 'id'
+export type Pipe = {
+  id: string; // Added 'id' to match PdfPipeOutputs' Pipe type
+  nps: string;
+  od: string;
+  schedule: string;
+  tRequired: number;
+  t: number;
+};
+
 export type PdfContentProps = {
   drawingInfo: DrawingInfo;
   designParams: DesignParams;
   material: string;
-  pipes: {
-    nps: string;
-    od: string;
-    schedule: string;
-    tRequired: number;
-    t: number;
-  }[];
+  pipes: Pipe[]; // Now using the corrected Pipe type
 };
 
 const PdfContent = forwardRef<HTMLDivElement, PdfContentProps>(

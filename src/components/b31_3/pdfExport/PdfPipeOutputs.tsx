@@ -1,16 +1,19 @@
+"use client";
+
 import React from "react";
 import { DesignParams, Units } from "@/types/units";
-import pipeDimensions from "@/data/transformed_pipeData.json";
+import pipeDimensions from "@/data/transformed_pipeData.json"; // Assuming this path is correct
 import { npsToMmMap, unitConversions } from "@/utils/unitConversions";
-import pipeData from "@/data/pipeData.json";
+import pipeData from "@/data/pipeData.json"; // Assuming this path is correct
 import { useTheme } from "@mui/material/styles"; // Import useTheme
 
 type Pipe = {
+  id: string; // Ensure pipe has an ID for unique keys
   od: string;
   nps: string;
   schedule: string;
-  tRequired: number;
-  t: number;
+  tRequired: number; // This is the calculated tRequired (in Imperial units from B31_3Calculator)
+  t: number; // This is the actual pipe thickness
 };
 
 type PdfPipeOutputsProps = {
@@ -64,25 +67,45 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
   return (
     <>
       {pipes.map((pipe, index) => {
+        // Get raw thickness from pipeData.json (it's in Imperial inches)
         // @ts-expect-error this is required
-        const rawThickness = pipeDimensions["Imperial"][pipe.nps]?.schedules[pipe.schedule] ?? 0;
+        const rawThicknessImperial = pipeDimensions["Imperial"][pipe.nps]?.schedules[pipe.schedule] ?? 0;
 
-        const units = designParams.units as keyof typeof unitConversions.length;
-        const thicknessConversion = unitConversions.length[units];
+        const units = designParams.units; // Current display units
+        const lengthConversion = unitConversions.length[units];
+        const pressureConversion = unitConversions.pressure[units];
 
-        const displayedScheduleThickness = thicknessConversion.to(rawThickness);
+        // Convert rawThickness (Imperial) to display units for 't'
+        const displayedScheduleThickness = lengthConversion.to(rawThicknessImperial);
+
+        // Get outer diameter in display units
         const targetNps =
           units === Units.Metric ? npsToMmMap[pipe.nps] : pipe.nps;
-        const outerDiameter =
+        const outerDiameterDisplay =
           pipeData[units]?.columns?.find((col) => col.NPS === targetNps)?.OD ||
           0;
 
-        const numerator = pressure * outerDiameter;
-        const denominator =
-          2 * ((allowableStress ?? 0) * (e ?? 1) * (w ?? 1) + pressure * (gamma ?? 1));
+        // --- Convert design parameters to Imperial for formula display consistency ---
+        // pressure from designParams is in display units, convert to Imperial for formula
+        const pressureImperial = pressureConversion.toImperial(pressure);
+        // outerDiameter from pipeData is in display units, convert to Imperial for formula
+        const outerDiameterImperial = unitConversions.length[units].toImperial(outerDiameterDisplay);
+        // corrosionAllowance from designParams is in display units, convert to Imperial for formula
+        const corrosionAllowanceImperial = lengthConversion.toImperial(corrosionAllowance);
+        // allowableStress is already in Imperial (PSI) from B31_3Calculator
+
+        // Calculate numerator and denominator using Imperial units for formula display
+        const numeratorImperial = pressureImperial * outerDiameterImperial;
+        const denominatorImperial =
+          2 * ((allowableStress ?? 0) * (e ?? 1) * (w ?? 1) + pressureImperial * (gamma ?? 1));
+
+        // The tRequired from pipe object is already calculated in B31_3Calculator (in Imperial)
+        // Convert pipe.tRequired (Imperial) to display units for showing in the final line and comparison
+        const displayedTRequired = lengthConversion.to(pipe.tRequired);
+
         return (
           <div
-            key={pipe.nps}
+            key={pipe.id} // Use pipe.id for key, as nps might not be unique
             style={{
               borderTop: `1px solid ${theme.palette.divider}`, // Use theme's divider color for the section border
               paddingTop: 10,
@@ -92,10 +115,10 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
             <div style={valueStyle}>
               <strong>Pipe {index + 1}</strong> — For NPS {pipe.nps} SCH{" "}
               {pipe.schedule} {material} (D=
-              {outerDiameter}
-              {unitConversions.length[designParams.units].unit}, t ={" "}
+              {outerDiameterDisplay.toFixed(3)}
+              {lengthConversion.unit}, t ={" "}
               {displayedScheduleThickness.toFixed(3)}
-              {unitConversions.length[designParams.units].unit}):
+              {lengthConversion.unit}):
             </div>
 
             {/* Indented formula */}
@@ -112,27 +135,27 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
                   <span style={denominatorStyle}>(1 - Mill Tolerance)</span>
                 </span>
               </div>
-              {/* Initial Values */}
+              {/* Initial Values (using Imperial values for calculation display in formula) */}
               <div>
                 <span>tᵣ = (</span>
                 <span style={fractionStyle}>
                   <span style={numeratorStyle}>
-                    {pressure}
-                    {unitConversions.pressure[designParams.units].unit} ×{" "}
-                    {outerDiameter}
-                    {unitConversions.length[designParams.units].unit}
+                    {pressureImperial.toFixed(2)}
+                    {unitConversions.pressure[Units.Imperial].unit} ×{" "}
+                    {outerDiameterImperial.toFixed(3)}
+                    {unitConversions.length[Units.Imperial].unit}
                   </span>
                   <span style={denominatorStyle}>
-                    2(({allowableStress}
-                    {unitConversions.pressure[designParams.units].unit})({e})(
-                    {w}) + ({pressure}
-                    {unitConversions.pressure[designParams.units].unit})(
+                    2(({(allowableStress ?? 0).toFixed(2)}
+                    {unitConversions.pressure[Units.Imperial].unit})({e})(
+                    {w}) + ({pressureImperial.toFixed(2)}
+                    {unitConversions.pressure[Units.Imperial].unit})(
                     {gamma}))
                   </span>
                 </span>
                 <span>
-                  + {corrosionAllowance}
-                  {unitConversions.length[designParams.units].unit}) ×{" "}
+                  + {corrosionAllowanceImperial.toFixed(3)}
+                  {unitConversions.length[Units.Imperial].unit}) ×{" "}
                 </span>
                 <span style={fractionStyle}>
                   <span style={numeratorStyle}>1</span>
@@ -141,21 +164,21 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
                   </span>
                 </span>
               </div>
-              {/* Calculated Values */}
+              {/* Calculated Values (using Imperial values for calculation display in formula) */}
               <div>
                 <span>tᵣ = (</span>
                 <span style={fractionStyle}>
-                  <span style={numeratorStyle}>{numerator.toFixed(2)}</span>
-                  <span style={denominatorStyle}>{denominator.toFixed(2)}</span>
+                  <span style={numeratorStyle}>{numeratorImperial.toFixed(2)}</span>
+                  <span style={denominatorStyle}>{denominatorImperial.toFixed(2)}</span>
                 </span>
                 <span>
-                  {unitConversions.length[designParams.units].unit} +{" "}
-                  {corrosionAllowance}
-                  {unitConversions.length[designParams.units].unit}) ×{" "}
+                  {unitConversions.length[Units.Imperial].unit} +{" "}
+                  {corrosionAllowanceImperial.toFixed(3)}
+                  {unitConversions.length[Units.Imperial].unit}) ×{" "}
                 </span>
                 <span style={fractionStyle}>
                   <span style={numeratorStyle}>1</span>
-                  <span style={denominatorStyle}>({millTolDenominator})</span>
+                  <span style={denominatorStyle}>({millTolDenominator.toFixed(3)})</span>
                 </span>
               </div>
             </div>
@@ -164,20 +187,17 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
               <div>
                 <span>
                   tᵣ ={" "}
-                  {(
-                    (numerator / denominator + corrosionAllowance) *
-                    (1 / millTolDenominator)
-                  ).toFixed(3)}{" "}
-                  {unitConversions.length[designParams.units].unit}
+                  {displayedTRequired.toFixed(3)}{" "} {/* Use the converted tRequired from pipe object */}
+                  {lengthConversion.unit}
                 </span>
               </div>
             </div>
             <div style={{ marginTop: 8 }}>
               <div>
                 <span>
-                  t {displayedScheduleThickness > pipe.tRequired ? ">" : "<"} tᵣ
-                  ∴{" "}
-                  {displayedScheduleThickness > pipe.tRequired ? (
+                  t {displayedScheduleThickness > displayedTRequired ? ">" : "<"}{" "}
+                  tᵣ ∴{" "}
+                  {displayedScheduleThickness > displayedTRequired ? (
                     <span
                       style={{
                         color: theme.palette.success.main,
