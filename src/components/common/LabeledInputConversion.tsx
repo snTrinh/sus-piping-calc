@@ -7,7 +7,7 @@ type LabeledInputProps = {
   label: string;
   symbol?: string;
   unit?: string;
-  value?: number | null | undefined;
+  value?: number;
   onChange: (value: number) => void;
   disabled?: boolean;
   step?: number;
@@ -18,7 +18,7 @@ type LabeledInputProps = {
   percentage?: boolean;
 };
 
-export default function LabeledInput({
+export default function LabeledInputConversion({
   label,
   symbol,
   unit,

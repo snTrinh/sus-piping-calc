@@ -30,8 +30,8 @@ export default function Sidebar() {
 
   const navItems = [
     { icon: <CalculateIcon />, href: "/", label: "Calculations" },
-    { icon: <AssessmentIcon />, href: "/z662", label: "Z662 Code" },
-    { icon: <FunctionsIcon />, href: "/interpolation", label: "Interpolation" },
+    // { icon: <AssessmentIcon />, href: "/z662", label: "Z662 Code" },
+    { icon: <FunctionsIcon />, href: "/interpolation", label: "Utilities" },
   ];
 
   const themeToggleItem = {

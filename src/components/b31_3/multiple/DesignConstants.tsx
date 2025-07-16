@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { MenuItem, TextField, Box, Typography } from "@mui/material"; // Import Typography
-import LabeledInput from "../../common/LabeledInput";
+import LabeledInput from "../../common/LabeledInputConversion";
 import { DesignParams, Units } from "@/types/units";
 import { unitConversions } from "@/utils/unitConversions";
 
@@ -27,8 +27,7 @@ export default function DesignConstants({
   onMaterialChange,
   onCAChange,
 }: DesignConstantsProps) {
-  const { corrosionAllowance } =
-    designParams;
+  const { corrosionAllowance } = designParams;
 
   return (
     <Box
@@ -68,7 +67,6 @@ export default function DesignConstants({
             </MenuItem>
           ))}
         </TextField>
-        
       </Box>
 
       {/* Corrosion Allowance & Allowable Stress LabeledInputs - Responsive Flex Direction */}
@@ -89,10 +87,7 @@ export default function DesignConstants({
           onChange={onCAChange}
           sx={{ minWidth: 140, flex: 1 }}
         />
-
-       
       </Box>
-      
     </Box>
   );
 }

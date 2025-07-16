@@ -1,24 +1,27 @@
 // src/app/b31.3-calculator/DesignParameters.tsx
-import React from "react";
-import { MenuItem, TextField, Box, Typography } from "@mui/material"; // Import Typography
-import LabeledInput from "../../common/LabeledInput";
+import React, { useEffect, useRef, useState } from "react";
+import { MenuItem, TextField, Box, Typography, InputAdornment } from "@mui/material";
+
 import { DesignParams, Units } from "@/types/units";
 import { unitConversions } from "@/utils/unitConversions";
+import { MaterialName } from "@/utils/materialsData"; // Import MaterialName
+import LabeledInputConversion from "@/components/common/LabeledInputConversion";
 
 type DesignParametersProps = {
   materials: string[];
-  material: string;
+  material: MaterialName; // Changed type to MaterialName
   designParams: DesignParams;
 
   onUnitsChange: (
     event: React.MouseEvent<HTMLElement>,
     newUnits: Units
   ) => void;
-  onMaterialChange: (value: string) => void;
+  onMaterialChange: (value: MaterialName) => void; // Changed type to MaterialName
   onTemperatureChange: (value: number) => void;
   onCAChange: (value: number) => void;
   onDesignPressureChange: (value: number) => void;
 };
+
 
 export default function DesignParameters({
   materials,
@@ -31,36 +34,34 @@ export default function DesignParameters({
 }: DesignParametersProps) {
   const { pressure, temperature, corrosionAllowance, allowableStress } =
     designParams;
-
+    
   return (
     <Box
       sx={{
         display: "flex",
         flexDirection: "column",
-        gap: 2, // This gap will now apply between the Typography and the first input Box
+        gap: 2,
         width: "100%",
       }}
     >
-      {/* Added Title */}
       <Typography variant="h6" gutterBottom>
         Design Parameters
       </Typography>
 
-      {/* Material TextField - Responsive Flex Direction */}
       <Box
         sx={{
           display: "flex",
           gap: 2,
           flexWrap: "wrap",
           justifyContent: "flex-start",
-          flexDirection: { xs: "column", sm: "row" }, // Added responsive flexDirection
+          flexDirection: { xs: "column", sm: "row" },
         }}
       >
         <TextField
           select
           label="Material"
           value={material}
-          onChange={(e) => onMaterialChange(e.target.value)}
+          onChange={(e) => onMaterialChange(e.target.value as MaterialName)} // Cast value to MaterialName
           sx={{ minWidth: 200, flexGrow: 1 }}
           size="small"
         >
@@ -72,17 +73,16 @@ export default function DesignParameters({
         </TextField>
       </Box>
 
-      {/* Design Pressure & Temperature LabeledInputs - Responsive Flex Direction */}
       <Box
         sx={{
           display: "flex",
           gap: 2,
           flexWrap: "wrap",
           justifyContent: "flex-start",
-          flexDirection: { xs: "column", sm: "row" }, // Added responsive flexDirection
+          flexDirection: { xs: "column", sm: "row" },
         }}
       >
-        <LabeledInput
+        <LabeledInputConversion
           label="Design Pressure"
           symbol="P"
           unit={unitConversions.pressure[designParams.units].unit}
@@ -91,7 +91,7 @@ export default function DesignParameters({
           sx={{ minWidth: 140, flex: 1 }}
         />
 
-        <LabeledInput
+        <LabeledInputConversion
           label="Temperature"
           symbol="T"
           unit={unitConversions.temperature[designParams.units].unit}
@@ -101,17 +101,16 @@ export default function DesignParameters({
         />
       </Box>
 
-      {/* Corrosion Allowance & Allowable Stress LabeledInputs - Responsive Flex Direction */}
       <Box
         sx={{
           display: "flex",
           gap: 2,
           flexWrap: "wrap",
           justifyContent: "flex-start",
-          flexDirection: { xs: "column", sm: "row" }, // Added responsive flexDirection
+          flexDirection: { xs: "column", sm: "row" },
         }}
       >
-        <LabeledInput
+        <LabeledInputConversion
           label="Corrosion Allowance"
           symbol="CA"
           unit={unitConversions.length[designParams.units].unit}
@@ -120,12 +119,13 @@ export default function DesignParameters({
           sx={{ minWidth: 140, flex: 1 }}
         />
 
-        <LabeledInput
+        <LabeledInputConversion
           label="Allowable Stress"
           symbol="S"
           unit={unitConversions.pressure[designParams.units].unit}
-          value={allowableStress}
-          onChange={() => {}}
+          // Display the calculated allowableStress
+          value={allowableStress.toFixed(2)}
+          onChange={() => {}} // Still disabled as it's calculated
           disabled
           sx={{ minWidth: 140, flex: 1 }}
         />

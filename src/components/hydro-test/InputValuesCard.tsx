@@ -2,7 +2,7 @@
 
 import { Box, Card, CardContent, Tooltip, Typography } from "@mui/material";
 import { useEffect, useRef } from "react";
-import LabeledInput from "../common/LabeledInput";
+import LabeledInput from "../common/LabeledInputConversion";
 import { Units } from "@/types/units";
 import { unitConversions } from "@/utils/unitConversions";
 
@@ -51,8 +51,7 @@ export default function InputValuesCard({
   }, [units]);
 
   return (
-    <Card sx={{ height: "100%", border: "1px solid #ddd" }}
-    elevation={0}>
+    <Card sx={{ height: "100%", border: "1px solid #ddd" }} elevation={0}>
       <CardContent>
         <Typography variant="h6" gutterBottom>
           Input Values

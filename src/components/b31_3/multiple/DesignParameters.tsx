@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { Box, Typography } from "@mui/material"; // Import Typography
-import LabeledInput from "../../common/LabeledInput";
+import LabeledInput from "../../common/LabeledInputConversion";
 import { DesignParams, Units } from "@/types/units";
 import { unitConversions } from "@/utils/unitConversions";
 
@@ -25,8 +25,7 @@ export default function DesignParameters({
   onTemperatureChange,
   onDesignPressureChange,
 }: DesignParametersProps) {
-  const { pressure, temperature, allowableStress } =
-    designParams;
+  const { pressure, temperature, allowableStress } = designParams;
 
   return (
     <Box

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react"; // Import useEffect
 import { v4 as uuidv4 } from "uuid";
 import { Box, Button, Card, Typography, CardContent } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
@@ -12,7 +12,9 @@ import PipeCard from "../PipeCard";
 import FormulaDisplay from "../FormulaDisplay";
 import DesignInputs from "./DesignParameters";
 import PdfExport from "../pdfExport/PdfExport";
-import { Units } from "@/types/units";
+import { Units, DesignParams } from "@/types/units"; // Import DesignParams
+import { MaterialName } from "@/utils/materialsData"; // Import MaterialName
+import { materialStress } from "@/utils/materialStress"; // Import materialStressLookup
 
 type Pipe = {
   id: string;
@@ -25,7 +27,7 @@ type Pipe = {
 
 interface SinglePressureTabContentProps {
   units: Units;
-  material: string;
+  material: MaterialName; // Changed type to MaterialName
   temperature: number;
   corrosionAllowance: number;
   pressure: number;
@@ -35,26 +37,17 @@ interface SinglePressureTabContentProps {
   e: number;
   w: number;
   pipesForDisplay: Pipe[];
-  materials: string[];
-  designParams: {
-    units: Units;
-    pressure: number;
-    temperature: number;
-    corrosionAllowance: number;
-    allowableStress: number | null;
-    gamma: number;
-    millTol: number;
-    e: number;
-    w: number;
-  };
+  materials: string[]; // This can remain string[] as it's just for the dropdown options
+  designParams: DesignParams; // Use the DesignParams type
 
-  setMaterial: (value: string) => void;
+  setMaterial: (value: MaterialName) => void; // Changed type to MaterialName
   setTemperature: (value: number) => void;
   setCorrosionAllowance: (value: number) => void;
   setPressure: (value: number) => void;
+  setAllowableStress: (value: number | null) => void; // NEW: Added setAllowableStress
   setPipes: (pipes: Pipe[]) => void;
 
-  updatePipe: (id: string, key: keyof Pipe, value: string | number) => void; // Corrected type for key and value
+  updatePipe: (id: string, key: keyof Pipe, value: string | number) => void;
   removePipe: (id: string) => void;
   handleUnitsChange: (
     event: React.MouseEvent<HTMLElement>,
@@ -68,18 +61,41 @@ interface SinglePressureTabContentProps {
 const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
   units,
   material,
+  temperature, // Destructure temperature
   pipesForDisplay,
   materials,
   designParams,
   setMaterial,
+  setTemperature, // Destructure setTemperature
+  setAllowableStress, // NEW: Destructure setAllowableStress
   setPipes,
   updatePipe,
   removePipe,
   handleUnitsChange,
-  handleTemperatureChange,
   handleCAChange,
   handleDesignPressureChange,
 }) => {
+  // useEffect to automatically calculate allowableStress on relevant input changes
+  useEffect(() => {
+    // Determine the category based on units
+    const category = units === "Imperial" ? "Imperial" : "Metric";
+
+    // Call the materialStressLookup function
+    const stress = materialStress(
+      category,
+      material,
+      temperature
+    );
+
+    // Update the allowableStress state
+    setAllowableStress(stress);
+
+    // Optionally, log a warning if stress is null
+    if (stress === null) {
+      console.warn(`Could not determine allowable stress for material: ${material}, temperature: ${temperature}, units: ${units}. Please check inputs and data range.`);
+    }
+  }, [units, material, temperature, setAllowableStress]); // Dependencies for this effect
+
   return (
     <>
       <Box
@@ -87,20 +103,19 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
           display: "flex",
           flexDirection: { xs: "column", md: "row" },
           gap: 4,
-          alignItems: "stretch", // Ensures cards stretch to the same height
-          justifyContent: "center", // Center the cards horizontally on larger screens
+          alignItems: "stretch",
+          justifyContent: "center",
           mt: 4,
         }}
       >
         {/* Left Column: Inputs Card */}
         <Card
           sx={{
-            // Removed flex: 1 to allow fixed width
-            width: { xs: "100%", md: 584 }, // Set width to 539px on desktop, full width on smaller screens
-            minWidth: { xs: "auto", md: 450 }, // Keep minWidth for smaller desktop sizes if needed, or adjust
+            width: { xs: "100%", md: 584 },
+            minWidth: { xs: "auto", md: 450 },
             display: "flex",
             flexDirection: "column",
-            height: 305, // Fixed height for consistent alignment
+            height: 305,
             border: "1px solid #ddd",
           }}
           elevation={0}
@@ -109,41 +124,38 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
             sx={{
               display: "flex",
               flexDirection: "column",
-              gap: 2, // Ensures 16px gap between DesignInputs and the button
+              gap: 2,
               height: "100%",
-              p: 2, // Provides 16px padding on all sides, including the bottom
+              p: 2,
             }}
           >
             <DesignInputs
               designParams={{
                 ...designParams,
-                allowableStress: designParams.allowableStress ?? 0,
+                allowableStress: designParams.allowableStress ?? 0, // Ensure it's a number for display
               }}
               materials={materials}
               material={material}
               onUnitsChange={handleUnitsChange}
               onMaterialChange={setMaterial}
-              onTemperatureChange={handleTemperatureChange}
+              onTemperatureChange={setTemperature} // Pass setTemperature directly
               onCAChange={handleCAChange}
               onDesignPressureChange={handleDesignPressureChange}
             />
 
-            {/* Button container now directly follows DesignInputs */}
             <Box sx={{ width: "100%", paddingTop:1.5 }}>
               <Button
                 startIcon={<AddCircleOutlineIcon />}
                 variant="outlined"
                 onClick={() => {
-                  // Create the new pipe object
-                  const newPipe: Pipe = { // Explicitly type newPipe as Pipe
+                  const newPipe: Pipe = {
                     id: uuidv4(),
                     nps: "2",
                     od: "2.375",
-                    schedule: "40" as PipeSchedule, // Explicitly cast to PipeSchedule
+                    schedule: "40" as PipeSchedule,
                     tRequired: 0,
                     t: 0,
                   };
-                  // Pass the new array directly to setPipes
                   setPipes([...pipesForDisplay, newPipe]);
                 }}
                 fullWidth
@@ -157,14 +169,13 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
         {/* Formula Card */}
         <Card
           sx={{
-            // Removed flex: 1 to allow fixed width
-            width: { xs: "100%", md: 584 }, // Set width to 539px on desktop, full width on smaller screens
-            minWidth: { xs: "auto", md: 450 }, // Keep minWidth for smaller desktop sizes if needed, or adjust
+            width: { xs: "100%", md: 584 },
+            minWidth: { xs: "auto", md: 450 },
             display: "flex",
             flexDirection: "column",
             p: 2,
             gap: 2,
-            height: 305, // Fixed height for consistent alignment
+            height: 305,
             border: "1px solid #ddd",
           }}
           elevation={0}
