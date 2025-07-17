@@ -109,7 +109,7 @@ const PdfDesignInputs: React.FC<PdfDesignInputsProps> = ({
         <div style={rowStyle}>
           <div style={labelStyle}>Corrosion Allowance:</div>
           {/* FIX: Convert corrosionAllowance to display units */}
-          <div style={valueStyle}>{lengthConversion.to(corrosionAllowance).toFixed(3)}</div>
+          <div style={valueStyle}>{corrosionAllowance}</div>
           <div style={unitStyle}>{lengthConversion.unit}</div>
         </div>
         <div style={rowStyle}>

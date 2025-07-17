@@ -95,19 +95,21 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
         // These values are already in the current display units, as per the LabeledInputConversion and DesignParameters behavior.
         const displayPressure = pressureConversion.to(pressure);
         const displayOuterDiameter = outerDiameterDisplay; // Already in current display units
-        const displayCorrosionAllowance = lengthConversion.to(corrosionAllowance); // Convert for display
+        // Corrosion allowance for display in formula should be in current display units
+        const displayCorrosionAllowance = corrosionAllowance;
         const displayAllowableStress = pressureConversion.to(allowableStress ?? 0);
 
         // --- Convert inputs to Imperial units for calculateTRequired utility function ---
-        // Assuming designParams values are already in Imperial base units (PSI, inches)
-        const imperialPressure = pressure; // Use directly
-        const imperialAllowableStress = allowableStress ?? 0; // Use directly
-        const imperialCorrosionAllowance = corrosionAllowance; // Use directly
+        // These values (pressure, allowableStress, corrosionAllowance) are stored in designParams
+        // in the CURRENTLY SELECTED DISPLAY UNIT.
+        // We MUST convert them to Imperial base units (psi, inches) for calculateTRequired.
+        const imperialPressure = pressureConversion.toImperial(pressure);
+        const imperialAllowableStress = pressureConversion.toImperial(allowableStress ?? 0);
+        const imperialCorrosionAllowance = lengthConversion.toImperial(corrosionAllowance);
 
-        // outerDiameterDisplay is in the current display unit. Convert to Imperial (inches) if Metric.
-        const imperialOuterDiameter = units === Units.Metric
-          ? unitConversions.length[Units.Metric].toImperial(outerDiameterDisplay)
-          : outerDiameterDisplay; // If already Imperial, no conversion needed
+        // outerDiameterDisplay comes from JSON and is in the CURRENT DISPLAY UNIT (mm or inches).
+        // It also needs to be converted to Imperial inches for the calculation.
+        const imperialOuterDiameter = lengthConversion.toImperial(outerDiameterDisplay);
 
         // Prepare parameters for the utility function
         const paramsForCalculation: TRequiredParams = {
@@ -144,7 +146,7 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
           >
             <div style={valueStyle}>
               <strong>Pipe {index + 1}</strong> — For NPS {pipe.nps} SCH{" "}
-              {pipe.schedule} {material} (D=
+              {material} (D=
               {outerDiameterDisplay.toFixed(3)}
               {lengthConversion.unit}, t ={" "}
               {displayedScheduleThickness.toFixed(3)}
