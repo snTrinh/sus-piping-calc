@@ -14,7 +14,7 @@ import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import { useTheme } from "@mui/material/styles";
 
 import { DesignParams, Units } from "@/types/units"; // Import DesignParams
-import { npsToMmMap, PIPE_SCHEDULE_ORDER, unitConversions } from "@/utils/unitConversions";
+import { npsToMmMap, PIPE_SCHEDULE_ORDER, PipeSchedule, unitConversions } from "@/utils/unitConversions";
 import pipeData from "@/data/transformed_pipeData.json"; // Ensure this path is correct
 import { calculateTRequired, TRequiredParams } from "@/utils/pipeCalculations"; // Import the utility function and its types
 
@@ -78,8 +78,8 @@ export default function PipeCard({
   const selectedPipeSizeData = currentUnitPipeData?.[currentNpsKey || ''];
   const scheduleOptions = selectedPipeSizeData
   ? Object.keys(selectedPipeSizeData.schedules).sort((a, b) => {
-      const indexA = PIPE_SCHEDULE_ORDER.indexOf(a as any); // Cast to any to match PipeSchedule type
-      const indexB = PIPE_SCHEDULE_ORDER.indexOf(b as any);
+      const indexA = PIPE_SCHEDULE_ORDER.indexOf(a as PipeSchedule); // Cast to any to match PipeSchedule type
+      const indexB = PIPE_SCHEDULE_ORDER.indexOf(b as PipeSchedule);
       return indexA - indexB;
     })
   : [];
