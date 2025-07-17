@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import CalculateIcon from "@mui/icons-material/Calculate";
 import FunctionsIcon from "@mui/icons-material/Functions";
+import AssessmentIcon from "@mui/icons-material/Assessment";
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 
@@ -28,7 +29,7 @@ export default function Sidebar() {
 
   const navItems = [
     { icon: <CalculateIcon />, href: "/", label: "Calculations" },
-    // { icon: <AssessmentIcon />, href: "/z662", label: "Z662 Code" },
+    { icon: <AssessmentIcon />, href: "/z662", label: "Z662 Code" },
     { icon: <FunctionsIcon />, href: "/interpolation", label: "Utilities" },
   ];
 

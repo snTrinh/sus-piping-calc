@@ -181,11 +181,6 @@ export default function B31_3Calculator() {
         const rawScheduleThicknessImperial = selectedPipeSizeData?.schedules[
           pipe.schedule
         ] ?? 0;
-
-        console.log("Final calculatedTRequired:", calculatedTRequired);
-        console.log("Raw Schedule Thickness (Imperial):", rawScheduleThicknessImperial);
-        console.log("---------------------------------------");
-
         return {
           ...pipe,
           tRequired: calculatedTRequired,
@@ -320,7 +315,7 @@ export default function B31_3Calculator() {
             scrollButtons="auto"
           >
             <Tab label="Single Pressure" />
-            {/* <Tab label="Multiple Pressures" /> */}
+            <Tab label="Multiple Pressures" />
           </Tabs>
           <UnitsToggle units={units} onChange={handleUnitsChange} />
         </Box>

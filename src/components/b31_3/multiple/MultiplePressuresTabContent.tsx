@@ -157,7 +157,15 @@ const MultiplePressuresTabContent: React.FC<
       </Box>
 
       {/* Pipe Cards Display */}
-      <Box sx={{ mt: 4, display: "flex", flexDirection: "column", gap: 2 }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          gap: 4,
+          alignItems: "stretch",
+          mt: 4,
+        }}
+      >
         {pipesForDisplay.map((pipe) => (
           <Box
             key={pipe.id} // Important: Key the outer Box for each pipe
