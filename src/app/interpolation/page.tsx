@@ -4,15 +4,7 @@ import { useState, useEffect } from "react";
 import {
   Box,
   Typography,
-  Container,
-  TextField,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
-  Button,
-  CardContent,
-  Card,
+  Container
 } from "@mui/material";
 import InputValuesCard from "./../../components/interpolation/InputValuesCard";
 import InterpolatedValueCard from "./../../components/interpolation/InterpolatedValuesCard";
@@ -22,8 +14,6 @@ import { linearInterpolation } from "./../../utils/interpolation";
 import { materialStress } from "./../../utils/materialStress";
 import { materialsData, UnitCategory, MaterialName } from "./../../utils/materialsData";
 import { Units } from "@/types/units"; // Import Units enum
-import LabeledInput from "@/components/common/LabeledInput";
-import { unitConversions } from "@/utils/unitConversions";
 
 export default function InterpolationPage() {
   // --- State for Generic Linear Interpolation ---
@@ -37,16 +27,9 @@ export default function InterpolationPage() {
   const y = linearInterpolation(x, x0, y0, x1, y1);
 
   // --- State for Material Stress Lookup ---
-  const [selectedCategory, setSelectedCategory] = useState<UnitCategory>("Metric");
+  const [selectedCategory] = useState<UnitCategory>("Metric");
   const [selectedMaterial, setSelectedMaterial] = useState<MaterialName>("A106B");
-  const [inputTemperature, setInputTemperature] = useState(200); // Default temperature for material lookup
-  const [materialStressResult, setMaterialStressResult] = useState<number | null>(null);
-  const [materialLookupError, setMaterialLookupError] = useState<string | null>(null);
-
-  // For material stress lookup, we need a 'currentUnits' context.
-  // Assuming for this page, the input temperature unit aligns with the selectedCategory.
-  // If Metric category is selected, inputTemperature is in Celsius, so currentUnits is Units.Metric.
-  // If Imperial category is selected, inputTemperature is in Fahrenheit, so currentUnits is Units.Imperial.
+  const [inputTemperature] = useState(200); // Default temperature for material lookup
   const currentUnitsForLookup = selectedCategory === "Metric" ? Units.Metric : Units.Imperial;
 
 

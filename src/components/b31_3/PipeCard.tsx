@@ -38,7 +38,7 @@ interface TransformedPipeData {
 }
 
 // Cast pipeData to the new interface
-const typedPipeData: TransformedPipeData = pipeData as any; // Using 'as any' for quick setup, consider stricter typing
+const typedPipeData: TransformedPipeData = pipeData; // Using 'as any' for quick setup, consider stricter typing
 
 type Pipe = {
   id: string;

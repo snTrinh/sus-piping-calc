@@ -1,7 +1,7 @@
 // src/app/b31.3-calculator/common/LabeledInput.tsx
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { TextField, InputAdornment } from "@mui/material";
+import { TextField} from "@mui/material";
 
 type LabeledInputConversionProps = {
   label: string;

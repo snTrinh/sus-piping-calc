@@ -2,13 +2,11 @@
 
 import React from "react";
 import { v4 as uuidv4 } from "uuid";
-import { Box, Button, Card, Typography, CardContent } from "@mui/material";
+import { Box, Button, Card, Typography } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
 import { Units, DesignParams } from "@/types/units"; // Import DesignParams
-import {
-  PipeSchedule,
-} from "@/utils/unitConversions";
+import { PipeSchedule } from "@/utils/unitConversions";
 import PipeCard from "../PipeCard";
 import FormulaDisplay from "../FormulaDisplay";
 import PdfExport from "../pdfExport/PdfExport";
@@ -63,7 +61,6 @@ interface MultiplePressuresTabContentProps {
 const MultiplePressuresTabContent: React.FC<
   MultiplePressuresTabContentProps
 > = ({
-  units,
   material,
   pipesForDisplay,
   materials,

@@ -2,7 +2,7 @@
 
 "use client";
 
-import React, { useEffect } from "react"; // Import useEffect
+import React from "react"; // Import useEffect
 import { v4 as uuidv4 } from "uuid";
 import { Box, Button, Card, Typography, CardContent } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
@@ -16,7 +16,6 @@ import FormulaDisplay from "../FormulaDisplay";
 import PdfExport from "../pdfExport/PdfExport";
 import { Units, DesignParams } from "@/types/units"; // Import DesignParams
 import { MaterialName } from "@/utils/materialsData"; // Import MaterialName
-import { materialStress } from "@/utils/materialStress"; // Corrected import name
 import DesignParameters from "./DesignParameters";
 
 type Pipe = {
@@ -62,15 +61,13 @@ interface SinglePressureTabContentProps {
 }
 
 const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
-  units,
   material,
-  temperature, // Destructure temperature
+
   pipesForDisplay,
   materials,
   designParams,
   setMaterial,
   setTemperature, // Destructure setTemperature
-  setAllowableStress, // Destructure setAllowableStress
   setPipes,
   updatePipe,
   removePipe,
@@ -100,7 +97,7 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
             minWidth: { xs: "auto", md: 450 },
             display: "flex",
             flexDirection: "column",
-            height: {xs:"100%", md: 305},
+            height: { xs: "100%", md: 305 },
             border: "1px solid #ddd",
           }}
           elevation={0}
@@ -128,7 +125,7 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
               onDesignPressureChange={handleDesignPressureChange}
             />
 
-            <Box sx={{ width: "100%", paddingTop:1.5 }}>
+            <Box sx={{ width: "100%", paddingTop: 1.5 }}>
               <Button
                 startIcon={<AddCircleOutlineIcon />}
                 variant="outlined"

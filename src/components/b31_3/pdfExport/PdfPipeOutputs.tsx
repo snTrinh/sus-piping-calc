@@ -4,7 +4,6 @@
 
 import React from "react";
 import { DesignParams, Units } from "@/types/units";
-import pipeDimensions from "@/data/transformed_pipeData.json"; // Assuming this is your detailed pipe data
 import pipeData from "@/data/transformed_pipeData.json"; // Assuming this is also your detailed pipe data (or same as pipeDimensions)
 import { npsToMmMap, unitConversions } from "@/utils/unitConversions";
 import { useTheme } from "@mui/material/styles";
@@ -22,7 +21,6 @@ export type PipeDataJson = {
 };
 
 const typedPipeData: PipeDataJson = pipeData;
-const typedPipeDimensions: PipeDataJson = pipeDimensions; // If pipeDimensions is truly the same data as pipeData, you can just use typedPipeData for both lookups
 
 type Pipe = {
   id: string;
