@@ -11,9 +11,7 @@ import InterpolatedValueCard from "./../../components/interpolation/Interpolated
 
 // Import the new TypeScript utility functions and data
 import { linearInterpolation } from "./../../utils/interpolation";
-import { materialStress } from "./../../utils/materialStress";
 import { materialsData, UnitCategory, MaterialName } from "./../../utils/materialsData";
-import { Units } from "@/types/units"; // Import Units enum
 
 export default function InterpolationPage() {
   // --- State for Generic Linear Interpolation ---
@@ -29,8 +27,6 @@ export default function InterpolationPage() {
   // --- State for Material Stress Lookup ---
   const [selectedCategory] = useState<UnitCategory>("Metric");
   const [selectedMaterial, setSelectedMaterial] = useState<MaterialName>("A106B");
-  const [inputTemperature] = useState(200); // Default temperature for material lookup
-  const currentUnitsForLookup = selectedCategory === "Metric" ? Units.Metric : Units.Imperial;
 
 
   // Dynamically get available materials for the selected category
