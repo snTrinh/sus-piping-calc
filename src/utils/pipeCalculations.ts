@@ -1,9 +1,5 @@
 // src/utils/pipeCalculations.ts
 
-/**
- * Interface for the parameters required to calculate pipe wall thickness.
- * All units are expected to be in a consistent system (Imperial: psi, inches).
- */
 export interface TRequiredParams {
     pressure: number; // Design Pressure (P) in psi
     outerDiameterInches: number; // Outer Diameter (D) in inches
@@ -13,17 +9,9 @@ export interface TRequiredParams {
     gamma: number; // Temperature Coefficient (Y)
     corrosionAllowanceInches: number; // Corrosion Allowance (c) in inches
     millTol: number; // Mill Tolerance (e.g., 0.125 for 12.5%)
-  }
-  
-  /**
-   * Calculates the required minimum wall thickness for a pipe based on ASME B31.3, eq. 304.1.2.
-   * tm = (t + c) / (1 - millTol)
-   * where t = (P * D) / (2 * (S*E*W + P*Y))
-   *
-   * @param params - An object containing all necessary design parameters.
-   * @returns The calculated required thickness (tm) in inches.
-   */
-  export const calculateTRequired = ({
+}
+
+export const calculateTRequired = ({
     pressure,
     outerDiameterInches,
     allowableStress,
@@ -32,24 +20,43 @@ export interface TRequiredParams {
     gamma,
     corrosionAllowanceInches,
     millTol,
-  }: TRequiredParams): number => {
-    // Use a safe value for allowableStress if it's null
+}: TRequiredParams): number => {
+    console.log("--- calculateTRequired Inputs ---");
+    console.log("pressure:", pressure);
+    console.log("outerDiameterInches:", outerDiameterInches);
+    console.log("allowableStress (S):", allowableStress);
+    console.log("e (E):", e);
+    console.log("w (W):", w);
+    console.log("gamma (Y):", gamma);
+    console.log("corrosionAllowanceInches (c):", corrosionAllowanceInches);
+    console.log("millTol:", millTol);
+
     const S = allowableStress ?? 0;
-  
+
     const numerator = pressure * outerDiameterInches;
     const denominator = 2 * (S * e * w + pressure * gamma);
-  
-    // Avoid division by zero
+
+    console.log("Numerator (P*D):", numerator);
+    console.log("Denominator (2*(SEW + PY)):", denominator);
+
     if (denominator === 0) {
-      return 0;
+        console.warn("Denominator is zero. Returning 0 for tRequired.");
+        return 0;
     }
-  
-    // Per B31.3, this is the pressure design thickness, 't'
+
     const pressureDesignThickness = numerator / denominator;
-  
-    // Per B31.3, this is the required thickness 'tm', including allowances
+    console.log("Pressure Design Thickness (t):", pressureDesignThickness);
+
+    if (1 - millTol <= 0) {
+        console.warn("Invalid millTol (1 - millTol <= 0). Returning 0 for tRequired.");
+        return 0; // Prevent division by zero or negative thickness
+    }
+
     const requiredThickness =
-      (pressureDesignThickness + corrosionAllowanceInches) / (1 - millTol);
-  
+        (pressureDesignThickness + corrosionAllowanceInches) / (1 - millTol);
+
+    console.log("Calculated tRequired:", requiredThickness);
+    console.log("-------------------------------");
+
     return requiredThickness;
-  };
+};

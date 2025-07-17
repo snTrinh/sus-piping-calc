@@ -2,40 +2,62 @@
 
 import { Units } from "@/types/units";
 
+export type PipeSchedule =
+  | "5s"
+  | "5"
+  | "10"
+  | "10s"
+  | "20"
+  | "30"
+  | "40S"
+  | "STD"
+  | "40"
+  | "60"
+  | "80S"
+  | "XH"
+  | "80"
+  | "100"
+  | "120"
+  | "140"
+  | "160"
+  | "XXH";
 
-  export type PipeSchedule =
-  | "5s" | "5" | "10" | "10s" | "20" | "30" | "40S" | "STD" | "40"
-  | "60" | "80S" | "XH" | "80" | "100" | "120" | "140" | "160" | "XXH";
-  
-  export type ThicknessData = {
-    [key in PipeSchedule]: (number | null)[];
-  };
-  
-  export const npsToMmMap: Record<string, number> = {
-    "1/8": 10,
-    "1/4": 13,
-    "3/8": 17,
-    "1/2": 21,
-    "3/4": 27,
-    "1": 33,
-    "1 1/4": 42,
-    "1 1/2": 48,
-    "2": 60,
-    "2 1/2": 73,
-    "3": 89,
-    "4": 114,
-    "5": 141,
-    "6": 168,
-    "8": 219,
-    "10": 273,
-    "12": 324,
-    "14": 356,
-    "16": 406,
-    "18": 457,
-    "20": 508,
-    "24": 610,
-  };
-  
+export type ThicknessData = {
+  [key in PipeSchedule]: (number | null)[];
+};
+
+export const npsToMmMap: Record<string, string> = {
+  "1/8": "10",
+  "1/4": "13",
+  "3/8": "17",
+  "1/2": "21",
+  "3/4": "26",
+  "1": "33",
+  "1-1/4": "42",
+  "1-1/2": "48",
+  "2": "60",
+  "2-1/2": "73",
+  "3": "88",
+  "3-1/2": "102", // Assuming 3-1/2" maps to 102 (4")
+  "4": "114",
+  "5": "141",
+  "6": "168",
+  "8": "219",
+  "10": "273",
+  "12": "323",
+  "14": "355",
+  "16": "406",
+  "18": "457",
+  "20": "508",
+  "24": "610",
+  "26": "660", // Assuming 26" maps to 660mm
+  "28": "711", // Assuming 28" maps to 711mm
+  "30": "762", // Assuming 30" maps to 762mm
+  "32": "813", // Assuming 32" maps to 813mm
+  "34": "864", // Assuming 34" maps to 864mm
+  "36": "914", // Assuming 36" maps to 914mm
+  // Add any other specific mappings required based on your pipe data and common NPS/DN conversions
+};
 
 export const unitConversions = {
   pressure: {
@@ -63,8 +85,8 @@ export const unitConversions = {
       unit: "in",
     },
     [Units.Metric]: {
-      to: (value: number) => value, // mm to mm (display) - value is already in mm
-      from: (value: number) => value, // mm to mm (internal)
+      to: (value: number) => value * 25.4, // CORRECTED: Convert inches (internal) to mm (display)
+      from: (value: number) => value / 25.4, // CORRECTED: Convert mm (display) to inches (internal)
       toImperial: (value: number) => value / 25.4, // From mm to Imperial (inch)
       fromImperial: (value: number) => value * 25.4, // From Imperial (inch) to mm
       unit: "mm",
@@ -96,27 +118,30 @@ export const unitConversions = {
     },
     [Units.Metric]: {
       to: (value: number) => {
-        // Convert inch NPS to approximate metric NPS in mm
-        return npsToMmMap[value] ?? NaN; // Return NaN if not found
+        // Convert inch NPS (number) to approximate metric NPS (string)
+        // Ensure the key is a string before looking up in npsToMmMap
+        return Number(npsToMmMap[value.toString()]) ?? NaN; // Convert result back to number
       },
       from: (value: number) => {
-        // Convert metric mm NPS back to inch NPS (approximate)
-        // Find key by value (reverse lookup)
+        // Convert metric mm NPS (number) back to inch NPS (approximate)
+        // Find key by value (reverse lookup) - ensure comparison is string to string
         const inchNps = Object.entries(npsToMmMap).find(
-          ([, mm]) => mm === value
+          ([, mmString]) => mmString === value.toString() // Convert number to string for comparison
         );
         return inchNps ? Number(inchNps[0]) : NaN;
       },
       toImperial: (value: number) => {
-        // Convert metric mm NPS to inch NPS (approximate)
+        // Convert metric mm NPS (number) to inch NPS (approximate)
+        // Ensure comparison is string to string
         const inchNps = Object.entries(npsToMmMap).find(
-          ([, mm]) => mm === value
+          ([, mmString]) => mmString === value.toString() // Convert number to string for comparison
         );
         return inchNps ? Number(inchNps[0]) : NaN;
       },
       fromImperial: (value: number) => {
-        // Convert inch NPS to approximate metric NPS in mm
-        return npsToMmMap[value] ?? NaN;
+        // Convert inch NPS (number) to approximate metric NPS in mm
+        // Ensure the key is a string before looking up in npsToMmMap
+        return Number(npsToMmMap[value.toString()]) ?? NaN; // Convert result back to number
       },
       unit: "mm",
     },
@@ -152,8 +177,9 @@ export function convertDesignInputs({
     pressureDisplay: pressure,
     corrosionAllowanceDisplay: corrosionAllowance,
     // Allowable stress is still calculated (internally Imperial) and converted for display
-    allowableStressDisplay: allowableStress !== null
-      ? unitConversions.pressure[units].fromImperial(allowableStress)
-      : 0, // Default to 0 for display if null
+    allowableStressDisplay:
+      allowableStress !== null
+        ? unitConversions.pressure[units].fromImperial(allowableStress)
+        : 0, // Default to 0 for display if null
   };
 }

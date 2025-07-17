@@ -98,7 +98,7 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
             minWidth: { xs: "auto", md: 450 },
             display: "flex",
             flexDirection: "column",
-            height: 305,
+            height: {xs:"100%", md: 305},
             border: "1px solid #ddd",
           }}
           elevation={0}
@@ -187,7 +187,7 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
           material={material}
           designParams={{
             ...designParams,
-            allowableStress: designParams.allowableStress ?? 0,
+            allowableStress: designParams.allowableStress,
           }}
           pipes={pipesForDisplay}
         />
