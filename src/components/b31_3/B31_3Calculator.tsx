@@ -320,7 +320,7 @@ export default function B31_3Calculator() {
             scrollButtons="auto"
           >
             <Tab label="Single Pressure" />
-            <Tab label="Multiple Pressures" />
+            {/* <Tab label="Multiple Pressures" /> */}
           </Tabs>
           <UnitsToggle units={units} onChange={handleUnitsChange} />
         </Box>
