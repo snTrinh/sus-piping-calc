@@ -13,9 +13,10 @@ import {
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import { useTheme } from "@mui/material/styles";
 
-import { Units } from "@/types/units";
+import { DesignParams, Units } from "@/types/units"; // Import DesignParams
 import { npsToMmMap, unitConversions } from "@/utils/unitConversions";
 import pipeData from "@/data/transformed_pipeData.json"; // Ensure this path is correct
+import { calculateTRequired, TRequiredParams } from "@/utils/pipeCalculations"; // Import the utility function and its types
 
 // Define the structure of your new pipeData.json for better type safety
 interface ScheduleThicknesses {
@@ -43,7 +44,7 @@ type Pipe = {
   id: string;
   nps: string;
   schedule: string;
-  tRequired: number; // stored internally in inches
+  tRequired: number; // stored internally in inches - this will now be overwritten by local calculation for display
   t: number; // stored internally in inches (user provided thickness) - Note: This field is not currently used in the component.
 };
 
@@ -51,7 +52,7 @@ type PipeCardProps = {
   pipe: Pipe;
   updatePipe: (id: string, key: keyof Pipe, value: string | number) => void;
   removePipe: (id: string) => void;
-  units: Units;
+  designParams: DesignParams; // Add designParams to props
   sx?: object;
 };
 
@@ -59,83 +60,67 @@ export default function PipeCard({
   pipe,
   updatePipe,
   removePipe,
-  units,
+  designParams, // Destructure designParams
   sx
 }: PipeCardProps) {
   const theme = useTheme();
 
+  const { pressure, corrosionAllowance, allowableStress, e, w, gamma, units } =
+    designParams; // Destructure units here
+
   const thicknessConversion = unitConversions.length[units];
+  const pressureConversion = unitConversions.pressure[units]; // Get pressure conversion
   const unitLabel = thicknessConversion.unit;
 
-  // Determine the correct NPS key for the current unit system based on transformed_pipeData.json
-  // For Metric, the NPS from pipe.nps (e.g., "4") needs to be converted to its corresponding DN number string (e.g., "100")
   const currentNpsKey = units === Units.Metric ? npsToMmMap[pipe.nps]?.toString() : pipe.nps;
 
-  console.log("--- PipeCard Debug ---");
-  console.log("Pipe ID:", pipe.id);
-  console.log("Selected NPS (pipe.nps):", pipe.nps);
-  console.log("Selected Schedule (pipe.schedule):", pipe.schedule);
-  console.log("Current Units:", units);
-  console.log("Derived currentNpsKey (for data lookup):", currentNpsKey);
-
-
-  // Get the data for the currently selected unit system (Metric or Imperial)
   const currentUnitPipeData = typedPipeData[units];
-  console.log("currentUnitPipeData exists:", !!currentUnitPipeData);
-
-
-  // Get the specific pipe size data (e.g., data for "1/2" NPS or "100" DN)
-  // Use empty string fallback for currentNpsKey to prevent errors if undefined
   const selectedPipeSizeData = currentUnitPipeData?.[currentNpsKey || ''];
-  console.log("selectedPipeSizeData exists:", !!selectedPipeSizeData);
-  if (selectedPipeSizeData) {
-      console.log("selectedPipeSizeData.OD (raw from JSON):", selectedPipeSizeData.OD);
-      console.log("selectedPipeSizeData.schedules (raw from JSON):", selectedPipeSizeData.schedules);
-  }
-
-
-  // Dynamically get schedule options based on the selected pipe size and current unit system
-  const scheduleOptions = selectedPipeSizeData ? Object.keys(selectedPipeSizeData.schedules).sort() : []; // Added .sort() for consistent order
-  console.log("Available schedule options for current NPS:", scheduleOptions);
-
-
-  // Look up the raw thickness directly from selectedPipeSizeData
+const scheduleOptions = selectedPipeSizeData ? Object.keys(selectedPipeSizeData.schedules).sort() : []; // Added .sort() for consistent order
   let rawScheduleThickness: number = 0;
   if (selectedPipeSizeData && selectedPipeSizeData.schedules && pipe.schedule in selectedPipeSizeData.schedules) {
     const fetchedThickness = selectedPipeSizeData.schedules[pipe.schedule];
     rawScheduleThickness = fetchedThickness === null ? 0 : fetchedThickness;
-    console.log(`Fetched rawScheduleThickness for schedule '${pipe.schedule}':`, fetchedThickness);
-  } else {
-      console.log(`Could not find schedule thickness for NPS '${currentNpsKey}' and Schedule '${pipe.schedule}'.`);
-      // If schedule isn't found, you might want to default to the first available or a specific schedule
-      // For now, it will remain 0.
-  }
+    
+  } 
 
   // Normalize the raw thickness to your internal standard unit (inches)
   let thicknessInInches = 0;
   if (units === Units.Metric && rawScheduleThickness) {
     // The metric data is in mm, so convert it to inches
-    thicknessInInches = unitConversions.length.Metric.from(rawScheduleThickness);
+    thicknessInInches = unitConversions.length.Metric.toImperial(rawScheduleThickness);
   } else {
     // The imperial data is already in inches
     thicknessInInches = rawScheduleThickness;
   }
-  console.log("thicknessInInches (converted to internal standard):", thicknessInInches);
 
-  // Now, calculate the displayed values from your consistent internal units (inches)
   const displayedScheduleThickness = thicknessConversion.to(thicknessInInches);
-  const displayedTRequired = unitConversions.length[units].to(pipe.tRequired);
-  console.log(`Displayed Schedule Thickness (${unitLabel}):`, displayedScheduleThickness);
-  console.log(`Displayed Required Thickness (${unitLabel}):`, displayedTRequired);
+  const outerDiameterDisplay = selectedPipeSizeData?.OD || 0;
+  const imperialPressure = pressureConversion.toImperial(pressure);
+  const imperialAllowableStress = pressureConversion.toImperial(allowableStress ?? 0);
+  const imperialCorrosionAllowance = thicknessConversion.toImperial(corrosionAllowance);
 
+  // outerDiameterDisplay is in the current display unit. Convert to Imperial (inches) if Metric.
+  const imperialOuterDiameter = units === Units.Metric
+    ? unitConversions.length[Units.Metric].toImperial(outerDiameterDisplay)
+    : outerDiameterDisplay; 
+  const paramsForCalculation: TRequiredParams = {
+    pressure: imperialPressure,
+    outerDiameterInches: imperialOuterDiameter,
+    allowableStress: imperialAllowableStress,
+    e: e ?? 1, // Ensure E, W, gamma have default values if null/undefined
+    w: w ?? 1,
+    gamma: gamma ?? 1,
+    corrosionAllowanceInches: imperialCorrosionAllowance,
+    millTol: designParams.millTol ?? 0,
+  };
 
-  // Look up the outer diameter directly from selectedPipeSizeData
-  const outerDiameter = selectedPipeSizeData?.OD || 0;
-  console.log("Outer Diameter (raw from JSON):", outerDiameter);
+  // Calculate tRequired using the utility function (result will be in Imperial inches)
+  const tRequiredCalculatedImperial = calculateTRequired(paramsForCalculation);
 
+  // Convert the calculated tRequired back to the current display units for rendering
+  const displayedTRequired = thicknessConversion.to(tRequiredCalculatedImperial);
 
-  // Get all available NPS options, sorted.
-  // We derive this from the Imperial section of the transformed_pipeData.json
   const npsOptions = Object.keys(typedPipeData.Imperial)
     .sort((a, b) => {
       // Custom sorting for mixed fractional and whole number NPS values
@@ -252,7 +237,7 @@ export default function PipeCard({
         >
           <TextField
             label={`Outer Diameter, D (${unitLabel})`}
-            value={outerDiameter.toFixed(2)}
+            value={outerDiameterDisplay.toFixed(2)} // Use outerDiameterDisplay
             size="small"
             disabled
             sx={{ minWidth: 120, flexGrow: 1, flexBasis: "120px" }}
@@ -268,7 +253,7 @@ export default function PipeCard({
         >
           <TextField
             label={`Required Thickness, tᵣ (${unitLabel})`}
-            value={displayedTRequired.toFixed(3)}
+            value={displayedTRequired.toFixed(3)} // Use the newly calculated value
             size="small"
             disabled
             sx={{ minWidth: 120, flexGrow: 1, flexBasis: "120px" }}
@@ -294,7 +279,7 @@ export default function PipeCard({
         <Typography sx={{ textAlign: "right" }}>
           <strong>Result:</strong>{" "}
           {/* Compare internal inch values for accuracy */}
-          {thicknessInInches >= pipe.tRequired ? (
+          {thicknessInInches >= tRequiredCalculatedImperial ? ( // Compare with the imperial calculated value
             <span style={{ color: theme.palette.success.main, fontWeight: "bold" }}>
               ACCEPTABLE
             </span>

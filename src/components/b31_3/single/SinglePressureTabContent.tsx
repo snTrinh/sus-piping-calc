@@ -1,3 +1,5 @@
+// src/app/b31.3-calculator/SinglePressureTabContent.tsx
+
 "use client";
 
 import React, { useEffect } from "react"; // Import useEffect
@@ -177,7 +179,7 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
             pipe={pipe}
             updatePipe={updatePipe}
             removePipe={removePipe}
-            units={units}
+            designParams={designParams} // Pass designParams here
           />
         ))}
       </Box>

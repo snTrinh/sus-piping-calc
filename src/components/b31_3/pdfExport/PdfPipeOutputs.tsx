@@ -8,6 +8,7 @@ import pipeDimensions from "@/data/transformed_pipeData.json"; // Assuming this 
 import pipeData from "@/data/transformed_pipeData.json"; // Assuming this is also your detailed pipe data (or same as pipeDimensions)
 import { npsToMmMap, unitConversions } from "@/utils/unitConversions";
 import { useTheme } from "@mui/material/styles";
+import { calculateTRequired, TRequiredParams } from "@/utils/pipeCalculations"; // Import the utility function and its types
 
 // --- Corrected and Consolidated Type Definitions ---
 export type PipeDataEntry = {
@@ -63,7 +64,6 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
   material,
   designParams,
 }) => {
-  
   const theme = useTheme();
 
   const { pressure, corrosionAllowance, allowableStress, e, w, gamma, units } =
@@ -84,7 +84,7 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
         // Get conversion functions for the current display units
         const lengthConversion = unitConversions.length[units];
         const pressureConversion = unitConversions.pressure[units];
-        
+
         // Determine the target NPS key for direct lookup in pipeData (e.g., "60" for Metric, "2" for Imperial)
         const targetNpsKey = units === Units.Metric ? npsToMmMap[pipe.nps] : pipe.nps;
 
@@ -95,47 +95,44 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
 
         // --- Prepare all values for formula calculation and display in the CURRENTLY SELECTED units ---
         // These values are already in the current display units, as per the LabeledInputConversion and DesignParameters behavior.
-        const displayPressure = pressureConversion.to(pressure); // Assuming 'pressure' is in a base unit, converted for display/calculation
-        // Outer Diameter from JSON is already in the current unit system (mm for Metric, inches for Imperial).
-        const displayOuterDiameter = outerDiameterDisplay;
-        // CHANGE: Use corrosionAllowance directly. It's the raw input number, whose unit is implied by designParams.units.
-        const displayCorrosionAllowance = corrosionAllowance;
-        const displayAllowableStress = pressureConversion.to(allowableStress ?? 0); // Assuming 'allowableStress' is in a base unit, converted for display/calculation
+        const displayPressure = pressureConversion.to(pressure);
+        const displayOuterDiameter = outerDiameterDisplay; // Already in current display units
+        const displayCorrosionAllowance = corrosionAllowance; // Raw input, unit implied by designParams.units
+        const displayAllowableStress = pressureConversion.to(allowableStress ?? 0);
 
-        // --- Debugging Logs for t_r calculation ---
-        console.log(`--- Pipe ${index + 1} t_r Calculation Debug ---`);
-        console.log("Current Units:", units);
-        console.log("displayPressure:", displayPressure, pressureConversion.unit);
-        console.log("displayOuterDiameter:", displayOuterDiameter, lengthConversion.unit);
-        console.log("displayCorrosionAllowance:", displayCorrosionAllowance, lengthConversion.unit); // This should now match the input
-        console.log("displayAllowableStress:", displayAllowableStress, pressureConversion.unit);
-        console.log("e:", e);
-        console.log("w:", w);
-        console.log("gamma:", gamma);
-        console.log("designParams.millTol:", designParams.millTol);
-        console.log("millTolDenominator (1 - millTol):", millTolDenominator);
-        // --- End Debugging Logs ---
+        // --- Convert inputs to Imperial units for calculateTRequired utility function ---
+        const imperialPressure = pressureConversion.toImperial(pressure);
+        const imperialAllowableStress = pressureConversion.toImperial(allowableStress ?? 0);
+        const imperialCorrosionAllowance = lengthConversion.toImperial(corrosionAllowance);
 
-        // --- Perform t_r calculation using values in the CURRENTLY SELECTED units ---
-        // This calculation will now directly use the values formatted for the current unit system.
-        const numeratorCalculated = displayPressure * displayOuterDiameter;
-        const denominatorCalculated =
+        // outerDiameterDisplay is in the current display unit. Convert to Imperial (inches) if Metric.
+        const imperialOuterDiameter = units === Units.Metric
+          ? unitConversions.length[Units.Metric].toImperial(outerDiameterDisplay)
+          : outerDiameterDisplay; // If already Imperial, no conversion needed
+
+        // Prepare parameters for the utility function
+        const paramsForCalculation: TRequiredParams = {
+          pressure: imperialPressure,
+          outerDiameterInches: imperialOuterDiameter,
+          allowableStress: imperialAllowableStress,
+          e: e ?? 1, // Ensure E, W, gamma have default values if null/undefined
+          w: w ?? 1,
+          gamma: gamma ?? 1,
+          corrosionAllowanceInches: imperialCorrosionAllowance,
+          millTol: designParams.millTol ?? 0,
+        };
+
+        // --- Calculate tRequired using the utility function (result will be in Imperial inches) ---
+        const tRequiredCalculatedImperial = calculateTRequired(paramsForCalculation);
+
+        // --- Convert the calculated tRequired back to the current display units for rendering ---
+        const tRequiredCalculatedDisplayUnits = lengthConversion.to(tRequiredCalculatedImperial);
+
+        // For display in the formula, we still need the numerator and denominator values in the *current display units*
+        // as if the calculation was done manually.
+        const numeratorForDisplay = displayPressure * displayOuterDiameter;
+        const denominatorForDisplay =
           2 * (displayAllowableStress * (e ?? 1) * (w ?? 1) + displayPressure * (gamma ?? 1));
-
-        const tRequiredCalculatedDisplayUnits =
-          (numeratorCalculated / denominatorCalculated + displayCorrosionAllowance) *
-          (1 / millTolDenominator);
-
-        // --- Debugging Logs for t_r results ---
-        console.log("numeratorCalculated:", numeratorCalculated.toFixed(3));
-        console.log("denominatorCalculated:", denominatorCalculated.toFixed(3));
-        console.log("tRequiredCalculatedDisplayUnits:", tRequiredCalculatedDisplayUnits.toFixed(3), lengthConversion.unit);
-        // The tRequired from pipe object is stated to be calculated in B31_3Calculator (in Imperial).
-        // Therefore, for comparison and display, we must convert it to the current display units.
-        const displayedTRequiredFromPipeProp = lengthConversion.to(pipe.tRequired);
-        console.log("displayedTRequiredFromPipeProp (from pipe prop, converted):", displayedTRequiredFromPipeProp.toFixed(3), lengthConversion.unit);
-        console.log("---------------------------------------");
-        // --- End Debugging Logs ---
 
         return (
           <div
@@ -181,10 +178,10 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
                   </span>
                   <span style={denominatorStyle}>
                     2(({displayAllowableStress.toFixed(2)}
-                    {pressureConversion.unit})({e})(
-                    {w}) + ({displayPressure.toFixed(2)}
+                    {pressureConversion.unit})({e ?? 1})(
+                    {w ?? 1}) + ({displayPressure.toFixed(2)}
                     {pressureConversion.unit})(
-                    {gamma}))
+                    {gamma ?? 1}))
                   </span>
                 </span>
                 <span>
@@ -194,7 +191,7 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
                 <span style={fractionStyle}>
                   <span style={numeratorStyle}>1</span>
                   <span style={denominatorStyle}>
-                    (1 - {designParams.millTol})
+                    (1 - {(designParams.millTol ?? 0).toFixed(3)})
                   </span>
                 </span>
               </div>
@@ -202,8 +199,8 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
               <div>
                 <span>tᵣ = (</span>
                 <span style={fractionStyle}>
-                  <span style={numeratorStyle}>{numeratorCalculated.toFixed(2)}</span>
-                  <span style={denominatorStyle}>{denominatorCalculated.toFixed(2)}</span>
+                  <span style={numeratorStyle}>{numeratorForDisplay.toFixed(2)}</span>
+                  <span style={denominatorStyle}>{denominatorForDisplay.toFixed(2)}</span>
                 </span>
                 <span>
                   {lengthConversion.unit} +{" "}
@@ -221,7 +218,7 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
               <div>
                 <span>
                   tᵣ ={" "}
-                  {tRequiredCalculatedDisplayUnits.toFixed(3)}{" "} {/* Use the newly calculated value */}
+                  {tRequiredCalculatedDisplayUnits.toFixed(3)}{" "}
                   {lengthConversion.unit}
                 </span>
               </div>
@@ -229,7 +226,7 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
             <div style={{ marginTop: 8 }}>
               <div>
                 <span>
-                  t {displayedScheduleThickness > tRequiredCalculatedDisplayUnits ? ">" : "<"}{" "} {/* Compare with the newly calculated value */}
+                  t {displayedScheduleThickness > tRequiredCalculatedDisplayUnits ? ">" : "<"}{" "}
                   tᵣ ∴{" "}
                   {displayedScheduleThickness > tRequiredCalculatedDisplayUnits ? (
                     <span

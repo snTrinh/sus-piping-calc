@@ -2,7 +2,7 @@
 
 import React from "react";
 import { v4 as uuidv4 } from "uuid";
-import { Box, Button, Card, Typography } from "@mui/material";
+import { Box, Button, Card, Typography, CardContent } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
 import { Units, DesignParams } from "@/types/units"; // Import DesignParams
@@ -201,8 +201,7 @@ const MultiplePressuresTabContent: React.FC<
               pipe={pipe}
               updatePipe={updatePipe}
               removePipe={removePipe}
-              units={units}
-              sx={{ flex: 1, minWidth: 450 }} // Apply similar flex/minWidth to PipeCard
+              designParams={designParams} // Pass designParams here
             />
           </Box>
         ))}
