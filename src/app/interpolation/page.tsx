@@ -52,24 +52,6 @@ export default function InterpolationPage() {
     }
   }, [selectedCategory, availableMaterials, selectedMaterial]);
 
-  // NEW: Effect to trigger material stress lookup on input changes
-  useEffect(() => {
-
-    setMaterialLookupError(null); // Clear previous errors
-    const result = materialStress(
-      selectedCategory,
-      selectedMaterial,
-      inputTemperature,
-      currentUnitsForLookup // Pass the derived currentUnitsForLookup
-    );
-
-    if (result === null) {
-      setMaterialLookupError("Could not find stress value for the given inputs. Check console for warnings.");
-    }
-    setMaterialStressResult(result);
-
-  }, [selectedCategory, selectedMaterial, inputTemperature, currentUnitsForLookup]); // Dependencies for this effect
-
   return (
     <Box
       sx={{
