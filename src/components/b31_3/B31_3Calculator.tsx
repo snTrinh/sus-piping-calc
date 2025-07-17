@@ -112,8 +112,7 @@ export default function B31_3Calculator() {
   };
 
   const handleCAChange = (value: number) => {
-    const convertedValue = unitConversions.length[units].toImperial(value);
-    setCorrosionAllowance(convertedValue);
+    setCorrosionAllowance(value);
   };
 
   const handleDesignPressureChange = (value: number) => {

@@ -186,7 +186,7 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
                   </span>
                 </span>
                 <span>
-                  + {displayCorrosionAllowance.toFixed(3)}
+                  + {displayCorrosionAllowance.toFixed(4)}
                   {lengthConversion.unit}) ×{" "}
                 </span>
                 <span style={fractionStyle}>
@@ -205,7 +205,7 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
                 </span>
                 <span>
                   {lengthConversion.unit} +{" "}
-                  {displayCorrosionAllowance.toFixed(3)}
+                  {displayCorrosionAllowance.toFixed(4)}
                   {lengthConversion.unit}) ×{" "}
                 </span>
                 <span style={fractionStyle}>

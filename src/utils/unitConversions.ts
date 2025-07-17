@@ -22,6 +22,28 @@ export type PipeSchedule =
   | "160"
   | "XXH";
 
+// Define the explicit order for pipe schedules
+export const PIPE_SCHEDULE_ORDER: PipeSchedule[] = [
+  "5s",
+  "5",
+  "10",
+  "10s",
+  "20",
+  "30",
+  "40S",
+  "STD",
+  "40",
+  "60",
+  "80S",
+  "XH",
+  "80",
+  "100",
+  "120",
+  "140",
+  "160",
+  "XXH",
+];
+
 export type ThicknessData = {
   [key in PipeSchedule]: (number | null)[];
 };

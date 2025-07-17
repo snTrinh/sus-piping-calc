@@ -2,7 +2,7 @@
 import React from "react"; // Import useState, useEffect, useRef
 import { MenuItem, TextField, Box, Typography } from "@mui/material"; // Import InputAdornment
 
-import LabeledInputConversion from "../../common/LabeledInput"; // Assuming this is the correct path to LabeledInput
+import LabeledInput from "../../common/LabeledInput"; // Assuming this is the correct path to LabeledInput
 
 import { DesignParams, Units } from "@/types/units";
 import { unitConversions } from "@/utils/unitConversions";
@@ -82,7 +82,7 @@ export default function DesignParameters({
           flexDirection: { xs: "column", sm: "row" },
         }}
       >
-        <LabeledInputConversion
+        <LabeledInput
           label="Design Pressure"
           symbol="P"
           unit={unitConversions.pressure[designParams.units].unit}
@@ -91,7 +91,7 @@ export default function DesignParameters({
           sx={{ minWidth: 140, flex: 1 }}
         />
 
-        <LabeledInputConversion
+        <LabeledInput
           label="Temperature"
           symbol="T"
           unit={unitConversions.temperature[designParams.units].unit}
@@ -110,16 +110,17 @@ export default function DesignParameters({
           flexDirection: { xs: "column", sm: "row" },
         }}
       >
-        <LabeledInputConversion
+        <LabeledInput
           label="Corrosion Allowance"
           symbol="CA"
           unit={unitConversions.length[designParams.units].unit}
           value={corrosionAllowance}
           onChange={onCAChange}
           sx={{ minWidth: 140, flex: 1 }}
+          precision={4} // Adjust precision based on units
         />
 
-        <LabeledInputConversion
+        <LabeledInput
           label="Allowable Stress"
           symbol="S"
           unit={unitConversions.pressure[designParams.units].unit}
