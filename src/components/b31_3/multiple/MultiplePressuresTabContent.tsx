@@ -12,6 +12,7 @@ import FormulaDisplay from "../FormulaDisplay";
 import PdfExport from "../pdfExport/PdfExport";
 import { MaterialName } from "@/utils/materialsData"; // Import MaterialName
 import DesignParameters from "./DesignParameters"; // Assuming this is correct
+import DesignConstants from "./DesignConstants";
 
 type Pipe = {
   id: string;
@@ -100,7 +101,7 @@ const MultiplePressuresTabContent: React.FC<
           elevation={0}
         >
           {/* Assuming DesignConstants is meant to be DesignParameters based on props */}
-          <DesignParameters // Changed from DesignConstants to DesignParameters
+          <DesignConstants // Changed from DesignConstants to DesignParameters
             designParams={designParams}
             materials={materials}
             material={material}

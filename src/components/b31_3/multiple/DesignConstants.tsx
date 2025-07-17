@@ -4,6 +4,7 @@ import { MenuItem, TextField, Box, Typography } from "@mui/material"; // Import 
 import LabeledInput from "../../common/LabeledInput";
 import { DesignParams, Units } from "@/types/units";
 import { unitConversions } from "@/utils/unitConversions";
+import { MaterialName } from "@/utils/materialsData";
 
 type DesignConstantsProps = {
   materials: string[];
@@ -14,7 +15,7 @@ type DesignConstantsProps = {
     event: React.MouseEvent<HTMLElement>,
     newUnits: Units
   ) => void;
-  onMaterialChange: (value: string) => void;
+  onMaterialChange: (value: MaterialName) => void; 
   onTemperatureChange: (value: number) => void;
   onCAChange: (value: number) => void;
   onDesignPressureChange: (value: number) => void;
@@ -57,7 +58,7 @@ export default function DesignConstants({
           select
           label="Material"
           value={material}
-          onChange={(e) => onMaterialChange(e.target.value)}
+          onChange={(e) => onMaterialChange(e.target.value as MaterialName)} 
           sx={{ minWidth: 200, flexGrow: 1 }}
           size="small"
         >

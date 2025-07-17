@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { TextField} from "@mui/material";
 
-type LabeledInputConversionProps = {
+type LabeledInputProps = {
   label: string;
   symbol?: string;
   unit?: string; // The string for the display unit (e.g., "mm", "in")
@@ -16,6 +16,7 @@ type LabeledInputConversionProps = {
   sx?: object;
   fullWidth?: boolean;
   percentage?: boolean;
+  precision?: number; // New prop for decimal precision
   // These factors are specific to the *current* unit system selected
   conversionFactorFromBase?: number; // Factor to convert *from* the internal base unit *to* the display unit (e.g., mm to in)
   conversionFactorToBase?: number;   // Factor to convert *from* the display unit *to* the internal base unit (e.g., in to mm)
@@ -34,9 +35,10 @@ export default function LabeledInputConversion({
   sx = {},
   fullWidth = false,
   percentage = false,
+  precision = 2, // Default precision to 2 decimal places
   conversionFactorFromBase = 1, // Default to 1 if no conversion needed (e.g., base unit is display unit)
   conversionFactorToBase = 1,   // Default to 1
-}: LabeledInputConversionProps) {
+}: LabeledInputProps) {
   // Ref to track if the change originated from user input or prop update
   const isInternalChange = useRef(false);
   // Ref to track the previous 'value' prop to detect external changes
@@ -50,7 +52,7 @@ export default function LabeledInputConversion({
     // This runs only on initial component mount.
     if (value === undefined || value === null || isNaN(value)) return "";
     const displayVal = value * conversionFactorFromBase;
-    return percentage ? `${(displayVal * 100).toFixed(2)}` : displayVal.toFixed(2);
+    return percentage ? `${(displayVal * 100).toFixed(2)}` : displayVal.toFixed(precision);
   });
 
   // Effect to re-sync local inputValue with the 'value' prop from parent.
@@ -78,7 +80,7 @@ export default function LabeledInputConversion({
     prevValueRef.current = value;
     // Note: The 'unit' prop is intentionally NOT a dependency here,
     // ensuring inputValue doesn't change when only the unit is toggled.
-  }, [value, percentage, conversionFactorFromBase]);
+  }, [value, percentage, precision, conversionFactorFromBase]);
 
   // Handles changes from user typing or arrow key presses
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -156,6 +158,7 @@ export default function LabeledInputConversion({
       }}
       fullWidth={fullWidth}
       type="number" // Essential for arrow key functionality
+      InputLabelProps={{ shrink: true }} // Keep label on top
     />
   );
 }

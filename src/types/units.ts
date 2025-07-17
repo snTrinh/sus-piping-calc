@@ -15,3 +15,12 @@ export type DesignParams = {
   gamma?: number;
   millTol?: number;
 };
+
+
+export type Z662DesignParams = {
+  F?: number;
+  L?: number;
+  J?: number;
+  gamma?: number;
+  millTol?: number;
+};

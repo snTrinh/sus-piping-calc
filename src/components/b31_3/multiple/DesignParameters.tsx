@@ -2,12 +2,11 @@
 import React from "react"; // Import useState, useEffect, useRef
 import { MenuItem, TextField, Box, Typography } from "@mui/material"; // Import InputAdornment
 
-import LabeledInputConversion from "../../common/LabeledInput"; // Assuming this is the correct path to LabeledInput
+import LabeledInput from "../../common/LabeledInput"; // Assuming this is the correct path to LabeledInput
 
 import { DesignParams, Units } from "@/types/units";
 import { unitConversions } from "@/utils/unitConversions";
 import { MaterialName } from "@/utils/materialsData"; // Import MaterialName
-import LabeledInput from "../../common/LabeledInput";
 
 type DesignParametersProps = {
   materials: string[];
@@ -60,20 +59,6 @@ export default function DesignParameters({
           flexDirection: { xs: "column", sm: "row" },
         }}
       >
-        <TextField
-          select
-          label="Material"
-          value={material}
-          onChange={(e) => onMaterialChange(e.target.value as MaterialName)} // Cast value to MaterialName
-          sx={{ minWidth: 200, flexGrow: 1 }}
-          size="small"
-        >
-          {materials.map((mat) => (
-            <MenuItem key={mat} value={mat}>
-              {mat}
-            </MenuItem>
-          ))}
-        </TextField>
       </Box>
 
       <Box
@@ -85,7 +70,7 @@ export default function DesignParameters({
           flexDirection: { xs: "column", sm: "row" },
         }}
       >
-        <LabeledInputConversion
+        <LabeledInput
           label="Design Pressure"
           symbol="P"
           unit={unitConversions.pressure[designParams.units].unit}
@@ -94,7 +79,7 @@ export default function DesignParameters({
           sx={{ minWidth: 140, flex: 1 }}
         />
 
-        <LabeledInputConversion
+        <LabeledInput
           label="Temperature"
           symbol="T"
           unit={unitConversions.temperature[designParams.units].unit}
@@ -113,7 +98,7 @@ export default function DesignParameters({
           flexDirection: { xs: "column", sm: "row" },
         }}
       >
-        <LabeledInputConversion
+        <LabeledInput
           label="Corrosion Allowance"
           symbol="CA"
           unit={unitConversions.length[designParams.units].unit}

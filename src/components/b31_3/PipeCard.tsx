@@ -14,7 +14,7 @@ import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import { useTheme } from "@mui/material/styles";
 
 import { DesignParams, Units } from "@/types/units"; // Import DesignParams
-import { npsToMmMap, unitConversions } from "@/utils/unitConversions";
+import { npsToMmMap, PIPE_SCHEDULE_ORDER, unitConversions } from "@/utils/unitConversions";
 import pipeData from "@/data/transformed_pipeData.json"; // Ensure this path is correct
 import { calculateTRequired, TRequiredParams } from "@/utils/pipeCalculations"; // Import the utility function and its types
 
@@ -75,14 +75,25 @@ export default function PipeCard({
   const currentNpsKey = units === Units.Metric ? npsToMmMap[pipe.nps]?.toString() : pipe.nps;
 
   const currentUnitPipeData = typedPipeData[units];
+
+
   const selectedPipeSizeData = currentUnitPipeData?.[currentNpsKey || ''];
-const scheduleOptions = selectedPipeSizeData ? Object.keys(selectedPipeSizeData.schedules).sort() : []; // Added .sort() for consistent order
+
+
+const scheduleOptions = selectedPipeSizeData
+    ? Object.keys(selectedPipeSizeData.schedules).sort((a, b) => {
+        const indexA = PIPE_SCHEDULE_ORDER.indexOf(a as any); // Cast to any to match PipeSchedule type
+        const indexB = PIPE_SCHEDULE_ORDER.indexOf(b as any);
+        return indexA - indexB;
+      })
+    : [];
+
   let rawScheduleThickness: number = 0;
   if (selectedPipeSizeData && selectedPipeSizeData.schedules && pipe.schedule in selectedPipeSizeData.schedules) {
     const fetchedThickness = selectedPipeSizeData.schedules[pipe.schedule];
     rawScheduleThickness = fetchedThickness === null ? 0 : fetchedThickness;
-    
-  } 
+
+  }
 
   // Normalize the raw thickness to your internal standard unit (inches)
   let thicknessInInches = 0;

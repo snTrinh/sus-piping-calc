@@ -75,8 +75,7 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
   handleCAChange,
   handleDesignPressureChange,
 }) => {
-  // REMOVED: useEffect to automatically calculate allowableStress on relevant input changes
-  // This calculation is now handled solely in B31_3Calculator.tsx to prevent infinite loops.
+
 
   return (
     <>
@@ -87,7 +86,6 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
           gap: 4,
           alignItems: "stretch",
           justifyContent: "center",
-          mt: 4,
         }}
       >
         {/* Left Column: Inputs Card */}

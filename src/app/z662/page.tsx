@@ -7,14 +7,15 @@ import {
   Container,
   Card
 } from "@mui/material";
-import InputValuesCard from "./../../components/interpolation/InputValuesCard";
-import InterpolatedValueCard from "./../../components/interpolation/InterpolatedValuesCard";
+
 
 // Import the new TypeScript utility functions and data
 import { linearInterpolation } from "./../../utils/interpolation";
 import { materialsData, UnitCategory, MaterialName } from "./../../utils/materialsData";
-import FormulaDisplay from "@/components/b31_3/FormulaDisplay";
+import FormulaDisplay from "@/components/z662/FormulaDisplay";
 import { Units } from "@/types/units";
+import UnitsToggle from "@/components/common/UnitsToggle";
+import DesignParameters from "@/components/z662/DesignParameters";
 
 export default function InterpolationPage() {
 
@@ -111,23 +112,38 @@ export default function InterpolationPage() {
           sx={{
             display: "flex",
             flexDirection: { xs: "column", md: "row" },
+            justifyContent: { xs: "flex-start", md: "space-between" },
+            alignItems: { xs: "flex-start", md: "center" },
+            gap: { xs: 2, md: 0 },
+            mt: 2,
+            mb: 2,
+          }}
+        >
+          <UnitsToggle units={units} onChange={() => null} />
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
             gap: 4,
             alignItems: "stretch",
             mt: 2,
           }}
         >
-          <InputValuesCard
-            x0={x0}
-            y0={y0}
-            x1={x1}
-            y1={y1}
-            x={x}
-            setX0={setX0}
-            setY0={setY0}
-            setX1={setX1}
-            setY1={setY1}
-            setX={setX}
-          />
+           <Card
+          sx={{
+            width: { xs: "100%", md: 584 },
+            minWidth: { xs: "auto", md: 450 },
+            display: "flex",
+            flexDirection: "column",
+            p: 2,
+            gap: 2,
+            height:{ xs: "100%", md: 353 },
+            border: "1px solid #ddd",
+          }}
+          elevation={0}
+        ><DesignParameters /></Card>
+          
 
         
           <Card
