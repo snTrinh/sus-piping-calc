@@ -95,13 +95,14 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
         // These values are already in the current display units, as per the LabeledInputConversion and DesignParameters behavior.
         const displayPressure = pressureConversion.to(pressure);
         const displayOuterDiameter = outerDiameterDisplay; // Already in current display units
-        const displayCorrosionAllowance = corrosionAllowance; // Raw input, unit implied by designParams.units
+        const displayCorrosionAllowance = lengthConversion.to(corrosionAllowance); // Convert for display
         const displayAllowableStress = pressureConversion.to(allowableStress ?? 0);
 
         // --- Convert inputs to Imperial units for calculateTRequired utility function ---
-        const imperialPressure = pressureConversion.toImperial(pressure);
-        const imperialAllowableStress = pressureConversion.toImperial(allowableStress ?? 0);
-        const imperialCorrosionAllowance = lengthConversion.toImperial(corrosionAllowance);
+        // Assuming designParams values are already in Imperial base units (PSI, inches)
+        const imperialPressure = pressure; // Use directly
+        const imperialAllowableStress = allowableStress ?? 0; // Use directly
+        const imperialCorrosionAllowance = corrosionAllowance; // Use directly
 
         // outerDiameterDisplay is in the current display unit. Convert to Imperial (inches) if Metric.
         const imperialOuterDiameter = units === Units.Metric

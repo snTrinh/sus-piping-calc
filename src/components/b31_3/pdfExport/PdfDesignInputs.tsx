@@ -1,3 +1,4 @@
+// src/app/b31.3-calculator/components/PdfDesignInputs.tsx
 import React from "react";
 import { DesignParams } from "@/types/units";
 import { unitConversions } from "@/utils/unitConversions";
@@ -51,6 +52,11 @@ const PdfDesignInputs: React.FC<PdfDesignInputsProps> = ({
     gamma,
   } = designParams;
 
+  // Get conversion functions for the current display units
+  const pressureConversion = unitConversions.pressure[units];
+  const temperatureConversion = unitConversions.temperature[units];
+  const lengthConversion = unitConversions.length[units];
+
   return (
     <Box sx={{ mb: 4 }}>
       {/* Header Row */}
@@ -92,23 +98,24 @@ const PdfDesignInputs: React.FC<PdfDesignInputsProps> = ({
         </div>
         <div style={rowStyle}>
           <div style={labelStyle}>Design Pressure:</div>
-          <div style={valueStyle}>{pressure}</div>
-          <div style={unitStyle}>{unitConversions.pressure[units].unit}</div>
+          <div style={valueStyle}>{pressureConversion.to(pressure).toFixed(2)}</div>
+          <div style={unitStyle}>{pressureConversion.unit}</div>
         </div>
         <div style={rowStyle}>
           <div style={labelStyle}>Design Temperature:</div>
-          <div style={valueStyle}>{temperature}</div>
-          <div style={unitStyle}>{unitConversions.temperature[units].unit}</div>
+          <div style={valueStyle}>{temperatureConversion.to(temperature).toFixed(0)}</div>
+          <div style={unitStyle}>{temperatureConversion.unit}</div>
         </div>
         <div style={rowStyle}>
           <div style={labelStyle}>Corrosion Allowance:</div>
-          <div style={valueStyle}>{corrosionAllowance}</div>
-          <div style={unitStyle}>{unitConversions.length[units].unit}</div>
+          {/* FIX: Convert corrosionAllowance to display units */}
+          <div style={valueStyle}>{lengthConversion.to(corrosionAllowance).toFixed(3)}</div>
+          <div style={unitStyle}>{lengthConversion.unit}</div>
         </div>
         <div style={rowStyle}>
           <div style={labelStyle}>Maximum Allowable Stress:</div>
-          <div style={valueStyle}>{allowableStress}</div>
-          <div style={unitStyle}>{unitConversions.pressure[units].unit}</div>
+          <div style={valueStyle}>{pressureConversion.to(allowableStress ?? 0).toFixed(2)}</div>
+          <div style={unitStyle}>{pressureConversion.unit}</div>
         </div>
         <div style={rowStyle}>
           <div style={labelStyle}>Temperature Coefficient, γ:</div>

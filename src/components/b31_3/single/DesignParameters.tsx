@@ -1,7 +1,6 @@
-// src/app/b31.3-calculator/components/DesignParameters.tsx
 "use client";
-import React from "react";
-import { MenuItem, TextField, Box, Typography } from "@mui/material";
+import React from "react"; // Import useState, useEffect, useRef
+import { MenuItem, TextField, Box, Typography } from "@mui/material"; // Import InputAdornment
 
 import LabeledInputConversion from "../../common/LabeledInput"; // Assuming this is the correct path to LabeledInput
 
@@ -34,19 +33,8 @@ export default function DesignParameters({
   onCAChange,
   onDesignPressureChange,
 }: DesignParametersProps) {
-  // Destructure `units` from designParams to access unit conversion details
-  const { pressure, temperature, corrosionAllowance, allowableStress, units } =
+  const { pressure, temperature, corrosionAllowance, allowableStress } =
     designParams;
-
-  // Get conversion details for each type of unit based on the current `units` system
-  // The `unitConversions` object provides `to` and `from` methods to convert
-  // between the internal base unit and the selected display unit.
-  // We derive the `conversionFactorFromBase` and `conversionFactorToBase` by
-  // seeing how a value of `1` is converted.
-  const pressureUnitDetails = unitConversions.pressure[units];
-  const temperatureUnitDetails = unitConversions.temperature[units];
-  const lengthUnitDetails = unitConversions.length[units];
-
   return (
     <Box
       sx={{
@@ -73,7 +61,7 @@ export default function DesignParameters({
           select
           label="Material"
           value={material}
-          onChange={(e) => onMaterialChange(e.target.value as MaterialName)}
+          onChange={(e) => onMaterialChange(e.target.value as MaterialName)} // Cast value to MaterialName
           sx={{ minWidth: 200, flexGrow: 1 }}
           size="small"
         >
@@ -97,24 +85,18 @@ export default function DesignParameters({
         <LabeledInputConversion
           label="Design Pressure"
           symbol="P"
-          unit={pressureUnitDetails.unit}
+          unit={unitConversions.pressure[designParams.units].unit}
           value={pressure}
           onChange={onDesignPressureChange}
-          // Derive conversion factors using the 'to' and 'from' methods
-          conversionFactorFromBase={pressureUnitDetails.to(1)} // How many display units in 1 base unit
-          conversionFactorToBase={pressureUnitDetails.from(1)} // How many base units in 1 display unit
           sx={{ minWidth: 140, flex: 1 }}
         />
 
         <LabeledInputConversion
           label="Temperature"
           symbol="T"
-          unit={temperatureUnitDetails.unit}
+          unit={unitConversions.temperature[designParams.units].unit}
           value={temperature}
           onChange={onTemperatureChange}
-          // Derive conversion factors using the 'to' and 'from' methods
-          conversionFactorFromBase={temperatureUnitDetails.to(1)}
-          conversionFactorToBase={temperatureUnitDetails.from(1)}
           sx={{ minWidth: 140, flex: 1 }}
         />
       </Box>
@@ -131,25 +113,20 @@ export default function DesignParameters({
         <LabeledInputConversion
           label="Corrosion Allowance"
           symbol="CA"
-          unit={lengthUnitDetails.unit}
-          value={corrosionAllowance} // This remains the base unit value (e.g., in mm)
-          onChange={onCAChange} // This expects a base unit value (e.g., in mm)
-          // Derive conversion factors using the 'to' and 'from' methods
-          conversionFactorFromBase={lengthUnitDetails.to(1)}
-          conversionFactorToBase={lengthUnitDetails.from(1)}
+          unit={unitConversions.length[designParams.units].unit}
+          value={corrosionAllowance}
+          onChange={onCAChange}
           sx={{ minWidth: 140, flex: 1 }}
         />
 
         <LabeledInputConversion
           label="Allowable Stress"
           symbol="S"
-          unit={pressureUnitDetails.unit}
+          unit={unitConversions.pressure[designParams.units].unit}
+          // Pass the numeric value directly. LabeledInputConversion handles toFixed(2) and "N/A".
           value={allowableStress}
           onChange={() => {}} // Still disabled as it's calculated
           disabled
-          // Derive conversion factors using the 'to' and 'from' methods
-          conversionFactorFromBase={pressureUnitDetails.to(1)}
-          conversionFactorToBase={pressureUnitDetails.from(1)}
           sx={{ minWidth: 140, flex: 1 }}
         />
       </Box>
