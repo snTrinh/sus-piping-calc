@@ -1,8 +1,8 @@
 "use client";
-import React from "react"; 
-import { MenuItem, TextField, Box, Typography } from "@mui/material"; 
+import React from "react";
+import { MenuItem, TextField, Box, Typography } from "@mui/material";
 
-import LabeledInputConversion from "../../common/LabeledInput"; 
+import LabeledInputConversion from "../../common/LabeledInput";
 
 import { DesignParams, Units } from "@/types/units";
 import { unitConversions } from "@/utils/unitConversions";
@@ -11,19 +11,18 @@ import LabeledInput from "../../common/LabeledInput";
 
 type DesignParametersProps = {
   materials: string[];
-  material: MaterialName; 
+  material: MaterialName;
   designParams: DesignParams;
 
   onUnitsChange: (
     event: React.MouseEvent<HTMLElement>,
     newUnits: Units
   ) => void;
-  onMaterialChange: (value: MaterialName) => void; 
+  onMaterialChange: (value: MaterialName) => void;
   onTemperatureChange: (value: number) => void;
   onCAChange: (value: number) => void;
   onDesignPressureChange: (value: number) => void;
 };
-
 
 export default function DesignParameters({
   materials,
@@ -36,7 +35,6 @@ export default function DesignParameters({
 }: DesignParametersProps) {
   const { pressure, temperature, corrosionAllowance, allowableStress } =
     designParams;
-
 
   return (
     <Box
@@ -64,7 +62,7 @@ export default function DesignParameters({
           select
           label="Material"
           value={material}
-          onChange={(e) => onMaterialChange(e.target.value as MaterialName)} 
+          onChange={(e) => onMaterialChange(e.target.value as MaterialName)}
           sx={{ minWidth: 200, flexGrow: 1 }}
           size="small"
         >
@@ -120,14 +118,15 @@ export default function DesignParameters({
           value={corrosionAllowance}
           onChange={onCAChange}
           sx={{ minWidth: 140, flex: 1 }}
+          precision={4}
         />
 
         <LabeledInput
           label="Allowable Stress"
           symbol="S"
           unit={unitConversions.pressure[designParams.units].unit}
-          value={allowableStress} 
-          onChange={() => {}} 
+          value={allowableStress}
+          onChange={() => {}}
           disabled
           sx={{ minWidth: 140, flex: 1 }}
         />

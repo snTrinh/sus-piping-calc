@@ -5,13 +5,14 @@ import { v4 as uuidv4 } from "uuid";
 import { Box, Button, Card, Typography } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
-import { Units, DesignParams } from "@/types/units"; 
+import { Units, DesignParams } from "@/types/units";
 import { PipeSchedule } from "@/utils/unitConversions";
 import PipeCard from "../PipeCard";
 import FormulaDisplay from "../FormulaDisplay";
 import PdfExport from "../pdfExport/PdfExport";
-import { MaterialName } from "@/utils/materialsData"; 
-import DesignParameters from "./DesignParameters"; 
+import { MaterialName } from "@/utils/materialsData";
+import DesignParameters from "./DesignParameters";
+import GlobalDesignParameters from "./GloablDesignParameters";
 
 type Pipe = {
   id: string;
@@ -23,7 +24,6 @@ type Pipe = {
 };
 
 interface MultiplePressuresTabContentProps {
-
   units: Units;
   material: MaterialName;
   temperature: number;
@@ -35,10 +35,10 @@ interface MultiplePressuresTabContentProps {
   e: number;
   w: number;
   pipesForDisplay: Pipe[];
-  materials: string[]; 
+  materials: string[];
   designParams: DesignParams;
 
-  setMaterial: (value: MaterialName) => void; 
+  setMaterial: (value: MaterialName) => void;
   setTemperature: (value: number) => void;
   setCorrosionAllowance: (value: number) => void;
   setPressure: (value: number) => void;
@@ -79,6 +79,7 @@ const MultiplePressuresTabContent: React.FC<
           flexDirection: { xs: "column", md: "row" },
           gap: 4,
           alignItems: "stretch",
+          justifyContent: "center",
           mt: 4,
         }}
       >
@@ -95,16 +96,10 @@ const MultiplePressuresTabContent: React.FC<
           }}
           elevation={0}
         >
-
-          <DesignParameters 
+          <GlobalDesignParameters
             designParams={designParams}
-            materials={materials}
-            material={material}
             onUnitsChange={handleUnitsChange}
-            onMaterialChange={setMaterial}
-            onTemperatureChange={handleTemperatureChange}
             onCAChange={handleCAChange}
-            onDesignPressureChange={handleDesignPressureChange}
           />
 
           <Box sx={{ mt: "auto", width: "100%" }}>
@@ -113,6 +108,7 @@ const MultiplePressuresTabContent: React.FC<
               variant="outlined"
               onClick={() =>
                 setPipes([
+                  ...pipesForDisplay,
                   {
                     id: uuidv4(),
                     nps: "2",
@@ -129,11 +125,10 @@ const MultiplePressuresTabContent: React.FC<
             </Button>
           </Box>
         </Card>
-
         <Card
           sx={{
             flex: 1,
-            minWidth: 450,
+            maxWidth: { md: 650 },
             display: "flex",
             flexDirection: "column",
             p: 2,
@@ -150,28 +145,29 @@ const MultiplePressuresTabContent: React.FC<
         </Card>
       </Box>
 
-      <Box sx={{ mt: 4, display: "flex", flexDirection: "column", gap: 2 }}>
-        {pipesForDisplay.map((pipe) => (
+      {pipesForDisplay.map((pipe) => (
+        <Box
+          key={pipe.id}
+          sx={{ mt: 4, display: "flex", flexDirection: "column", gap: 2 }}
+        >
           <Box
-            key={pipe.id} 
             sx={{
               display: "flex",
-              flexDirection: { xs: "column", md: "row" }, 
+              flexDirection: { xs: "column", md: "row" },
               gap: 4,
-              alignItems: "stretch", 
+              alignItems: "stretch",
             }}
           >
             <Card
               sx={{
-                flex: 1, 
-                minWidth: 450, 
+                flex: 1,
+                minWidth: 450,
                 display: "flex",
                 flexDirection: "column",
                 p: 2,
                 gap: 2,
-                height: 350, 
+                height: 305,
                 border: "1px solid #ddd",
-                alignItems: "stretch",
               }}
               elevation={0}
             >
@@ -186,15 +182,16 @@ const MultiplePressuresTabContent: React.FC<
                 onDesignPressureChange={handleDesignPressureChange}
               />
             </Card>
+
             <PipeCard
               pipe={pipe}
               updatePipe={updatePipe}
               removePipe={removePipe}
-              designParams={designParams} 
+              designParams={designParams}
             />
           </Box>
-        ))}
-      </Box>
+        </Box>
+      ))}
 
       <Box sx={{ mt: 6 }}>
         <PdfExport

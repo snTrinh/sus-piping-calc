@@ -144,10 +144,12 @@ export default function PipeCard({
   return (
     <Card
       sx={{
+        flex: 1,
         borderRadius: 2,
         border: "1px solid #ddd",
         boxShadow: "none",
         position: "relative",
+        minWidth: 450,
         ...sx
       }}
     >

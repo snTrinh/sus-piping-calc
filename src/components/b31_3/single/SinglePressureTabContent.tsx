@@ -87,26 +87,19 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
         }}
       >
 
-        <Card
-          sx={{
-            width: { xs: "100%", md: 584 },
-            minWidth: { xs: "auto", md: 450 },
-            display: "flex",
-            flexDirection: "column",
-            height: { xs: "100%", md: 305 },
-            border: "1px solid #ddd",
-          }}
-          elevation={0}
-        >
-          <CardContent
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 2,
-              height: "100%",
-              p: 2,
-            }}
-          >
+         <Card
+                  sx={{
+                    flex: 1,
+                    minWidth: 450,
+                    display: "flex",
+                    flexDirection: "column",
+                    p: 2,
+                    gap: 2,
+                    height: 305,
+                    border: "1px solid #ddd",
+                  }}
+                  elevation={0}
+                >
             <DesignParameters
               designParams={{
                 ...designParams,
@@ -141,13 +134,13 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
                 Add Pipe
               </Button>
             </Box>
-          </CardContent>
+          
         </Card>
 
         <Card
           sx={{
-            width: { xs: "100%", md: 584 },
-            minWidth: { xs: "auto", md: 450 },
+            flex: 1,
+            maxWidth: {  md: 650 },
             display: "flex",
             flexDirection: "column",
             p: 2,
@@ -171,7 +164,7 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
             pipe={pipe}
             updatePipe={updatePipe}
             removePipe={removePipe}
-            designParams={designParams} 
+            designParams={designParams} // Pass designParams here
           />
         ))}
       </Box>

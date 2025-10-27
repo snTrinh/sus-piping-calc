@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Container, Typography } from "@mui/material";
 import InputValuesCard from "./../../components/hydro-test/InputValuesCard";
 import CalculatedValueCard from "./../../components/hydro-test/CalculatedValuesCard";
 import UnitsToggle from "@/components/common/UnitsToggle";
@@ -36,6 +36,7 @@ export default function HydroTestPage() {
         p: 4,
       }}
     >
+      <Container maxWidth="lg" disableGutters>
       <Typography variant="h4" fontWeight="bold" align="left" gutterBottom>
         Hydro Test Pressure
       </Typography>
@@ -48,6 +49,7 @@ export default function HydroTestPage() {
           flexDirection: { xs: "column", md: "row" },
           gap: 4,
           alignItems: "stretch",
+          paddingTop: 4
         }}
       >
         <Box sx={{ flex: 1, minWidth: 450, height: 250 }}>
@@ -74,6 +76,7 @@ export default function HydroTestPage() {
       </Box>
 
       <Box sx={{ width: "100%" }}>{/* <PdfExport /> */}</Box>
+      </Container>
     </Box>
   );
 }

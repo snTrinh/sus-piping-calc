@@ -12,14 +12,15 @@ import {
 } from "@mui/material";
 import CalculateIcon from "@mui/icons-material/Calculate";
 import FunctionsIcon from "@mui/icons-material/Functions";
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
+// import AssessmentIcon from "@mui/icons-material/Assessment";
+import WaterIcon from "@mui/icons-material/Water";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
 
-import { useThemeMode } from '../app/ThemeContext';
-
+import { useThemeMode } from "../app/ThemeContext";
 
 const collapsedWidth = 56;
-const iconButtonSize = 40; 
+const iconButtonSize = 40;
 
 export default function Sidebar() {
   const theme = useTheme();
@@ -28,13 +29,14 @@ export default function Sidebar() {
 
   const navItems = [
     { icon: <CalculateIcon />, href: "/", label: "Calculations" },
-    // { icon: <AssessmentIcon />, href: "/z662", label: "Z662 Code" },
+    { icon: <WaterIcon />, href: "/hydro-test", label: "Hydro Test" },
+    // { icon: <AssessmentIcon />, href: "/z662", label: "Z662" },
     { icon: <FunctionsIcon />, href: "/interpolation", label: "Utilities" },
   ];
 
   const themeToggleItem = {
-    icon: mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />,
-    label: mode === 'dark' ? "Switch to Light Mode" : "Switch to Dark Mode",
+    icon: mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />,
+    label: mode === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode",
     onClick: toggleTheme,
   };
 
@@ -63,8 +65,8 @@ export default function Sidebar() {
             <Tooltip title={label} placement="right">
               <ListItemButton
                 onClick={(e) => {
-                  e.preventDefault(); 
-                  console.log(`Attempting to navigate to: ${href}`); 
+                  e.preventDefault();
+                  console.log(`Attempting to navigate to: ${href}`);
                   router.push(href);
                 }}
                 sx={{
@@ -73,7 +75,7 @@ export default function Sidebar() {
                   px: 0,
                   transition: "background-color 0.2s",
                   "&:hover": {
-                    backgroundColor: "transparent", 
+                    backgroundColor: "transparent",
                   },
                   cursor: "pointer",
                   color: "inherit",
@@ -89,12 +91,12 @@ export default function Sidebar() {
                     display: "flex",
                     width: iconButtonSize,
                     height: iconButtonSize,
-                    borderRadius: '50%',
+                    borderRadius: "50%",
                     margin: theme.spacing(0.5),
                     transition: "background-color 0.2s",
                     color: "text.secondary",
                     "&:hover": {
-                      backgroundColor: theme.palette.action.hover, 
+                      backgroundColor: theme.palette.action.hover,
                     },
                   }}
                 >
@@ -115,7 +117,7 @@ export default function Sidebar() {
                 px: 0,
                 transition: "background-color 0.2s",
                 "&:hover": {
-                  backgroundColor: "transparent", 
+                  backgroundColor: "transparent",
                 },
                 cursor: "pointer",
                 color: "inherit",
@@ -131,7 +133,7 @@ export default function Sidebar() {
                   display: "flex",
                   width: iconButtonSize,
                   height: iconButtonSize,
-                  borderRadius: '50%',
+                  borderRadius: "50%",
                   margin: theme.spacing(0.5),
                   transition: "background-color 0.2s",
                   color: "text.secondary",

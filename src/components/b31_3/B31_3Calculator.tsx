@@ -102,6 +102,7 @@ export default function B31_3Calculator() {
     newUnits: Units
   ) => {
     if (!newUnits || newUnits === units) return;
+    
     setUnits(newUnits);
   };
 
@@ -143,16 +144,6 @@ export default function B31_3Calculator() {
           outerDiameter
         );
 
-        console.log(`--- Pipe: ${pipe.nps}, Schedule: ${pipe.schedule} ---`);
-        console.log("Calculated OD in Inches (outerDiameterInches):", outerDiameterInches);
-        console.log("Design Pressure (pressure):", pressure);
-        console.log("Allowable Stress (allowableStress):", allowableStress);
-        console.log("E Factor (e):", e);
-        console.log("W Factor (w):", w);
-        console.log("Y Factor (gamma):", gamma);
-        console.log("Corrosion Allowance (corrosionAllowance):", corrosionAllowance);
-        console.log("Mill Tolerance (millTol):", millTol);
-
         const calculatedTRequired = calculateTRequired({
           pressure,
           outerDiameterInches,
@@ -167,10 +158,6 @@ export default function B31_3Calculator() {
         const rawScheduleThicknessImperial = selectedPipeSizeData?.schedules[
           pipe.schedule
         ] ?? 0;
-
-        console.log("Final calculatedTRequired:", calculatedTRequired);
-        console.log("Raw Schedule Thickness (Imperial):", rawScheduleThicknessImperial);
-        console.log("---------------------------------------");
 
         return {
           ...pipe,
@@ -306,7 +293,7 @@ export default function B31_3Calculator() {
             scrollButtons="auto"
           >
             <Tab label="Single Pressure" />
-
+            <Tab label="Multiple Pressure" />
           </Tabs>
           <UnitsToggle units={units} onChange={handleUnitsChange} />
         </Box>

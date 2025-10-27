@@ -1,26 +1,27 @@
 "use client";
-
+import { Provider } from "react-redux";
+import { store } from "../state/store"; 
 import { Inter } from "next/font/google";
-import React, { useState } from "react"; 
+import React, { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import {
   Box,
   Dialog,
-  DialogContent, 
-  DialogTitle, 
-  IconButton, 
-  Slide, 
-  TextField, 
-  Button, 
-  Typography, 
-  CircularProgress, 
-  Snackbar, 
-  Alert, 
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Slide,
+  TextField,
+  Button,
+  Typography,
+  CircularProgress,
+  Snackbar,
+  Alert,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close"; 
-import { TransitionProps } from "@mui/material/transitions"; 
+import CloseIcon from "@mui/icons-material/Close";
+import { TransitionProps } from "@mui/material/transitions";
 import ThemeContextProvider from "./ThemeContext";
- import FloatingActionButton from "@/components/common/FloatingActionButton";
+import FloatingActionButton from "@/components/common/FloatingActionButton";
 
 const inter = Inter({ subsets: ["latin"] });
 const Transition = React.forwardRef(function Transition(
@@ -46,15 +47,15 @@ export default function RootLayout({
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
     "success"
   );
-  const [dialogOpen, setDialogOpen] = useState(false); 
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const VERCEL_API_ENDPOINT =
     "https://email-sender-backend-indol.vercel.app/api/send-email";
 
   const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault(); 
+    event.preventDefault();
     setLoading(true);
-    setSnackbarOpen(false); 
+    setSnackbarOpen(false);
 
     if (!name || !email || !message) {
       setSnackbarMessage("Please fill in all fields.");
@@ -79,7 +80,7 @@ export default function RootLayout({
         setName("");
         setEmail("");
         setMessage("");
-        setDialogOpen(false); 
+        setDialogOpen(false);
       } else {
         const errorData = await response.json();
         setSnackbarMessage(
@@ -117,111 +118,119 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className} style={{ display: "flex" }}>
-        <ThemeContextProvider>
-          <Sidebar />
-          <Box
-            sx={{
-              flexGrow: 1,
-              display: "flex",
-              flexDirection: "column",
-              minHeight: "100vh",
-            }}
-          >
-            <Box component="main" sx={{ flexGrow: 1 }}>
-              {children}
-            </Box>
-          </Box>
-
-          <FloatingActionButton />
-
-          <Dialog
-            open={dialogOpen}
-            onClose={handleCloseDialog}
-            TransitionComponent={Transition} 
-            aria-labelledby="contact-form-dialog-title"
-            PaperProps={{
-              sx: {
-                borderRadius: 2, 
-                minWidth: { xs: "90%", sm: "400px", md: "500px" }, 
-                maxWidth: "500px",
-              },
-            }}
-          >
-            <DialogTitle id="contact-form-dialog-title" sx={{ m: 0, p: 2 }}>
-              <Typography variant="h6" component="span" fontWeight="bold">
-                Contact Us
-              </Typography>
-              <IconButton
-                aria-label="close"
-                onClick={handleCloseDialog}
-                sx={{
-                  position: "absolute",
-                  right: 8,
-                  top: 8,
-                  color: (theme) => theme.palette.grey[500],
-                }}
-              >
-                <CloseIcon />
-              </IconButton>
-            </DialogTitle>
-            <DialogContent dividers sx={{ p: 2 }}>
-              <form onSubmit={handleSubmit}>
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                  <TextField
-                    label="Your Name"
-                    fullWidth
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    size="small"
-                    required
-                  />
-                  <TextField
-                    label="Your Email"
-                    type="email"
-                    fullWidth
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    size="small"
-                    required
-                  />
-                  <TextField
-                    label="Your Message"
-                    fullWidth
-                    multiline
-                    rows={4}
-                    placeholder="Something sus? Send us a message to give us feedback"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    size="small"
-                    required
-                  />
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    disabled={loading}
-                    sx={{ mt: 2 }}
-                  >
-                    {loading ? <CircularProgress size={24} /> : "Send Message"}
-                  </Button>
-                </Box>
-              </form>
-            </DialogContent>
-          </Dialog>
-
-          <Snackbar
-            open={snackbarOpen}
-            autoHideDuration={6000}
-            onClose={handleSnackbarClose}
-          >
-            <Alert
-              onClose={handleSnackbarClose}
-              severity={snackbarSeverity}
-              sx={{ width: "100%" }}
+        <Provider store={store}>
+          <ThemeContextProvider>
+            <Sidebar />
+            <Box
+              sx={{
+                flexGrow: 1,
+                display: "flex",
+                flexDirection: "column",
+                minHeight: "100vh",
+              }}
             >
-              {snackbarMessage}
-            </Alert>
-          </Snackbar>
-        </ThemeContextProvider>
+              <Box component="main" sx={{ flexGrow: 1 }}>
+                {children}
+              </Box>
+            </Box>
+
+            <FloatingActionButton />
+
+            <Dialog
+              open={dialogOpen}
+              onClose={handleCloseDialog}
+              TransitionComponent={Transition}
+              aria-labelledby="contact-form-dialog-title"
+              PaperProps={{
+                sx: {
+                  borderRadius: 2,
+                  minWidth: { xs: "90%", sm: "400px", md: "500px" },
+                  maxWidth: "500px",
+                },
+              }}
+            >
+              <DialogTitle id="contact-form-dialog-title" sx={{ m: 0, p: 2 }}>
+                <Typography variant="h6" component="span" fontWeight="bold">
+                  Contact Us
+                </Typography>
+                <IconButton
+                  aria-label="close"
+                  onClick={handleCloseDialog}
+                  sx={{
+                    position: "absolute",
+                    right: 8,
+                    top: 8,
+                    color: (theme) => theme.palette.grey[500],
+                  }}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </DialogTitle>
+              <DialogContent dividers sx={{ p: 2 }}>
+                <form onSubmit={handleSubmit}>
+                  <Box
+                    sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+                  >
+                    <TextField
+                      label="Your Name"
+                      fullWidth
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      size="small"
+                      required
+                    />
+                    <TextField
+                      label="Your Email"
+                      type="email"
+                      fullWidth
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      size="small"
+                      required
+                    />
+                    <TextField
+                      label="Your Message"
+                      fullWidth
+                      multiline
+                      rows={4}
+                      placeholder="Something sus? Send us a message to give us feedback"
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      size="small"
+                      required
+                    />
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      disabled={loading}
+                      sx={{ mt: 2 }}
+                    >
+                      {loading ? (
+                        <CircularProgress size={24} />
+                      ) : (
+                        "Send Message"
+                      )}
+                    </Button>
+                  </Box>
+                </form>
+              </DialogContent>
+            </Dialog>
+
+            <Snackbar
+              open={snackbarOpen}
+              autoHideDuration={6000}
+              onClose={handleSnackbarClose}
+            >
+              <Alert
+                onClose={handleSnackbarClose}
+                severity={snackbarSeverity}
+                sx={{ width: "100%" }}
+              >
+                {snackbarMessage}
+              </Alert>
+            </Snackbar>
+          </ThemeContextProvider>
+        </Provider>
       </body>
     </html>
   );

@@ -1,0 +1,43 @@
+{
+    "fluidTypes": [
+      "Gas",
+      "HVP (Non-Sour Service) & CO2 (Non-Sour Service)",
+      "LVP (Non-Sour Service)",
+      "Sour Service Fluids"
+    ],
+    "applicationClassFactors": [
+      { "Application": "Gas - General", "Class 1": 1.000, "Class 2": 0.900, "Class 3": 0.700, "Class 4": 0.550 },
+      { "Application": "Gas - Cased Crossing", "Class 1": 1.000, "Class 2": 0.900, "Class 3": 0.700, "Class 4": 0.550 },
+      { "Application": "Gas - Roads", "Class 1": 0.750, "Class 2": 0.625, "Class 3": 0.625, "Class 4": 0.500 },
+      { "Application": "Gas - Railways", "Class 1": 0.625, "Class 2": 0.625, "Class 3": 0.625, "Class 4": 0.500 },
+      { "Application": "Gas - Stations", "Class 1": 0.625, "Class 2": 0.625, "Class 3": 0.625, "Class 4": 0.500 },
+      { "Application": "Gas - Other", "Class 1": 0.750, "Class 2": 0.750, "Class 3": 0.625, "Class 4": 0.500 },
+      { "Application": "HVP (Non-Sour Serv)", "Class 1": 1.000, "Class 2": 0.800, "Class 3": 0.800, "Class 4": 0.800 },
+      { "Application": "HVP (Non-Sour Serv)", "Class 1": 0.800, "Class 2": 0.800, "Class 3": 0.800, "Class 4": 0.800 },
+      { "Application": "HVP (Non-Sour Serv)", "Class 1": 0.625, "Class 2": 0.625, "Class 3": 0.625, "Class 4": 0.500 },
+      { "Application": "HVP (Non-Sour Serv)", "Class 1": 0.800, "Class 2": 0.800, "Class 3": 0.800, "Class 4": 0.800 },
+      { "Application": "HVP (Non-Sour Serv)", "Class 1": 0.800, "Class 2": 0.800, "Class 3": 0.800, "Class 4": 0.800 },
+      { "Application": "LVP (Non-Sour Servic", "Class 1": 1.000, "Class 2": 1.000, "Class 3": 1.000, "Class 4": 1.000 },
+      { "Application": "LVP (Non-Sour Servic", "Class 1": 0.625, "Class 2": 0.625, "Class 3": 0.625, "Class 4": 0.625 },
+      { "Application": "Sour Service Fluids -", "Class 1": 0.900, "Class 2": 0.750, "Class 3": 0.625, "Class 4": 0.500 },
+      { "Application": "Sour Service Fluids -", "Class 1": 0.900, "Class 2": 0.750, "Class 3": 0.625, "Class 4": 0.500 },
+      { "Application": "Sour Service Fluids -", "Class 1": 0.750, "Class 2": 0.625, "Class 3": 0.625, "Class 4": 0.500 },
+      { "Application": "Sour Service Fluids -", "Class 1": 0.625, "Class 2": 0.625, "Class 3": 0.625, "Class 4": 0.500 },
+      { "Application": "Sour Service Fluids -", "Class 1": 0.625, "Class 2": 0.625, "Class 3": 0.625, "Class 4": 0.500 },
+      { "Application": "Sour Service Fluids -", "Class 1": 0.750, "Class 2": 0.750, "Class 3": 0.625, "Class 4": 0.500 }
+    ],
+    "pipeJointFactors": [
+      { "Pipe Type": "Seamless", "Joint Factor": 1.00 },
+      { "Pipe Type": "Electric Welded", "Joint Factor": 1.00 },
+      { "Pipe Type": "Submerged Arc Welde", "Joint Factor": 1.00 },
+      { "Pipe Type": "Continuous Weld", "Joint Factor": 0.60 }
+    ],
+    "temperatureFactors": [
+      { "Temperature": "Up to 120", "Temperature Factor": 1.00 },
+      { "Temperature": "150", "Temperature Factor": 0.97 },
+      { "Temperature": "180", "Temperature Factor": 0.93 },
+      { "Temperature": "200", "Temperature Factor": 0.91 },
+      { "Temperature": "230", "Temperature Factor": 0.87 }
+    ]
+  }
+  
