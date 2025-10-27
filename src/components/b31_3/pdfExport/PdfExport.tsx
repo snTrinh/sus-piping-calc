@@ -1,8 +1,7 @@
 "use client";
-import html2pdf from "html2pdf.js";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Box, TextField, Button } from "@mui/material";
-import { DesignParams } from "@/types/units"; 
+import { DesignParams } from "@/types/units";
 import PdfContent from "./PdfContent";
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 
@@ -31,17 +30,25 @@ export default function PdfExport({
   const [drawingNumber, setDrawingNumber] = useState("");
   const [drawingRevision, setDrawingRevision] = useState("0");
   const [calculationRevision, setCalculationRevision] = useState("0");
-  const [date, setDate] = useState(
-    () => new Date().toISOString().split("T")[0]
-  );
+  const [date, setDate] = useState(() => new Date().toISOString().split("T")[0]);
+
+  const html2pdfRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      import("html2pdf.js").then((mod) => {
+        html2pdfRef.current = mod.default || mod;
+      });
+    }
+  }, []);
 
   const handleDownloadPdf = () => {
-    if (!printRef.current) return;
-  
-    html2pdf()
+    if (!printRef.current || !html2pdfRef.current) return;
+
+    html2pdfRef.current()
       .set({
         margin: 1,
-        filename: "document.pdf",
+        filename: `Drawing-${drawingNumber || "N/A"}-Rev${drawingRevision || "0"}-${date}.pdf`,
         image: { type: "jpeg", quality: 0.98 },
         html2canvas: {},
         jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
@@ -49,7 +56,7 @@ export default function PdfExport({
       .from(printRef.current)
       .save();
   };
-  
+
   const drawingInfo = {
     drawingNumber,
     drawingRevision,
@@ -57,11 +64,10 @@ export default function PdfExport({
     date,
   };
 
-
   const responsiveFlex = {
-    xs: '1 1 100%', 
-    sm: '1 1 calc(50% - 8px)', 
-    md: '1 1 0%', 
+    xs: "1 1 100%",
+    sm: "1 1 calc(50% - 8px)",
+    md: "1 1 0%",
   };
 
   return (
@@ -74,21 +80,20 @@ export default function PdfExport({
         border: "1px solid #ddd",
       }}
     >
-
       <Box
         sx={{
           display: "flex",
-          flexWrap: "wrap", 
+          flexWrap: "wrap",
           gap: 2,
           mb: 2,
         }}
       >
         <TextField
-          label="Drawing Number"
+          label={`Drawing Number${drawingNumber ? `, ${drawingNumber}` : ""}`}
           value={drawingNumber}
           onChange={(e) => setDrawingNumber(e.target.value)}
           size="small"
-          sx={{ flex: responsiveFlex, minWidth: 180 }} 
+          sx={{ flex: responsiveFlex, minWidth: 180 }}
           variant="outlined"
           InputLabelProps={{ shrink: true }}
         />
@@ -106,7 +111,7 @@ export default function PdfExport({
           value={calculationRevision}
           onChange={(e) => setCalculationRevision(e.target.value)}
           size="small"
-          sx={{ flex: responsiveFlex, minWidth: 180 }} 
+          sx={{ flex: responsiveFlex, minWidth: 180 }}
           variant="outlined"
           InputLabelProps={{ shrink: true }}
         />
@@ -116,15 +121,15 @@ export default function PdfExport({
           value={date}
           onChange={(e) => setDate(e.target.value)}
           size="small"
-          sx={{ flex: responsiveFlex, minWidth: 180 }} 
+          sx={{ flex: responsiveFlex, minWidth: 180 }}
           variant="outlined"
           InputLabelProps={{ shrink: true }}
         />
         <Button
           variant="outlined"
-          startIcon={<ArrowCircleDownIcon/>}
+          startIcon={<ArrowCircleDownIcon />}
           onClick={handleDownloadPdf}
-          sx={{ flex: responsiveFlex, minWidth: 180 }} 
+          sx={{ flex: responsiveFlex, minWidth: 180 }}
         >
           Download PDF
         </Button>
