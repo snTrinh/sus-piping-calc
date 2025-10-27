@@ -44,7 +44,7 @@ export default function InputValuesCard({
           Input Values
         </Typography>
 
-        {/* x₀ and y₀ - Responsive Flex Direction */}
+
         <Box
           sx={{
             display: "flex",
@@ -61,10 +61,9 @@ export default function InputValuesCard({
             size="small"
             InputProps={{
               inputProps: {
-                step: "0.01", // Changed step back to 0.01
+                step: "0.01", 
               },
               sx: {
-                // Hide the spin buttons for WebKit browsers (Chrome, Safari, Edge)
                 "& input[type=number]::-webkit-inner-spin-button": {
                   "-webkit-appearance": "none",
                 },
@@ -80,7 +79,7 @@ export default function InputValuesCard({
             size="small"
             InputProps={{
               inputProps: {
-                step: "0.01", // Changed step back to 0.01
+                step: "0.01", 
               },
               sx: {
                 "& input[type=number]::-webkit-inner-spin-button": {
@@ -90,7 +89,7 @@ export default function InputValuesCard({
             }}
           />
         </Box>
-        {/* x₁ and y₁ - Responsive Flex Direction */}
+
         <Box
           sx={{
             display: "flex",
@@ -107,7 +106,7 @@ export default function InputValuesCard({
             size="small"
             InputProps={{
               inputProps: {
-                step: "0.01", // Changed step back to 0.01
+                step: "0.01", 
               },
               sx: {
                 "& input[type=number]::-webkit-inner-spin-button": {
@@ -125,7 +124,7 @@ export default function InputValuesCard({
             size="small"
             InputProps={{
               inputProps: {
-                step: "0.01", // Changed step back to 0.01
+                step: "0.01",
               },
               sx: {
                 "& input[type=number]::-webkit-inner-spin-button": {
@@ -135,7 +134,7 @@ export default function InputValuesCard({
             }}
           />
         </Box>
-        {/* x - Responsive Flex Direction */}
+
         <Box
           sx={{
             display: "flex",
@@ -152,7 +151,7 @@ export default function InputValuesCard({
             size="small"
             InputProps={{
               inputProps: {
-                step: "0.01", // Changed step back to 0.01
+                step: "0.01", 
               },
               sx: {
                 "& input[type=number]::-webkit-inner-spin-button": {

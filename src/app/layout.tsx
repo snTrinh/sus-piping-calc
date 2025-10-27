@@ -23,8 +23,6 @@ import ThemeContextProvider from "./ThemeContext";
  import FloatingActionButton from "@/components/common/FloatingActionButton";
 
 const inter = Inter({ subsets: ["latin"] });
-
-// Define a transition for the dialog to slide up
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
     children: React.ReactElement;
@@ -39,7 +37,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // State for the contact form and dialog
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -49,15 +46,15 @@ export default function RootLayout({
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
     "success"
   );
-  const [dialogOpen, setDialogOpen] = useState(false); // State to control dialog visibility
+  const [dialogOpen, setDialogOpen] = useState(false); 
 
   const VERCEL_API_ENDPOINT =
     "https://email-sender-backend-indol.vercel.app/api/send-email";
 
   const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault(); // Prevent default form submission
+    event.preventDefault(); 
     setLoading(true);
-    setSnackbarOpen(false); // Close any existing snackbar
+    setSnackbarOpen(false); 
 
     if (!name || !email || !message) {
       setSnackbarMessage("Please fill in all fields.");
@@ -82,7 +79,7 @@ export default function RootLayout({
         setName("");
         setEmail("");
         setMessage("");
-        setDialogOpen(false); // Close dialog on success
+        setDialogOpen(false); 
       } else {
         const errorData = await response.json();
         setSnackbarMessage(
@@ -112,7 +109,6 @@ export default function RootLayout({
 
   const handleCloseDialog = () => {
     setDialogOpen(false);
-    // Optionally reset form fields when closing dialog without sending
     setName("");
     setEmail("");
     setMessage("");
@@ -169,8 +165,6 @@ export default function RootLayout({
               </IconButton>
             </DialogTitle>
             <DialogContent dividers sx={{ p: 2 }}>
-              {" "}
-              {/* Add padding and dividers */}
               <form onSubmit={handleSubmit}>
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                   <TextField
@@ -214,7 +208,6 @@ export default function RootLayout({
             </DialogContent>
           </Dialog>
 
-          {/* Snackbar for feedback - Now in RootLayout */}
           <Snackbar
             open={snackbarOpen}
             autoHideDuration={6000}

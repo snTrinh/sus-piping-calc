@@ -1,8 +1,8 @@
 "use client";
 
 import { IconButton, Tooltip } from '@mui/material';
-import Brightness4Icon from '@mui/icons-material/Brightness4'; // Represents dark mode
-import Brightness7Icon from '@mui/icons-material/Brightness7'; // Represents light mode
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7'; 
 import { useThemeMode } from '@/app/ThemeContext';
 
 export default function ThemeToggleButton() {

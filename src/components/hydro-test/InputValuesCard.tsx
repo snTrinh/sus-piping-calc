@@ -27,21 +27,19 @@ export default function InputValuesCard({
 }: InputValuesCardProps) {
   const pressureUnit = unitConversions.pressure[units].unit;
 
-  // Track previous units for comparison
+
   const prevUnits = useRef(units);
 
-  // Handle unit change and convert values accordingly
   useEffect(() => {
     if (prevUnits.current !== units) {
       const prev = prevUnits.current;
       const convertFromPrev = unitConversions.pressure[prev].from;
       const convertToNew = unitConversions.pressure[units].to;
 
-      const baseP = convertFromPrev(P); // Convert to base (psi)
+      const baseP = convertFromPrev(P); 
       const baseSt = convertFromPrev(St);
       const baseS = convertFromPrev(S);
 
-      // Convert from base to new unit
       setP(Number(convertToNew(baseP).toFixed(2)));
       setSt(Number(convertToNew(baseSt).toFixed(2)));
       setS(Number(convertToNew(baseS).toFixed(2)));

@@ -1,21 +1,19 @@
-// src/app/b31.3-calculator/SinglePressureTabContent.tsx
-
 "use client";
 
-import React from "react"; // Import useEffect
+import React from "react"; 
 import { v4 as uuidv4 } from "uuid";
 import { Box, Button, Card, Typography, CardContent } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
 import {
-  PipeSchedule, // Ensure PipeSchedule is imported from unitConversions
+  PipeSchedule, 
 } from "@/utils/unitConversions";
 import PipeCard from "../PipeCard";
 import FormulaDisplay from "../FormulaDisplay";
 
 import PdfExport from "../pdfExport/PdfExport";
-import { Units, DesignParams } from "@/types/units"; // Import DesignParams
-import { MaterialName } from "@/utils/materialsData"; // Import MaterialName
+import { Units, DesignParams } from "@/types/units"; 
+import { MaterialName } from "@/utils/materialsData"; 
 import DesignParameters from "./DesignParameters";
 
 type Pipe = {
@@ -29,7 +27,7 @@ type Pipe = {
 
 interface SinglePressureTabContentProps {
   units: Units;
-  material: MaterialName; // Changed type to MaterialName
+  material: MaterialName; 
   temperature: number;
   corrosionAllowance: number;
   pressure: number;
@@ -39,14 +37,14 @@ interface SinglePressureTabContentProps {
   e: number;
   w: number;
   pipesForDisplay: Pipe[];
-  materials: string[]; // This can remain string[] as it's just for the dropdown options
-  designParams: DesignParams; // Use the DesignParams type
+  materials: string[]; 
+  designParams: DesignParams; 
 
-  setMaterial: (value: MaterialName) => void; // Changed type to MaterialName
+  setMaterial: (value: MaterialName) => void; 
   setTemperature: (value: number) => void;
   setCorrosionAllowance: (value: number) => void;
   setPressure: (value: number) => void;
-  setAllowableStress: (value: number | null) => void; // Corrected type to allow null
+  setAllowableStress: (value: number | null) => void; // 
   setPipes: (pipes: Pipe[]) => void;
 
   updatePipe: (id: string, key: keyof Pipe, value: string | number) => void;
@@ -67,7 +65,7 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
   materials,
   designParams,
   setMaterial,
-  setTemperature, // Destructure setTemperature
+  setTemperature, 
   setPipes,
   updatePipe,
   removePipe,
@@ -75,8 +73,6 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
   handleCAChange,
   handleDesignPressureChange,
 }) => {
-  // REMOVED: useEffect to automatically calculate allowableStress on relevant input changes
-  // This calculation is now handled solely in B31_3Calculator.tsx to prevent infinite loops.
 
   return (
     <>
@@ -90,7 +86,7 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
           mt: 4,
         }}
       >
-        {/* Left Column: Inputs Card */}
+
         <Card
           sx={{
             width: { xs: "100%", md: 584 },
@@ -114,13 +110,13 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
             <DesignParameters
               designParams={{
                 ...designParams,
-                allowableStress: designParams.allowableStress ?? 0, // Ensure it's a number for display
+                allowableStress: designParams.allowableStress ?? 0,
               }}
               materials={materials}
               material={material}
               onUnitsChange={handleUnitsChange}
               onMaterialChange={setMaterial}
-              onTemperatureChange={setTemperature} // Pass setTemperature directly
+              onTemperatureChange={setTemperature} 
               onCAChange={handleCAChange}
               onDesignPressureChange={handleDesignPressureChange}
             />
@@ -135,8 +131,8 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
                     nps: "2",
                     od: "2.375",
                     schedule: "40" as PipeSchedule,
-                    tRequired: 0, // Will be calculated by parent's useEffect
-                    t: 0, // Will be calculated by parent's useEffect
+                    tRequired: 0, 
+                    t: 0, 
                   };
                   setPipes([...pipesForDisplay, newPipe]);
                 }}
@@ -148,7 +144,6 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
           </CardContent>
         </Card>
 
-        {/* Formula Card */}
         <Card
           sx={{
             width: { xs: "100%", md: 584 },
@@ -176,7 +171,7 @@ const SinglePressureTabContent: React.FC<SinglePressureTabContentProps> = ({
             pipe={pipe}
             updatePipe={updatePipe}
             removePipe={removePipe}
-            designParams={designParams} // Pass designParams here
+            designParams={designParams} 
           />
         ))}
       </Box>

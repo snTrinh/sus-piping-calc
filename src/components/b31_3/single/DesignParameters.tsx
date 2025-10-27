@@ -1,23 +1,23 @@
 "use client";
-import React from "react"; // Import useState, useEffect, useRef
-import { MenuItem, TextField, Box, Typography } from "@mui/material"; // Import InputAdornment
+import React from "react"; 
+import { MenuItem, TextField, Box, Typography } from "@mui/material"; 
 
-import LabeledInput from "../../common/LabeledInput"; // Assuming this is the correct path to LabeledInput
+import LabeledInput from "../../common/LabeledInput"; 
 
 import { DesignParams, Units } from "@/types/units";
 import { unitConversions } from "@/utils/unitConversions";
-import { MaterialName } from "@/utils/materialsData"; // Import MaterialName
+import { MaterialName } from "@/utils/materialsData"; 
 
 type DesignParametersProps = {
   materials: string[];
-  material: MaterialName; // Changed type to MaterialName
+  material: MaterialName; 
   designParams: DesignParams;
 
   onUnitsChange: (
     event: React.MouseEvent<HTMLElement>,
     newUnits: Units
   ) => void;
-  onMaterialChange: (value: MaterialName) => void; // Changed type to MaterialName
+  onMaterialChange: (value: MaterialName) => void; 
   onTemperatureChange: (value: number) => void;
   onCAChange: (value: number) => void;
   onDesignPressureChange: (value: number) => void;
@@ -61,7 +61,7 @@ export default function DesignParameters({
           select
           label="Material"
           value={material}
-          onChange={(e) => onMaterialChange(e.target.value as MaterialName)} // Cast value to MaterialName
+          onChange={(e) => onMaterialChange(e.target.value as MaterialName)} 
           sx={{ minWidth: 200, flexGrow: 1 }}
           size="small"
         >
@@ -117,16 +117,15 @@ export default function DesignParameters({
           value={corrosionAllowance}
           onChange={onCAChange}
           sx={{ minWidth: 140, flex: 1 }}
-          precision={4} // Adjust precision based on units
+          precision={4} 
         />
 
         <LabeledInput
           label="Allowable Stress"
           symbol="S"
           unit={unitConversions.pressure[designParams.units].unit}
-          // Pass the numeric value directly. LabeledInputConversion handles toFixed(2) and "N/A".
           value={allowableStress}
-          onChange={() => {}} // Still disabled as it's calculated
+          onChange={() => {}} 
           disabled
           sx={{ minWidth: 140, flex: 1 }}
         />

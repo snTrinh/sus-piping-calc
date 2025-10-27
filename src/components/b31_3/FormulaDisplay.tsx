@@ -1,4 +1,4 @@
-// src/app/FormulaDisplay.tsx
+
 import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 
@@ -9,7 +9,7 @@ interface FormulaDisplayProps {
 }
 
 export default function FormulaDisplay({ designParams }: FormulaDisplayProps) {
-  const theme = useTheme(); // Access the current theme
+  const theme = useTheme(); 
   const e = designParams?.e ?? 1;
   const w = designParams?.w ?? 1;
   const gamma = designParams?.gamma ?? 0.4;
@@ -63,7 +63,6 @@ export default function FormulaDisplay({ designParams }: FormulaDisplayProps) {
         >
           <Box
             sx={{
-              // Apply !important to ensure this border color overrides any conflicting rules
               borderBottom: `1px solid ${theme.palette.text.primary} !important`,
               px: 0.5,
               textAlign: "center",
@@ -114,7 +113,6 @@ export default function FormulaDisplay({ designParams }: FormulaDisplayProps) {
         >
           <Box
             sx={{
-              // Apply !important to ensure this border color overrides any conflicting rules
               borderBottom: `1px solid ${theme.palette.text.primary} !important`,
               px: 0.5,
               mt: 0.3,
@@ -129,7 +127,7 @@ export default function FormulaDisplay({ designParams }: FormulaDisplayProps) {
         </Box>
       </Typography>
 
-      {/* Label */}
+
       <Typography
         variant="body2"
         color="text.secondary"

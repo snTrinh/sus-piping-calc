@@ -51,7 +51,7 @@ export default function CalculatedValueCard({
             </Box>
           </Box>
 
-          {/* Formula with actual values */}
+
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Typography variant="body2" component="span">
               Pₜ = 1.5({P})

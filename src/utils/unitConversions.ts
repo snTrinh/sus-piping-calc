@@ -1,4 +1,4 @@
-// src/utils/unitConversions.ts
+
 
 import { Units } from "@/types/units";
 
@@ -22,7 +22,7 @@ export type PipeSchedule =
   | "160"
   | "XXH";
 
-// Define the explicit order for pipe schedules
+
 export const PIPE_SCHEDULE_ORDER: PipeSchedule[] = [
   "5s",
   "5",
@@ -60,7 +60,7 @@ export const npsToMmMap: Record<string, string> = {
   "2": "60",
   "2-1/2": "73",
   "3": "88",
-  "3-1/2": "102", // Assuming 3-1/2" maps to 102 (4")
+  "3-1/2": "102", 
   "4": "114",
   "5": "141",
   "6": "168",
@@ -72,67 +72,66 @@ export const npsToMmMap: Record<string, string> = {
   "18": "457",
   "20": "508",
   "24": "610",
-  "26": "660", // Assuming 26" maps to 660mm
-  "28": "711", // Assuming 28" maps to 711mm
-  "30": "762", // Assuming 30" maps to 762mm
-  "32": "813", // Assuming 32" maps to 813mm
-  "34": "864", // Assuming 34" maps to 864mm
-  "36": "914", // Assuming 36" maps to 914mm
-  // Add any other specific mappings required based on your pipe data and common NPS/DN conversions
+  "26": "660", 
+  "28": "711", 
+  "30": "762", 
+  "32": "813",
+  "34": "864", 
+  "36": "914", 
 };
 
 export const unitConversions = {
   pressure: {
     [Units.Imperial]: {
-      to: (value: number) => value, // psi to psi (display)
-      from: (value: number) => value, // psi to psi (internal)
-      toImperial: (value: number) => value, // From current display unit to Imperial (psi)
-      fromImperial: (value: number) => value, // From Imperial (psi) to current display unit
+      to: (value: number) => value, 
+      from: (value: number) => value, 
+      toImperial: (value: number) => value,
+      fromImperial: (value: number) => value, 
       unit: "psi",
     },
     [Units.Metric]: {
-      to: (value: number) => value, // kPa to kPa (display) - value is already in kPa
-      from: (value: number) => value, // kPa to kPa (internal)
-      toImperial: (value: number) => value / 6.89476, // From kPa to Imperial (psi)
-      fromImperial: (value: number) => value * 6.89476, // From Imperial (psi) to kPa
+      to: (value: number) => value, 
+      from: (value: number) => value,
+      toImperial: (value: number) => value / 6.89476,
+      fromImperial: (value: number) => value * 6.89476,
       unit: "kPa",
     },
   },
   length: {
     [Units.Imperial]: {
-      to: (value: number) => value, // inch to inch (display)
-      from: (value: number) => value, // inch to inch (internal)
-      toImperial: (value: number) => value, // From current display unit to Imperial (inch)
-      fromImperial: (value: number) => value, // From Imperial (inch) to current display unit
+      to: (value: number) => value, 
+      from: (value: number) => value, 
+      toImperial: (value: number) => value, 
+      fromImperial: (value: number) => value, 
       unit: "in",
     },
     [Units.Metric]: {
-      to: (value: number) => value * 25.4, // CORRECTED: Convert inches (internal) to mm (display)
-      from: (value: number) => value / 25.4, // CORRECTED: Convert mm (display) to inches (internal)
-      toImperial: (value: number) => value / 25.4, // From mm to Imperial (inch)
-      fromImperial: (value: number) => value * 25.4, // From Imperial (inch) to mm
+      to: (value: number) => value * 25.4, 
+      from: (value: number) => value / 25.4, 
+      toImperial: (value: number) => value / 25.4, 
+      fromImperial: (value: number) => value * 25.4, 
       unit: "mm",
     },
   },
   temperature: {
     [Units.Imperial]: {
-      to: (value: number) => value, // F to F (display)
-      from: (value: number) => value, // F to F (internal)
-      toImperial: (value: number) => value, // From current display unit to Imperial (F)
-      fromImperial: (value: number) => value, // From Imperial (F) to C
+      to: (value: number) => value, 
+      from: (value: number) => value, 
+      toImperial: (value: number) => value,
+      fromImperial: (value: number) => value,
       unit: "°F",
     },
     [Units.Metric]: {
-      to: (value: number) => value, // C to C (display) - value is already in C
-      from: (value: number) => value, // C to C (internal)
-      toImperial: (value: number) => (value * 9) / 5 + 32, // From C to Imperial (F)
-      fromImperial: (value: number) => ((value - 32) * 5) / 9, // From Imperial (F) to C
+      to: (value: number) => value,
+      from: (value: number) => value, 
+      toImperial: (value: number) => (value * 9) / 5 + 32, 
+      fromImperial: (value: number) => ((value - 32) * 5) / 9, 
       unit: "°C",
     },
   },
   nps: {
     [Units.Imperial]: {
-      to: (value: number) => value, // NPS inch to inch (no change)
+      to: (value: number) => value, 
       from: (value: number) => value,
       toImperial: (value: number) => value,
       fromImperial: (value: number) => value,
@@ -140,43 +139,35 @@ export const unitConversions = {
     },
     [Units.Metric]: {
       to: (value: number) => {
-        // Convert inch NPS (number) to approximate metric NPS (string)
-        // Ensure the key is a string before looking up in npsToMmMap
-        return Number(npsToMmMap[value.toString()]) ?? NaN; // Convert result back to number
+        
+        return Number(npsToMmMap[value.toString()]) ?? NaN; 
       },
       from: (value: number) => {
-        // Convert metric mm NPS (number) back to inch NPS (approximate)
-        // Find key by value (reverse lookup) - ensure comparison is string to string
         const inchNps = Object.entries(npsToMmMap).find(
-          ([, mmString]) => mmString === value.toString() // Convert number to string for comparison
+          ([, mmString]) => mmString === value.toString() 
         );
         return inchNps ? Number(inchNps[0]) : NaN;
       },
       toImperial: (value: number) => {
-        // Convert metric mm NPS (number) to inch NPS (approximate)
-        // Ensure comparison is string to string
         const inchNps = Object.entries(npsToMmMap).find(
-          ([, mmString]) => mmString === value.toString() // Convert number to string for comparison
+          ([, mmString]) => mmString === value.toString() 
         );
         return inchNps ? Number(inchNps[0]) : NaN;
       },
       fromImperial: (value: number) => {
-        // Convert inch NPS (number) to approximate metric NPS in mm
-        // Ensure the key is a string before looking up in npsToMmMap
-        return Number(npsToMmMap[value.toString()]) ?? NaN; // Convert result back to number
+        return Number(npsToMmMap[value.toString()]) ?? NaN; 
       },
       unit: "mm",
     },
   },
 };
 
-// Assuming DesignParams type exists in '@/types/units'
 interface ConvertDesignInputsProps {
   units: Units;
-  temperature: number; // Stored in current display unit
-  allowableStress: number | null; // Stored in Imperial internally, converted for display
-  corrosionAllowance: number; // Stored in current display unit
-  pressure: number; // Stored in current display unit
+  temperature: number; 
+  allowableStress: number | null; 
+  corrosionAllowance: number; 
+  pressure: number;
 }
 
 interface ConvertedDesignInputs {
@@ -194,14 +185,14 @@ export function convertDesignInputs({
   pressure,
 }: ConvertDesignInputsProps): ConvertedDesignInputs {
   return {
-    // These are now just passing through, as the state is already in display units
+    
     temperatureDisplay: temperature,
     pressureDisplay: pressure,
     corrosionAllowanceDisplay: corrosionAllowance,
-    // Allowable stress is still calculated (internally Imperial) and converted for display
+    
     allowableStressDisplay:
       allowableStress !== null
         ? unitConversions.pressure[units].fromImperial(allowableStress)
-        : 0, // Default to 0 for display if null
+        : 0, 
   };
 }

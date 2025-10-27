@@ -11,7 +11,6 @@ import {
   unitConversions,
 } from "@/utils/unitConversions";
 
-// NEW: Interfaces for transformed_pipeData.json
 interface ScheduleThicknesses {
   [key: string]: number | null;
 }
@@ -30,44 +29,44 @@ interface TransformedPipeData {
   };
 }
 
-// Cast pipeData to the new interface type
-import rawPipeData from "@/data/transformed_pipeData.json"; // Renamed to rawPipeData to avoid conflict
+
+import rawPipeData from "@/data/transformed_pipeData.json"; 
 const typedPipeData: TransformedPipeData = rawPipeData as TransformedPipeData;
 
 import SinglePressureTabContent from "./single/SinglePressureTabContent";
 import MultiplePressuresTabContent from "./multiple/MultiplePressuresTabContent";
 import UnitsToggle from "../common/UnitsToggle";
 import { materialStress } from "@/utils/materialStress";
-import { calculateTRequired } from "@/utils/pipeCalculations"; // Import the new calculation function
+import { calculateTRequired } from "@/utils/pipeCalculations"; 
 
 type Pipe = {
   id: string;
   nps: string;
-  od: string; // This will actually be the NPS key (e.g., "4" or "100") not OD itself
+  od: string;
   schedule: PipeSchedule;
   tRequired: number;
-  t: number; // Actual schedule thickness
+  t: number; 
 };
 
 export default function B31_3Calculator() {
   const [units, setUnits] = useState<Units>(Units.Imperial);
   const [material, setMaterial] = useState<MaterialName>("A106B");
-  const [temperature, setTemperature] = useState(100); // °F internally
+  const [temperature, setTemperature] = useState(100);
   const [allowableStress, setAllowableStress] = useState<number | null>(null);
-  const [corrosionAllowance, setCorrosionAllowance] = useState(0); // inches
+  const [corrosionAllowance, setCorrosionAllowance] = useState(0); 
 
   const [e, setE] = useState(1);
-  const [w, setW] = useState(1); // W factor
-  const [gamma, setGamma] = useState(0.4); // Y factor
-  const [millTol, setMillTol] = useState(0.125); // Corrected to 12.5% (0.125)
+  const [w, setW] = useState(1); 
+  const [gamma, setGamma] = useState(0.4);
+  const [millTol, setMillTol] = useState(0.125);
 
-  const [pressure, setPressure] = useState(1414); // psi
+  const [pressure, setPressure] = useState(1414); 
 
   const [pipes, setPipes] = useState<Pipe[]>([
     {
       id: uuidv4(),
       nps: "4",
-      od: "4.5", // This `od` here is likely meant to be the display value, not the internal key.
+      od: "4.5",
       schedule: "40",
       tRequired: 0,
       t: 0,
@@ -76,14 +75,14 @@ export default function B31_3Calculator() {
 
   const [tabIndex, setTabIndex] = useState(0);
 
-  // Effect to automatically calculate allowableStress on relevant input changes
+
   useEffect(() => {
     const category = units === Units.Imperial ? "Imperial" : "Metric";
     const stress = materialStress(
       category,
       material,
       temperature,
-      units // Pass the current units state as the fourth argument
+      units 
     );
 
     if (stress !== allowableStress) {
@@ -97,7 +96,7 @@ export default function B31_3Calculator() {
     }
   }, [units, material, temperature, allowableStress, setAllowableStress]);
 
-  // Handlers
+
   const handleUnitsChange = (
     event: React.MouseEvent<HTMLElement>,
     newUnits: Units
@@ -130,29 +129,20 @@ export default function B31_3Calculator() {
     setPipes((prev) => prev.filter((p) => p.id !== id));
   };
 
-  // Derived states and props to pass down using useMemo for optimization
+
   const pipesForDisplay = useMemo(
     () =>
       pipes.map((pipe) => {
-        // `pipe.nps` is the string like "4" or "1/2"
-        // `npsToMmMap` helps convert "1/2" to "15" for metric lookup
         const currentNpsKey =
           units === Units.Metric ? npsToMmMap[pipe.nps]?.toString() : pipe.nps;
-
-        // Corrected way to get pipe size data from the transformed_pipeData.json structure
         const selectedPipeSizeData = typedPipeData[units]?.[currentNpsKey || ''];
 
-        // Retrieve Outer Diameter
         const outerDiameter = selectedPipeSizeData?.OD || 0;
 
-        // Convert OD to Imperial inches for calculation (as formula expects Imperial)
-        // unitConversions.length[units].toImperial will handle "mm" to "inches" for metric,
-        // and just return the value for imperial.
         const outerDiameterInches = unitConversions.length[units].toImperial(
           outerDiameter
         );
 
-        // --- Start Debugging Logs for tRequired inputs ---
         console.log(`--- Pipe: ${pipe.nps}, Schedule: ${pipe.schedule} ---`);
         console.log("Calculated OD in Inches (outerDiameterInches):", outerDiameterInches);
         console.log("Design Pressure (pressure):", pressure);
@@ -162,21 +152,18 @@ export default function B31_3Calculator() {
         console.log("Y Factor (gamma):", gamma);
         console.log("Corrosion Allowance (corrosionAllowance):", corrosionAllowance);
         console.log("Mill Tolerance (millTol):", millTol);
-        // --- End Debugging Logs ---
 
         const calculatedTRequired = calculateTRequired({
-          pressure, // Already in psi
+          pressure,
           outerDiameterInches,
           allowableStress,
           e,
           w,
           gamma,
-          corrosionAllowanceInches: corrosionAllowance, // Already in inches
+          corrosionAllowanceInches: corrosionAllowance, 
           millTol,
         });
 
-        // Calculate actual schedule thickness (pipe.t)
-        // This value is stored in Imperial inches in transformed_pipeData.json
         const rawScheduleThicknessImperial = selectedPipeSizeData?.schedules[
           pipe.schedule
         ] ?? 0;
@@ -188,7 +175,7 @@ export default function B31_3Calculator() {
         return {
           ...pipe,
           tRequired: calculatedTRequired,
-          t: rawScheduleThicknessImperial, // Store actual thickness in Imperial inches
+          t: rawScheduleThicknessImperial, 
         };
       }),
     [
@@ -201,17 +188,17 @@ export default function B31_3Calculator() {
       gamma,
       corrosionAllowance,
       millTol,
-    ] // Dependencies for recalculation
+    ] 
   );
 
-  // Derive materials from materialsData
+
   const materials = useMemo(
     () => {
       const metricMaterials = Object.keys(materialsData.Metric.materials);
       const imperialMaterials = Object.keys(materialsData.Imperial.materials);
       return [...new Set([...metricMaterials, ...imperialMaterials])] as MaterialName[];
     },
-    [] // materialsData is static, so no dependencies needed
+    [] 
   );
 
   const {
@@ -279,9 +266,9 @@ export default function B31_3Calculator() {
     setMillTol,
     pressure,
     setPressure,
-    pipes, // Pass `pipes` (the raw state)
+    pipes, 
     setPipes,
-    pipesForDisplay, // Pass `pipesForDisplay` (the memoized, calculated version)
+    pipesForDisplay, 
     materials,
     designParams,
     updatePipe,
@@ -319,12 +306,12 @@ export default function B31_3Calculator() {
             scrollButtons="auto"
           >
             <Tab label="Single Pressure" />
-            {/* <Tab label="Multiple Pressures" /> */}
+
           </Tabs>
           <UnitsToggle units={units} onChange={handleUnitsChange} />
         </Box>
 
-        {/* Render content based on tabIndex */}
+ 
         {tabIndex === 0 && (
           <SinglePressureTabContent {...commonTabContentProps} />
         )}

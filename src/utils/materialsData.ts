@@ -1,4 +1,4 @@
-// materialsData.ts
+
 
 export const materialsData = {
     Metric: {
@@ -23,11 +23,11 @@ export const materialsData = {
     }
   };
   
-  // Define types for better readability and safety
+
   export type UnitCategory = keyof typeof materialsData;
   export type MaterialName = keyof (typeof materialsData)["Metric"]["materials"];
   
-  // Optional: Define a more specific type for the structure if needed
+
   export type MaterialTable = {
     label: string;
     columns: number[];

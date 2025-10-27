@@ -20,7 +20,6 @@ export default function HydroTestPage() {
 
   const calculatedPressure = hydroTestPressure(P, St, S);
 
-  // Unit toggle and conversions
   const handleUnitsChange = (
     event: React.MouseEvent<HTMLElement>,
     newUnits: Units
@@ -43,7 +42,6 @@ export default function HydroTestPage() {
 
       <UnitsToggle units={units} onChange={handleUnitsChange} />
 
-      {/* Two-column layout */}
       <Box
         sx={{
           display: "flex",
@@ -75,7 +73,6 @@ export default function HydroTestPage() {
         </Box>
       </Box>
 
-      {/* Full-width row for PDF Export */}
       <Box sx={{ width: "100%" }}>{/* <PdfExport /> */}</Box>
     </Box>
   );

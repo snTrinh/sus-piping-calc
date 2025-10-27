@@ -1,4 +1,3 @@
-// src/app/b31.3-calculator/PipeCard.tsx
 "use client";
 import React from "react";
 import {
@@ -13,14 +12,12 @@ import {
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import { useTheme } from "@mui/material/styles";
 
-import { DesignParams, Units } from "@/types/units"; // Import DesignParams
+import { DesignParams, Units } from "@/types/units"; 
 import { npsToMmMap, PIPE_SCHEDULE_ORDER, PipeSchedule, unitConversions } from "@/utils/unitConversions";
-import pipeData from "@/data/transformed_pipeData.json"; // Ensure this path is correct
-import { calculateTRequired, TRequiredParams } from "@/utils/pipeCalculations"; // Import the utility function and its types
-
-// Define the structure of your new pipeData.json for better type safety
+import pipeData from "@/data/transformed_pipeData.json"; 
+import { calculateTRequired, TRequiredParams } from "@/utils/pipeCalculations"; 
 interface ScheduleThicknesses {
-  [key: string]: number | null; // Schedule names map to thickness (number) or null
+  [key: string]: number | null;
 }
 
 interface PipeSizeData {
@@ -30,29 +27,29 @@ interface PipeSizeData {
 
 interface TransformedPipeData {
   Metric: {
-    [key: string]: PipeSizeData; // NPS/DN as string keys (e.g. "10", "13"), mapping to PipeSizeData
+    [key: string]: PipeSizeData; 
   };
   Imperial: {
-    [key: string]: PipeSizeData; // NPS as string keys (e.g., "1/8", "1"), mapping to PipeSizeData
+    [key: string]: PipeSizeData; 
   };
 }
 
-// Cast pipeData to the new interface
-const typedPipeData: TransformedPipeData = pipeData; // Using 'as any' for quick setup, consider stricter typing
+
+const typedPipeData: TransformedPipeData = pipeData; 
 
 type Pipe = {
   id: string;
   nps: string;
   schedule: string;
-  tRequired: number; // stored internally in inches - this will now be overwritten by local calculation for display
-  t: number; // stored internally in inches (user provided thickness) - Note: This field is not currently used in the component.
+  tRequired: number; 
+  t: number; 
 };
 
 type PipeCardProps = {
   pipe: Pipe;
   updatePipe: (id: string, key: keyof Pipe, value: string | number) => void;
   removePipe: (id: string) => void;
-  designParams: DesignParams; // Add designParams to props
+  designParams: DesignParams;
   sx?: object;
 };
 
@@ -60,16 +57,16 @@ export default function PipeCard({
   pipe,
   updatePipe,
   removePipe,
-  designParams, // Destructure designParams
+  designParams,
   sx
 }: PipeCardProps) {
   const theme = useTheme();
 
   const { pressure, corrosionAllowance, allowableStress, e, w, gamma, units } =
-    designParams; // Destructure units here
+    designParams; 
 
   const thicknessConversion = unitConversions.length[units];
-  const pressureConversion = unitConversions.pressure[units]; // Get pressure conversion
+  const pressureConversion = unitConversions.pressure[units]; 
   const unitLabel = thicknessConversion.unit;
 
   const currentNpsKey = units === Units.Metric ? npsToMmMap[pipe.nps]?.toString() : pipe.nps;
@@ -78,7 +75,7 @@ export default function PipeCard({
   const selectedPipeSizeData = currentUnitPipeData?.[currentNpsKey || ''];
   const scheduleOptions = selectedPipeSizeData
   ? Object.keys(selectedPipeSizeData.schedules).sort((a, b) => {
-      const indexA = PIPE_SCHEDULE_ORDER.indexOf(a as PipeSchedule); // Cast to any to match PipeSchedule type
+      const indexA = PIPE_SCHEDULE_ORDER.indexOf(a as PipeSchedule); 
       const indexB = PIPE_SCHEDULE_ORDER.indexOf(b as PipeSchedule);
       return indexA - indexB;
     })
@@ -90,13 +87,13 @@ export default function PipeCard({
     
   } 
 
-  // Normalize the raw thickness to your internal standard unit (inches)
+
   let thicknessInInches = 0;
   if (units === Units.Metric && rawScheduleThickness) {
-    // The metric data is in mm, so convert it to inches
+
     thicknessInInches = unitConversions.length.Metric.toImperial(rawScheduleThickness);
   } else {
-    // The imperial data is already in inches
+
     thicknessInInches = rawScheduleThickness;
   }
 
@@ -106,7 +103,7 @@ export default function PipeCard({
   const imperialAllowableStress = pressureConversion.toImperial(allowableStress ?? 0);
   const imperialCorrosionAllowance = thicknessConversion.toImperial(corrosionAllowance);
 
-  // outerDiameterDisplay is in the current display unit. Convert to Imperial (inches) if Metric.
+
   const imperialOuterDiameter = units === Units.Metric
     ? unitConversions.length[Units.Metric].toImperial(outerDiameterDisplay)
     : outerDiameterDisplay; 
@@ -114,31 +111,30 @@ export default function PipeCard({
     pressure: imperialPressure,
     outerDiameterInches: imperialOuterDiameter,
     allowableStress: imperialAllowableStress,
-    e: e ?? 1, // Ensure E, W, gamma have default values if null/undefined
+    e: e ?? 1, 
     w: w ?? 1,
     gamma: gamma ?? 1,
     corrosionAllowanceInches: imperialCorrosionAllowance,
     millTol: designParams.millTol ?? 0,
   };
 
-  // Calculate tRequired using the utility function (result will be in Imperial inches)
+
   const tRequiredCalculatedImperial = calculateTRequired(paramsForCalculation);
 
-  // Convert the calculated tRequired back to the current display units for rendering
+
   const displayedTRequired = thicknessConversion.to(tRequiredCalculatedImperial);
 
   const npsOptions = Object.keys(typedPipeData.Imperial)
     .sort((a, b) => {
-      // Custom sorting for mixed fractional and whole number NPS values
       const toNumber = (val: string) => {
-        if (val.includes(" ")) { // Handle "X Y/Z" (e.g., "1-1/4")
+        if (val.includes(" ")) { 
           const [whole, fraction] = val.split(" ");
           const [num, denom] = fraction.split("/").map(Number);
           return Number(whole) + num / denom;
-        } else if (val.includes("/")) { // Handle "X/Y" (e.g., "1/8")
+        } else if (val.includes("/")) { 
           const [num, denom] = val.split("/").map(Number);
           return num / denom;
-        } else { // Handle whole numbers (e.g., "1", "2")
+        } else { 
           return Number(val);
         }
       };
@@ -192,15 +188,13 @@ export default function PipeCard({
             value={pipe.nps}
             onChange={(e) => {
               updatePipe(pipe.id, "nps", e.target.value);
-              // When NPS changes, also ensure schedule is reset to a valid default if necessary
-              // This is a common point of error where schedule becomes stale
-              // You might want to update the schedule to the first available option for the new NPS
+
               const newNpsKey = units === Units.Metric ? npsToMmMap[e.target.value]?.toString() : e.target.value;
               const newSelectedPipeSizeData = typedPipeData[units]?.[newNpsKey || ''];
               if (newSelectedPipeSizeData) {
                 const firstNewSchedule = Object.keys(newSelectedPipeSizeData.schedules).sort()[0];
                 if (firstNewSchedule && !newSelectedPipeSizeData.schedules[pipe.schedule]) {
-                  // Only update if current schedule is not valid for new NPS
+
                   updatePipe(pipe.id, "schedule", firstNewSchedule);
                 }
               }
@@ -221,7 +215,6 @@ export default function PipeCard({
             value={pipe.schedule}
             onChange={(e) => updatePipe(pipe.id, "schedule", e.target.value)}
             sx={{ minWidth: 120, flexGrow: 1, flexBasis: "120px" }}
-            // Disable schedule if no pipe size data is found or no schedules are available for it
             disabled={!selectedPipeSizeData || scheduleOptions.length === 0}
             size="small"
           >
@@ -243,7 +236,7 @@ export default function PipeCard({
         >
           <TextField
             label={`Outer Diameter, D (${unitLabel})`}
-            value={outerDiameterDisplay.toFixed(2)} // Use outerDiameterDisplay
+            value={outerDiameterDisplay.toFixed(2)} 
             size="small"
             disabled
             sx={{ minWidth: 120, flexGrow: 1, flexBasis: "120px" }}
@@ -259,7 +252,7 @@ export default function PipeCard({
         >
           <TextField
             label={`Required Thickness, tᵣ (${unitLabel})`}
-            value={displayedTRequired.toFixed(3)} // Use the newly calculated value
+            value={displayedTRequired.toFixed(3)} 
             size="small"
             disabled
             sx={{ minWidth: 120, flexGrow: 1, flexBasis: "120px" }}
@@ -284,8 +277,8 @@ export default function PipeCard({
 
         <Typography sx={{ textAlign: "right" }}>
           <strong>Result:</strong>{" "}
-          {/* Compare internal inch values for accuracy */}
-          {thicknessInInches >= tRequiredCalculatedImperial ? ( // Compare with the imperial calculated value
+
+          {thicknessInInches >= tRequiredCalculatedImperial ? ( 
             <span style={{ color: theme.palette.success.main, fontWeight: "bold" }}>
               ACCEPTABLE
             </span>

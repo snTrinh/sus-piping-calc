@@ -1,24 +1,24 @@
 "use client";
-import React from "react"; // Import useState, useEffect, useRef
-import { MenuItem, TextField, Box, Typography } from "@mui/material"; // Import InputAdornment
+import React from "react"; 
+import { MenuItem, TextField, Box, Typography } from "@mui/material"; 
 
-import LabeledInputConversion from "../../common/LabeledInput"; // Assuming this is the correct path to LabeledInput
+import LabeledInputConversion from "../../common/LabeledInput"; 
 
 import { DesignParams, Units } from "@/types/units";
 import { unitConversions } from "@/utils/unitConversions";
-import { MaterialName } from "@/utils/materialsData"; // Import MaterialName
+import { MaterialName } from "@/utils/materialsData";
 import LabeledInput from "../../common/LabeledInput";
 
 type DesignParametersProps = {
   materials: string[];
-  material: MaterialName; // Changed type to MaterialName
+  material: MaterialName; 
   designParams: DesignParams;
 
   onUnitsChange: (
     event: React.MouseEvent<HTMLElement>,
     newUnits: Units
   ) => void;
-  onMaterialChange: (value: MaterialName) => void; // Changed type to MaterialName
+  onMaterialChange: (value: MaterialName) => void; 
   onTemperatureChange: (value: number) => void;
   onCAChange: (value: number) => void;
   onDesignPressureChange: (value: number) => void;
@@ -64,7 +64,7 @@ export default function DesignParameters({
           select
           label="Material"
           value={material}
-          onChange={(e) => onMaterialChange(e.target.value as MaterialName)} // Cast value to MaterialName
+          onChange={(e) => onMaterialChange(e.target.value as MaterialName)} 
           sx={{ minWidth: 200, flexGrow: 1 }}
           size="small"
         >

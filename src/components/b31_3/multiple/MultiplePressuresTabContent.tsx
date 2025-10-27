@@ -5,13 +5,13 @@ import { v4 as uuidv4 } from "uuid";
 import { Box, Button, Card, Typography } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
-import { Units, DesignParams } from "@/types/units"; // Import DesignParams
+import { Units, DesignParams } from "@/types/units"; 
 import { PipeSchedule } from "@/utils/unitConversions";
 import PipeCard from "../PipeCard";
 import FormulaDisplay from "../FormulaDisplay";
 import PdfExport from "../pdfExport/PdfExport";
-import { MaterialName } from "@/utils/materialsData"; // Import MaterialName
-import DesignParameters from "./DesignParameters"; // Assuming this is correct
+import { MaterialName } from "@/utils/materialsData"; 
+import DesignParameters from "./DesignParameters"; 
 
 type Pipe = {
   id: string;
@@ -22,31 +22,28 @@ type Pipe = {
   t: number;
 };
 
-// Define props for this component (similar to SinglePressureTabContent)
 interface MultiplePressuresTabContentProps {
-  // State values
+
   units: Units;
-  material: MaterialName; // Changed type to MaterialName
+  material: MaterialName;
   temperature: number;
   corrosionAllowance: number;
   pressure: number;
-  allowableStress: number | null; // Make sure this is passed if needed for display
+  allowableStress: number | null;
   gamma: number;
   millTol: number;
   e: number;
   w: number;
   pipesForDisplay: Pipe[];
-  materials: string[]; // This can remain string[] as it's just for the dropdown options
-  designParams: DesignParams; // Use the DesignParams type
+  materials: string[]; 
+  designParams: DesignParams;
 
-  // State setters
-  setMaterial: (value: MaterialName) => void; // Changed type to MaterialName
+  setMaterial: (value: MaterialName) => void; 
   setTemperature: (value: number) => void;
   setCorrosionAllowance: (value: number) => void;
   setPressure: (value: number) => void;
   setPipes: (pipes: Pipe[]) => void;
 
-  // Handlers
   updatePipe: (id: string, key: keyof Pipe, value: string | number) => void;
   removePipe: (id: string) => void;
   handleUnitsChange: (
@@ -85,7 +82,6 @@ const MultiplePressuresTabContent: React.FC<
           mt: 4,
         }}
       >
-        {/* Left Column: Inputs - Corrected to appear only once */}
         <Card
           sx={{
             flex: 1,
@@ -99,8 +95,8 @@ const MultiplePressuresTabContent: React.FC<
           }}
           elevation={0}
         >
-          {/* Assuming DesignConstants is meant to be DesignParameters based on props */}
-          <DesignParameters // Changed from DesignConstants to DesignParameters
+
+          <DesignParameters 
             designParams={designParams}
             materials={materials}
             material={material}
@@ -111,7 +107,6 @@ const MultiplePressuresTabContent: React.FC<
             onDesignPressureChange={handleDesignPressureChange}
           />
 
-          {/* Button container with marginTop: "auto" to push it to the bottom */}
           <Box sx={{ mt: "auto", width: "100%" }}>
             <Button
               startIcon={<AddCircleOutlineIcon />}
@@ -135,7 +130,6 @@ const MultiplePressuresTabContent: React.FC<
           </Box>
         </Card>
 
-        {/* Formula Card - Corrected to appear only once */}
         <Card
           sx={{
             flex: 1,
@@ -156,28 +150,26 @@ const MultiplePressuresTabContent: React.FC<
         </Card>
       </Box>
 
-      {/* Pipe Cards Display */}
       <Box sx={{ mt: 4, display: "flex", flexDirection: "column", gap: 2 }}>
         {pipesForDisplay.map((pipe) => (
           <Box
-            key={pipe.id} // Important: Key the outer Box for each pipe
+            key={pipe.id} 
             sx={{
               display: "flex",
-              flexDirection: { xs: "column", md: "row" }, // Two columns on medium screens and up
-              gap: 4, // Gap between the two columns
-              alignItems: "stretch", // Ensures cards stretch to same height
-              // You might want to add margin-bottom here if you need more space between each pipe-row
+              flexDirection: { xs: "column", md: "row" }, 
+              gap: 4,
+              alignItems: "stretch", 
             }}
           >
             <Card
               sx={{
-                flex: 1, // Allows it to take available space
-                minWidth: 450, // Ensures it doesn't get too small
+                flex: 1, 
+                minWidth: 450, 
                 display: "flex",
                 flexDirection: "column",
                 p: 2,
                 gap: 2,
-                height: 350, // Ensures content fills card height
+                height: 350, 
                 border: "1px solid #ddd",
                 alignItems: "stretch",
               }}
@@ -198,7 +190,7 @@ const MultiplePressuresTabContent: React.FC<
               pipe={pipe}
               updatePipe={updatePipe}
               removePipe={removePipe}
-              designParams={designParams} // Pass designParams here
+              designParams={designParams} 
             />
           </Box>
         ))}

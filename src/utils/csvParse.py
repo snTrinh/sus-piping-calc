@@ -7,14 +7,14 @@ def transform_pipe_data(data):
         columns = unit_data.get("columns", [])
         schedules = unit_data.get("schedules", {})
 
-        # For each column entry (NPS + OD), create an entry keyed by NPS
+
         nps_dict = {}
 
         for i, entry in enumerate(columns):
             nps = str(entry.get("NPS"))
             od = entry.get("OD")
 
-            # Collect thickness for each schedule at index i
+
             schedule_thicknesses = {}
             for schedule_name, thicknesses in schedules.items():
                 if i < len(thicknesses):
@@ -39,7 +39,6 @@ if __name__ == "__main__":
 
     transformed_data = transform_pipe_data(data)
 
-    # Write to JSON
     with open("transformed_pipeData.json", "w") as f:
         json.dump(transformed_data, f, indent=2)
 

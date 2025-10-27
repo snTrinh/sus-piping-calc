@@ -1,14 +1,14 @@
-// src/utils/pipeCalculations.ts
+
 
 export interface TRequiredParams {
-    pressure: number; // Design Pressure (P) in psi
-    outerDiameterInches: number; // Outer Diameter (D) in inches
-    allowableStress: number | null; // Allowable Stress (S) in psi
-    e: number; // Quality Factor (E)
-    w: number; // Weld Joint Strength Reduction Factor (W)
-    gamma: number; // Temperature Coefficient (Y)
-    corrosionAllowanceInches: number; // Corrosion Allowance (c) in inches
-    millTol: number; // Mill Tolerance (e.g., 0.125 for 12.5%)
+    pressure: number; 
+    outerDiameterInches: number; 
+    allowableStress: number | null; 
+    e: number;
+    w: number;
+    gamma: number; 
+    corrosionAllowanceInches: number; 
+    millTol: number;
 }
 
 export const calculateTRequired = ({
@@ -49,7 +49,7 @@ export const calculateTRequired = ({
 
     if (1 - millTol <= 0) {
         console.warn("Invalid millTol (1 - millTol <= 0). Returning 0 for tRequired.");
-        return 0; // Prevent division by zero or negative thickness
+        return 0; 
     }
 
     const requiredThickness =

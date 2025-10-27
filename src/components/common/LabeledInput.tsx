@@ -1,4 +1,3 @@
-// src/app/b31.3-calculator/common/LabeledInput.tsx
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { TextField} from "@mui/material";
@@ -38,9 +37,9 @@ export default function LabeledInputConversion({
   conversionFactorFromBase = 1,
   conversionFactorToBase = 1,
 }: LabeledInputProps) {
-  // HIGHLIGHT START
-  const inputRef = useRef<HTMLInputElement>(null); // Ref to the actual input element
-  // HIGHLIGHT END
+
+  const inputRef = useRef<HTMLInputElement>(null); 
+
 
   const formatDisplayValue = (val: number | undefined | null): string => {
     if (val === undefined || val === null || isNaN(val)) return "";
@@ -51,13 +50,11 @@ export default function LabeledInputConversion({
   const [inputValue, setInputValue] = useState<string>(() => formatDisplayValue(value));
 
   useEffect(() => {
-    // HIGHLIGHT START
-    // Only update inputValue from prop if the input is not currently focused
-    // This prevents reformatting while the user is actively typing
+
     if (inputRef.current && document.activeElement !== inputRef.current) {
       setInputValue(formatDisplayValue(value));
     }
-    // HIGHLIGHT END
+
   }, [value, percentage, precision, conversionFactorFromBase]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,9 +92,8 @@ export default function LabeledInputConversion({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleBlur();
-      // HIGHLIGHT START
-      inputRef.current?.blur(); // Explicitly blur the input
-      // HIGHLIGHT END
+
+      inputRef.current?.blur(); 
     }
   };
 
@@ -123,9 +119,7 @@ export default function LabeledInputConversion({
       fullWidth={fullWidth}
       type="number"
       InputLabelProps={{ shrink: true }}
-      // HIGHLIGHT START
-      inputRef={inputRef} // Attach ref to the input element
-      // HIGHLIGHT END
+      inputRef={inputRef} 
     />
   );
 }

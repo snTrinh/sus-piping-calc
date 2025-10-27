@@ -1,8 +1,8 @@
-// src/utils/materialStressLookup.ts
+
 
 import { materialsData, UnitCategory, MaterialName } from "./materialsData";
 import { linearInterpolation } from "./interpolation";
-import { unitConversions } from "./unitConversions"; // Import unitConversions and Units
+import { unitConversions } from "./unitConversions"; 
 import { Units } from "@/types/units";
 /**
  * /**
@@ -16,11 +16,11 @@ import { Units } from "@/types/units";
 export function materialStress(
   category: UnitCategory,
   material: MaterialName,
-  temperature: number, // This is the temperature in the CURRENT DISPLAY UNIT (F or C)
-  currentUnits: Units // Pass the current display units from B31_3Calculator
+  temperature: number, 
+  currentUnits: Units 
 ): number | null {
   const table = materialsData[category];
-  const columns = table.columns; // These columns are in the unit of the category (C for Metric, F for Imperial)
+  const columns = table.columns; 
   const values = table.materials[material];
 
   if (!values) {
@@ -33,32 +33,28 @@ export function materialStress(
     return null;
   }
 
-  // --- CORRECTED TEMPERATURE CONVERSION LOGIC (from display unit to table's unit) ---
   let temperatureForLookup: number;
 
   if (category === "Metric") {
-    // If the data table is Metric (columns are in Celsius), convert input temperature to Celsius.
+   
     if (currentUnits === Units.Imperial) {
-      // Input is Fahrenheit, convert to Celsius
+      
       temperatureForLookup = unitConversions.temperature[Units.Metric].fromImperial(temperature);
     } else {
-      // Input is already Celsius, no conversion needed
+     
       temperatureForLookup = temperature;
     }
-  } else { // Imperial category
-    // If the data table is Imperial (columns are in Fahrenheit), convert input temperature to Fahrenheit.
+  } else { 
+   
     if (currentUnits === Units.Metric) {
-      // Input is Celsius, convert to Fahrenheit
+      
       temperatureForLookup = unitConversions.temperature[Units.Imperial].toImperial(temperature);
     } else {
-      // Input is already Fahrenheit, no conversion needed
+      
       temperatureForLookup = temperature;
     }
   }
-  // --- END CORRECTED TEMPERATURE CONVERSION LOGIC ---
-
-
-  // Ensure the temperatureForLookup is a finite number
+  
   if (!Number.isFinite(temperatureForLookup)) {
       console.warn(`Warning: Invalid temperature value for lookup: ${temperatureForLookup}. Returning null.`);
       return null;
@@ -80,14 +76,12 @@ export function materialStress(
   }
 
   if (columns[lowerIndex] === temperatureForLookup) {
-    // If exact match, return the value from the table
-    // This value is in the table's unit (kPa for Metric, psi for Imperial)
+    
     const exactStress = values[lowerIndex];
-    // --- NEW: Convert exact stress to Imperial (PSI) before returning ---
     if (category === "Metric") {
       return unitConversions.pressure[Units.Metric].toImperial(exactStress);
     } else {
-      return exactStress; // Already Imperial (PSI)
+      return exactStress; 
     }
   }
 
@@ -110,12 +104,9 @@ export function materialStress(
 
   const interpolatedStress = linearInterpolation(temperatureForLookup, x1, y1, x2, y2);
 
-  // --- NEW: Convert interpolated stress to Imperial (PSI) before returning ---
-  // The interpolated stress value is in the unit of the 'category' (kPa for Metric, psi for Imperial).
-  // We need to convert it to Imperial (psi) before returning.
   if (category === "Metric") {
     return unitConversions.pressure[Units.Metric].toImperial(interpolatedStress);
   } else {
-    return interpolatedStress; // Already Imperial (PSI)
+    return interpolatedStress; 
   }
 }

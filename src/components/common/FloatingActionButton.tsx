@@ -20,7 +20,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import EmailIcon from "@mui/icons-material/Email";
 import { TransitionProps } from "@mui/material/transitions";
 
-// Define a transition for the dialog to slide up
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
    
@@ -32,7 +31,7 @@ const Transition = React.forwardRef(function Transition(
 });
 
 export default function FloatingActionButton() {
-  // State for the contact form and dialog
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -42,15 +41,15 @@ export default function FloatingActionButton() {
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
     "success"
   );
-  const [dialogOpen, setDialogOpen] = useState(false); // State to control dialog visibility
+  const [dialogOpen, setDialogOpen] = useState(false); 
 
   const VERCEL_API_ENDPOINT =
     "https://email-sender-backend-indol.vercel.app/api/send-email";
 
   const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault(); // Prevent default form submission
+    event.preventDefault(); 
     setLoading(true);
-    setSnackbarOpen(false); // Close any existing snackbar
+    setSnackbarOpen(false); 
 
     if (!name || !email || !message) {
       setSnackbarMessage("Please fill in all fields.");
@@ -75,7 +74,7 @@ export default function FloatingActionButton() {
         setName("");
         setEmail("");
         setMessage("");
-        setDialogOpen(false); // Close dialog on success
+        setDialogOpen(false); 
       } else {
         const errorData = await response.json();
         setSnackbarMessage(
@@ -109,7 +108,7 @@ export default function FloatingActionButton() {
 
   const handleCloseDialog = () => {
     setDialogOpen(false);
-    // Optionally reset form fields when closing dialog without sending
+
     setName("");
     setEmail("");
     setMessage("");
@@ -117,31 +116,31 @@ export default function FloatingActionButton() {
 
   return (
     <>
-      {/* Floating Action Button */}
+
       <Fab
         color="primary"
         aria-label="contact"
         onClick={handleOpenDialog}
         sx={{
-          position: "fixed", // Keeps the button fixed on screen
-          bottom: 16, // Distance from bottom
-          right: 16, // Distance from right
+          position: "fixed", 
+          bottom: 16, 
+          right: 16, 
         }}
       >
         <EmailIcon />
       </Fab>
 
-      {/* Contact Form Dialog */}
+
       <Dialog
         open={dialogOpen}
         onClose={handleCloseDialog}
-        TransitionComponent={Transition} // Apply slide transition
+        TransitionComponent={Transition} 
         aria-labelledby="contact-form-dialog-title"
         PaperProps={{
           sx: {
-            borderRadius: 2, // Apply border radius to the dialog paper
-            minWidth: { xs: "90%", sm: "400px", md: "500px" }, // Responsive width
-            maxWidth: "500px", // Max width for the dialog
+            borderRadius: 2,
+            minWidth: { xs: "90%", sm: "400px", md: "500px" }, 
+            maxWidth: "500px", 
           },
         }}
       >
@@ -174,7 +173,7 @@ export default function FloatingActionButton() {
                 required
                
                 InputLabelProps={{
-                  shrink: true, // This makes the label always appear on top
+                  shrink: true, 
                 }}
               />
               <TextField
@@ -186,7 +185,7 @@ export default function FloatingActionButton() {
                 size="small"
                 required
                 InputLabelProps={{
-                  shrink: true, // This makes the label always appear on top
+                  shrink: true, 
                 }}
               />
               <TextField
@@ -200,7 +199,7 @@ export default function FloatingActionButton() {
                 size="small"
                 required
                 InputLabelProps={{
-                  shrink: true, // This makes the label always appear on top
+                  shrink: true,
                 }}
               />
               <Button

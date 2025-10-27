@@ -19,7 +19,7 @@ import { useThemeMode } from '../app/ThemeContext';
 
 
 const collapsedWidth = 56;
-const iconButtonSize = 40; // Consistent size for the circular hover area
+const iconButtonSize = 40; 
 
 export default function Sidebar() {
   const theme = useTheme();
@@ -63,8 +63,8 @@ export default function Sidebar() {
             <Tooltip title={label} placement="right">
               <ListItemButton
                 onClick={(e) => {
-                  e.preventDefault(); // Prevent default link behavior if any
-                  console.log(`Attempting to navigate to: ${href}`); // Debugging log
+                  e.preventDefault(); 
+                  console.log(`Attempting to navigate to: ${href}`); 
                   router.push(href);
                 }}
                 sx={{
@@ -73,7 +73,7 @@ export default function Sidebar() {
                   px: 0,
                   transition: "background-color 0.2s",
                   "&:hover": {
-                    backgroundColor: "transparent", // Hide ListItemButton's hover background
+                    backgroundColor: "transparent", 
                   },
                   cursor: "pointer",
                   color: "inherit",
@@ -94,7 +94,7 @@ export default function Sidebar() {
                     transition: "background-color 0.2s",
                     color: "text.secondary",
                     "&:hover": {
-                      backgroundColor: theme.palette.action.hover, // Circular hover effect remains here
+                      backgroundColor: theme.palette.action.hover, 
                     },
                   }}
                 >
@@ -115,7 +115,7 @@ export default function Sidebar() {
                 px: 0,
                 transition: "background-color 0.2s",
                 "&:hover": {
-                  backgroundColor: "transparent", // Hide ListItemButton's hover background
+                  backgroundColor: "transparent", 
                 },
                 cursor: "pointer",
                 color: "inherit",

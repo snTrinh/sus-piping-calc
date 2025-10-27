@@ -1,4 +1,3 @@
-// src/app/b31.3-calculator/components/PdfDesignInputs.tsx
 import React from "react";
 import { DesignParams } from "@/types/units";
 import { unitConversions } from "@/utils/unitConversions";
@@ -52,14 +51,14 @@ const PdfDesignInputs: React.FC<PdfDesignInputsProps> = ({
     gamma,
   } = designParams;
 
-  // Get conversion functions for the current display units
+
   const pressureConversion = unitConversions.pressure[units];
   const temperatureConversion = unitConversions.temperature[units];
   const lengthConversion = unitConversions.length[units];
 
   return (
     <Box sx={{ mb: 4 }}>
-      {/* Header Row */}
+
       <Box
         sx={{
           display: "flex",
@@ -84,7 +83,7 @@ const PdfDesignInputs: React.FC<PdfDesignInputsProps> = ({
         </Box>
       </Box>
 
-      {/* Styled Inputs Table */}
+
       <Box>
         <div style={rowStyle}>
           <div style={labelStyle}>Calculation Revision:</div>

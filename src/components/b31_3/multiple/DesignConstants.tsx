@@ -34,23 +34,23 @@ export default function DesignConstants({
       sx={{
         display: "flex",
         flexDirection: "column",
-        gap: 2, // This gap will now apply between the Typography and the first input Box
+        gap: 2, 
         width: "100%",
       }}
     >
-      {/* Added Title */}
+
       <Typography variant="h6" gutterBottom>
         Design Parameters
       </Typography>
 
-      {/* Material TextField - Responsive Flex Direction */}
+
       <Box
         sx={{
           display: "flex",
           gap: 2,
           flexWrap: "wrap",
           justifyContent: "flex-start",
-          flexDirection: { xs: "column", sm: "row" }, // Added responsive flexDirection
+          flexDirection: { xs: "column", sm: "row" }, 
         }}
       >
         <TextField
@@ -69,14 +69,13 @@ export default function DesignConstants({
         </TextField>
       </Box>
 
-      {/* Corrosion Allowance & Allowable Stress LabeledInputs - Responsive Flex Direction */}
       <Box
         sx={{
           display: "flex",
           gap: 2,
           flexWrap: "wrap",
           justifyContent: "flex-start",
-          flexDirection: { xs: "column", sm: "row" }, // Added responsive flexDirection
+          flexDirection: { xs: "column", sm: "row" }, 
         }}
       >
         <LabeledInput

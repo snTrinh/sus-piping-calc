@@ -1,4 +1,4 @@
-// interpolationUtils.ts
+
 
 /**
  * Performs linear interpolation between two points.
@@ -11,7 +11,7 @@
  */
 export function linearInterpolation(x: number, x1: number, y1: number, x2: number, y2: number): number {
     if (x1 === x2) {
-      return y1; // Avoid division by zero if points are at the same x-coordinate
+      return y1; 
     }
     return y1 + (x - x1) * ((y2 - y1) / (x2 - x1));
   }

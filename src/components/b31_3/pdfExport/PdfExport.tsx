@@ -1,7 +1,7 @@
 "use client";
 import { useRef, useState } from "react";
 import { Box, TextField, Button } from "@mui/material";
-import { DesignParams } from "@/types/units"; // Assuming DesignParams is from types/units
+import { DesignParams } from "@/types/units"; 
 import PdfContent from "./PdfContent";
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 
@@ -60,11 +60,11 @@ export default function PdfExport({
     date,
   };
 
-  // Define the common responsive flex style for all inputs and the button
+
   const responsiveFlex = {
-    xs: '1 1 100%', // Full width on extra-small screens (mobile)
-    sm: '1 1 calc(50% - 8px)', // Two columns on small screens (tablet) - 8px accounts for half the 16px gap
-    md: '1 1 0%', // Single row, distributed evenly on medium screens and up (desktop)
+    xs: '1 1 100%', 
+    sm: '1 1 calc(50% - 8px)', 
+    md: '1 1 0%', 
   };
 
   return (
@@ -77,12 +77,12 @@ export default function PdfExport({
         border: "1px solid #ddd",
       }}
     >
-      {/* Group input fields into a flex container for consistent spacing */}
+
       <Box
         sx={{
           display: "flex",
-          flexWrap: "wrap", // Allows items to wrap to the next line if space is insufficient
-          gap: 2, // Space between items (16px)
+          flexWrap: "wrap", 
+          gap: 2,
           mb: 2,
         }}
       >
@@ -91,7 +91,7 @@ export default function PdfExport({
           value={drawingNumber}
           onChange={(e) => setDrawingNumber(e.target.value)}
           size="small"
-          sx={{ flex: responsiveFlex, minWidth: 180 }} // Apply responsive flex
+          sx={{ flex: responsiveFlex, minWidth: 180 }} 
           variant="outlined"
           InputLabelProps={{ shrink: true }}
         />
@@ -100,7 +100,7 @@ export default function PdfExport({
           value={drawingRevision}
           onChange={(e) => setDrawingRevision(e.target.value)}
           size="small"
-          sx={{ flex: responsiveFlex, minWidth: 180 }} // Apply responsive flex
+          sx={{ flex: responsiveFlex, minWidth: 180 }}
           variant="outlined"
           InputLabelProps={{ shrink: true }}
         />
@@ -109,7 +109,7 @@ export default function PdfExport({
           value={calculationRevision}
           onChange={(e) => setCalculationRevision(e.target.value)}
           size="small"
-          sx={{ flex: responsiveFlex, minWidth: 180 }} // Apply responsive flex
+          sx={{ flex: responsiveFlex, minWidth: 180 }} 
           variant="outlined"
           InputLabelProps={{ shrink: true }}
         />
@@ -119,7 +119,7 @@ export default function PdfExport({
           value={date}
           onChange={(e) => setDate(e.target.value)}
           size="small"
-          sx={{ flex: responsiveFlex, minWidth: 180 }} // Apply responsive flex
+          sx={{ flex: responsiveFlex, minWidth: 180 }} 
           variant="outlined"
           InputLabelProps={{ shrink: true }}
         />
@@ -127,7 +127,7 @@ export default function PdfExport({
           variant="outlined"
           startIcon={<ArrowCircleDownIcon/>}
           onClick={handleDownloadPdf}
-          sx={{ flex: responsiveFlex, minWidth: 180 }} // Apply responsive flex
+          sx={{ flex: responsiveFlex, minWidth: 180 }} 
         >
           Download PDF
         </Button>

@@ -1,7 +1,7 @@
 "use client";
 
 import { Box, Card, CardContent, TextField, Typography } from "@mui/material";
-import { useTheme } from "@mui/material/styles"; // Import useTheme
+import { useTheme } from "@mui/material/styles"; 
 
 type InterpolatedValueCardProps = {
   x0: number;
@@ -20,19 +20,19 @@ export default function InterpolatedValueCard({
   x,
   y,
 }: InterpolatedValueCardProps) {
-  const theme = useTheme(); // Access the theme object
+  const theme = useTheme(); 
 
   return (
     <Card
       sx={{
-        flex: 1, // Allows card to grow and shrink
-        minWidth: { xs: "auto", md: 450 }, // Auto width on small, min 450px on md+
-        display: "flex", // Make card a flex container for its content
-        flexDirection: "column", // Stack content vertically inside card
+        flex: 1, 
+        minWidth: { xs: "auto", md: 450 }, 
+        display: "flex", 
+        flexDirection: "column",
         height: 250,
-        border: "1px solid #ddd", // Add border if desired
+        border: "1px solid #ddd", 
       }}
-      elevation={0} // Ensure consistent elevation
+      elevation={0}
     >
       <CardContent>
         <Typography variant="h6" gutterBottom>
@@ -42,7 +42,7 @@ export default function InterpolatedValueCard({
           (x₀, y₀) = ({x0}, {y0})<br />
           (x₁, y₁) = ({x1}, {y1})<br />
         </Typography>
-        {/* Formula Display */}
+
         <Box>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Typography variant="body2" component="span">
@@ -59,7 +59,7 @@ export default function InterpolatedValueCard({
             >
               <Box
                 sx={{
-                  borderBottom: `1px solid ${theme.palette.text.primary}`, // CHANGED to themed color
+                  borderBottom: `1px solid ${theme.palette.text.primary}`, 
                   px: 0.5,
                 }}
               >
@@ -68,7 +68,7 @@ export default function InterpolatedValueCard({
               <Box sx={{ px: 0.5 }}>x₁ − x₀</Box>
             </Box>
           </Box>
-          {/* Formula with actual values */}
+
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Typography variant="body2" component="span">
               y = {y0} + ({x} − {x0})
@@ -84,7 +84,7 @@ export default function InterpolatedValueCard({
             >
               <Box
                 sx={{
-                  borderBottom: `1px solid ${theme.palette.text.primary}`, // CHANGED to themed color
+                  borderBottom: `1px solid ${theme.palette.text.primary}`, 
                   px: 0.5,
                 }}
               >

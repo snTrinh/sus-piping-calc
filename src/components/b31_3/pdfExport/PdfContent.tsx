@@ -2,11 +2,9 @@ import React, { forwardRef } from "react";
 import { DesignParams} from "@/types/units";
 import PdfDesignInputs, { DrawingInfo } from "./PdfDesignInputs";
 import PdfPipeOutputs from "./PdfPipeOutputs";
-import { useTheme } from "@mui/material/styles"; // Import useTheme
-
-// Corrected Pipe type to include 'id'
+import { useTheme } from "@mui/material/styles"; 
 export type Pipe = {
-  id: string; // Added 'id' to match PdfPipeOutputs' Pipe type
+  id: string; 
   nps: string;
   od: string;
   schedule: string;
@@ -18,12 +16,12 @@ export type PdfContentProps = {
   drawingInfo: DrawingInfo;
   designParams: DesignParams;
   material: string;
-  pipes: Pipe[]; // Now using the corrected Pipe type
+  pipes: Pipe[]; 
 };
 
 const PdfContent = forwardRef<HTMLDivElement, PdfContentProps>(
   ({ drawingInfo, designParams, material, pipes }, ref) => {
-    const theme = useTheme(); // Access the Material-UI theme
+    const theme = useTheme(); 
 
     return (
       <div
@@ -34,7 +32,7 @@ const PdfContent = forwardRef<HTMLDivElement, PdfContentProps>(
           fontSize: 14,
           fontFamily:
             "'Calibri', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-          color: theme.palette.text.primary, // Use the primary text color from your theme
+          color: theme.palette.text.primary, 
         }}
       >
         <PdfDesignInputs
