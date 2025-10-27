@@ -11,7 +11,7 @@ import {
 import PipeCard from "../PipeCard";
 import FormulaDisplay from "../FormulaDisplay";
 
-import PdfExport from "../pdfExport/PdfExport";
+import PdfExport from "../pdfExport/SinglePressure/PdfExport";
 import { Units, DesignParams } from "@/types/units"; 
 import { MaterialName } from "@/utils/materialsData"; 
 import DesignParameters from "./DesignParameters";

@@ -9,7 +9,7 @@ import { Units, DesignParams } from "@/types/units";
 import { PipeSchedule } from "@/utils/unitConversions";
 import PipeCard from "../PipeCard";
 import FormulaDisplay from "../FormulaDisplay";
-import PdfExport from "../pdfExport/PdfExport";
+import PdfExport from "../pdfExport/SinglePressure/PdfExport";
 import { MaterialName } from "@/utils/materialsData";
 import DesignParameters from "./DesignParameters";
 import GlobalDesignParameters from "./GloablDesignParameters";
