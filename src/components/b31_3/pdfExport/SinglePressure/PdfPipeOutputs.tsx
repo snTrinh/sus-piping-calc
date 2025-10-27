@@ -122,7 +122,7 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
             }}
           >
             <div style={valueStyle}>
-              <strong>Pipe {index + 1}</strong> — For NPS {pipe.nps} SCH{" "}
+              <strong>Pipe {index + 1}</strong> — For NPS {pipe.nps} SCH{" "}{pipe.schedule}{" "}
               {material} (D=
               {outerDiameterDisplay.toFixed(3)}
               {lengthConversion.unit}, t ={" "}
@@ -130,7 +130,6 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
               {lengthConversion.unit}):
             </div>
 
-            {/* Indented formula */}
             <div style={{ marginTop: 8, marginLeft: 24 }}>
               <div>
                 <span>tᵣ = (</span>
