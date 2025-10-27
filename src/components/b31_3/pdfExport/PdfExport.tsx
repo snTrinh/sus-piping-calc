@@ -1,4 +1,5 @@
 "use client";
+import html2pdf from "html2pdf.js";
 import { useRef, useState } from "react";
 import { Box, TextField, Button } from "@mui/material";
 import { DesignParams } from "@/types/units"; 
@@ -36,23 +37,19 @@ export default function PdfExport({
 
   const handleDownloadPdf = () => {
     if (!printRef.current) return;
-
-    if (typeof window !== 'undefined' && (window as Window & typeof globalThis).html2pdf) {
-      (window as Window & typeof globalThis).html2pdf()
-        .set({
-          margin: 1,
-          filename: "document.pdf",
-          image: { type: "jpeg", quality: 0.98 },
-          html2canvas: {},
-          jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
-        })
-        .from(printRef.current)
-        .save();
-    } else {
-      console.error("html2pdf.js not loaded.");
-    }
+  
+    html2pdf()
+      .set({
+        margin: 1,
+        filename: "document.pdf",
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: {},
+        jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+      })
+      .from(printRef.current)
+      .save();
   };
-
+  
   const drawingInfo = {
     drawingNumber,
     drawingRevision,

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { TextField} from "@mui/material";
+import { TextField } from "@mui/material";
 
 type LabeledInputProps = {
   label: string;
@@ -37,24 +37,24 @@ export default function LabeledInputConversion({
   conversionFactorFromBase = 1,
   conversionFactorToBase = 1,
 }: LabeledInputProps) {
-
-  const inputRef = useRef<HTMLInputElement>(null); 
-
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const formatDisplayValue = (val: number | undefined | null): string => {
     if (val === undefined || val === null || isNaN(val)) return "";
     const displayVal = val * conversionFactorFromBase;
-    return percentage ? `${(displayVal * 100).toFixed(2)}` : displayVal.toFixed(precision);
+    return percentage
+      ? `${(displayVal * 100).toFixed(2)}`
+      : displayVal.toFixed(precision);
   };
 
-  const [inputValue, setInputValue] = useState<string>(() => formatDisplayValue(value));
+  const [inputValue, setInputValue] = useState<string>(() =>
+    formatDisplayValue(value)
+  );
 
   useEffect(() => {
-
     if (inputRef.current && document.activeElement !== inputRef.current) {
       setInputValue(formatDisplayValue(value));
     }
-
   }, [value, percentage, precision, conversionFactorFromBase]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,8 +65,8 @@ export default function LabeledInputConversion({
 
     if (!isNaN(numericValue)) {
       const baseUnitValue = percentage
-        ? (numericValue / 100)
-        : (numericValue * conversionFactorToBase);
+        ? numericValue / 100
+        : numericValue * conversionFactorToBase;
       onChange(baseUnitValue);
     }
   };
@@ -76,8 +76,8 @@ export default function LabeledInputConversion({
 
     if (!isNaN(numericValue)) {
       const baseUnitValue = percentage
-        ? (numericValue / 100)
-        : (numericValue * conversionFactorToBase);
+        ? numericValue / 100
+        : numericValue * conversionFactorToBase;
       onChange(baseUnitValue);
       setInputValue(formatDisplayValue(numericValue / conversionFactorToBase));
     } else {
@@ -93,7 +93,7 @@ export default function LabeledInputConversion({
     if (e.key === "Enter") {
       handleBlur();
 
-      inputRef.current?.blur(); 
+      inputRef.current?.blur();
     }
   };
 
@@ -113,13 +113,13 @@ export default function LabeledInputConversion({
         minWidth: 180,
         ...sx,
         "& input[type=number]::-webkit-inner-spin-button": {
-          "-webkit-appearance": "none",
+          WebkitAppearance: "none",
         },
       }}
       fullWidth={fullWidth}
       type="number"
       InputLabelProps={{ shrink: true }}
-      inputRef={inputRef} 
+      inputRef={inputRef}
     />
   );
 }
