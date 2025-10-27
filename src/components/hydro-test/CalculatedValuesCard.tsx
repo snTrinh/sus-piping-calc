@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Card, CardContent, Typography } from "@mui/material";
+import { Box, Card, CardContent, Typography, useTheme } from "@mui/material";
 import LabeledInput from "../common/LabeledInput";
 import { Units } from "@/types/units";
 import { unitConversions } from "@/utils/unitConversions";
@@ -20,6 +20,7 @@ export default function CalculatedValueCard({
   S,
   units,
 }: CalculatedValueCardProps) {
+  const theme = useTheme();
   const pressureUnit = unitConversions.pressure[units].unit;
   const temperatureUnit =
     units === Units.Imperial
@@ -46,11 +47,17 @@ export default function CalculatedValueCard({
                 lineHeight: 1,
               }}
             >
-              <Box sx={{ borderBottom: "1px solid #000", px: 0.5 }}>Sₜ*</Box>
+              <Box
+                sx={{
+                  borderBottom: `1px solid ${theme.palette.text.primary}`,
+                  px: 0.5,
+                }}
+              >
+                Sₜ*
+              </Box>
               <Box sx={{ px: 0.5 }}>S</Box>
             </Box>
           </Box>
-
 
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Typography variant="body2" component="span">
@@ -65,7 +72,14 @@ export default function CalculatedValueCard({
                 lineHeight: 1,
               }}
             >
-              <Box sx={{ borderBottom: "1px solid #000", px: 0.5 }}>{St}</Box>
+              <Box
+                sx={{
+                  borderBottom: `1px solid ${theme.palette.text.primary}`,
+                  px: 0.5,
+                }}
+              >
+                {St}
+              </Box>
               <Box sx={{ px: 0.5 }}>{S}</Box>
             </Box>
           </Box>
