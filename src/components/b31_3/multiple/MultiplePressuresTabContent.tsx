@@ -1,76 +1,76 @@
 "use client";
 
-import React from "react";
+import React, { useMemo, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Box, Button, Card, Typography } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-
-import { Units, DesignParams } from "@/types/units";
-import { PipeSchedule } from "@/utils/unitConversions";
 import PipeCard from "../PipeCard";
 import FormulaDisplay from "../FormulaDisplay";
 import PdfExport from "../pdfExport/SinglePressure/PdfExport";
-import { MaterialName } from "@/utils/materialsData";
+import { MaterialName, materialsData } from "@/utils/materialsData";
 import DesignParameters from "./DesignParameters";
-import GlobalDesignParameters from "./GloablDesignParameters";
+import GlobalDesignParameters from "./GlobalDesignParameters";
+import { addPipeMultiple, removePipeMultiple } from "@/state/multipleSlice";
+import { RootState } from "@/state/store";
+import { useDispatch, useSelector } from "react-redux";
+import { PipeSchedule } from "@/utils/unitConversions";
 
-type Pipe = {
-  id: string;
-  nps: string;
-  od: string;
-  schedule: PipeSchedule;
-  tRequired: number;
-  t: number;
-};
+const MultiplePressuresTabContent: React.FC = () => {
+  const dispatch = useDispatch();
 
-interface MultiplePressuresTabContentProps {
-  units: Units;
-  material: MaterialName;
-  temperature: number;
-  corrosionAllowance: number;
-  pressure: number;
-  allowableStress: number | null;
-  gamma: number;
-  millTol: number;
-  e: number;
-  w: number;
-  pipesForDisplay: Pipe[];
-  materials: string[];
-  designParams: DesignParams;
+  const pipes = useSelector((state: RootState) => state.multiple.pipes);
 
-  setMaterial: (value: MaterialName) => void;
-  setTemperature: (value: number) => void;
-  setCorrosionAllowance: (value: number) => void;
-  setPressure: (value: number) => void;
-  setPipes: (pipes: Pipe[]) => void;
+  const { corrosionAllowance, gamma, e, w, millTol } = useSelector(
+    (state: RootState) => state.single.global
+  );
 
-  updatePipe: (id: string, key: keyof Pipe, value: string | number) => void;
-  removePipe: (id: string) => void;
-  handleUnitsChange: (
-    event: React.MouseEvent<HTMLElement>,
-    newUnits: Units
-  ) => void;
-  handleTemperatureChange: (value: number) => void;
-  handleCAChange: (value: number) => void;
-  handleDesignPressureChange: (value: number) => void;
-}
+  // Add default 4" Schedule 40 pipe on first mount
+  useEffect(() => {
+    if (pipes.length === 0) {
+      dispatch(
+        addPipeMultiple({
+          pipe: {
+            id: uuidv4(),
+            nps: "4",
+            schedule: "40" as PipeSchedule,
+            od: "4.5",
+          },
+          material: "A106B",
+          pressure: 1414,
+          temperature: 100,
+        })
+      );
+    }
+  }, [dispatch, pipes.length]);
 
-const MultiplePressuresTabContent: React.FC<
-  MultiplePressuresTabContentProps
-> = ({
-  material,
-  pipesForDisplay,
-  materials,
-  designParams,
-  setMaterial,
-  setPipes,
-  updatePipe,
-  removePipe,
-  handleUnitsChange,
-  handleTemperatureChange,
-  handleCAChange,
-  handleDesignPressureChange,
-}) => {
+  const handleAddPipe = () => {
+    dispatch(
+      addPipeMultiple({
+        pipe: {
+          id: uuidv4(),
+          nps: "4",
+          schedule: "40",
+          od: "4.5",
+        },
+        material: "A106B",
+        pressure: 0,
+        temperature: 0,
+      })
+    );
+  };
+
+  const handleRemovePipe = (id: string) => {
+    dispatch(removePipeMultiple(id));
+  };
+
+  function updatePipeField(arg0: {
+    pipeId: string;
+    key: keyof import("../../../types/pipe").Pipe;
+    value: string | number;
+  }): any {
+    throw new Error("Function not implemented.");
+  }
+
   return (
     <>
       <Box
@@ -96,29 +96,13 @@ const MultiplePressuresTabContent: React.FC<
           }}
           elevation={0}
         >
-          <GlobalDesignParameters
-            designParams={designParams}
-            onUnitsChange={handleUnitsChange}
-            onCAChange={handleCAChange}
-          />
+          <GlobalDesignParameters />
 
           <Box sx={{ mt: "auto", width: "100%" }}>
             <Button
               startIcon={<AddCircleOutlineIcon />}
               variant="outlined"
-              onClick={() =>
-                setPipes([
-                  ...pipesForDisplay,
-                  {
-                    id: uuidv4(),
-                    nps: "2",
-                    od: "2.375",
-                    schedule: "40",
-                    tRequired: 0,
-                    t: 0,
-                  },
-                ])
-              }
+              onClick={handleAddPipe}
               fullWidth
             >
               Add Pipe
@@ -141,13 +125,13 @@ const MultiplePressuresTabContent: React.FC<
           <Typography variant="h6" gutterBottom>
             Formula
           </Typography>
-          <FormulaDisplay designParams={designParams} />
+          <FormulaDisplay />
         </Card>
       </Box>
 
-      {pipesForDisplay.map((pipe) => (
+      {pipes.map((pipeState) => (
         <Box
-          key={pipe.id}
+          key={pipeState.pipe.id}
           sx={{ mt: 4, display: "flex", flexDirection: "column", gap: 2 }}
         >
           <Box
@@ -171,34 +155,32 @@ const MultiplePressuresTabContent: React.FC<
               }}
               elevation={0}
             >
-              <DesignParameters
-                designParams={designParams}
-                materials={materials}
-                material={material}
-                onUnitsChange={handleUnitsChange}
-                onMaterialChange={setMaterial}
-                onTemperatureChange={handleTemperatureChange}
-                onCAChange={handleCAChange}
-                onDesignPressureChange={handleDesignPressureChange}
-              />
+              <DesignParameters pipeId={pipeState.pipe.id} />
             </Card>
 
             <PipeCard
-              pipe={pipe}
-              updatePipe={updatePipe}
-              removePipe={removePipe}
-              designParams={designParams}
+              pipe={pipeState.pipe}
+              updatePipe={(id, key, value) => {
+                dispatch(updatePipeField({ pipeId: id, key, value }));
+              }}
+              removePipe={() => handleRemovePipe(pipeState.pipe.id)}
+              designParams={{
+                pressure: pipeState.pressure,
+                temperature: pipeState.temperature,
+                allowableStress: pipeState.pipe.allowableStress,
+                corrosionAllowance,
+                gamma,
+                e,
+                w,
+                millTol,
+              }}
             />
           </Box>
         </Box>
       ))}
 
       <Box sx={{ mt: 6 }}>
-        <PdfExport
-          material={material}
-          designParams={designParams}
-          pipes={pipesForDisplay}
-        />
+        <PdfExport pipes={pipes.map((p) => p.pipe)} />
       </Box>
     </>
   );

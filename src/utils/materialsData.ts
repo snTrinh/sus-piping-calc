@@ -1,3 +1,4 @@
+import { Units } from "@/types/units";
 
 
 export const materialsData = {
@@ -38,4 +39,28 @@ export const materialsData = {
   
   export type MaterialsDataType = {
     [key in UnitCategory]: MaterialTable;
+  };
+
+
+  export const getAllowableStressForTemp = (
+    material: MaterialName,
+    units: Units,
+    temperature: number
+  ): number => {
+    const unitCategory: UnitCategory = units === Units.Metric ? "Metric" : "Imperial";
+    const table = materialsData[unitCategory];
+    const stressArray = table.materials[material];
+    const columns = table.columns;
+  
+    // find the largest index where columnTemp <= designTemp
+    let columnIndex = 0;
+    for (let i = 0; i < columns.length; i++) {
+      if (temperature >= columns[i]) {
+        columnIndex = i;
+      } else {
+        break;
+      }
+    }
+  
+    return stressArray[columnIndex];
   };

@@ -1,30 +1,26 @@
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Units } from "@/types/units";
 
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Units } from '@/types/units';
 interface UnitState {
-  unit: Units;
+  currentUnit: Units;
 }
 
-
 const initialState: UnitState = {
-    unit: Units.Imperial,
+  currentUnit: Units.Imperial,
 };
 
-
 export const unitSlice = createSlice({
-  name: 'unit', 
-  initialState, 
+  name: "unit",
+  initialState,
   reducers: {
-
     setUnit: (state, action: PayloadAction<Units>) => {
-      state.unit = action.payload;
+      state.currentUnit = action.payload;
     },
   },
 });
 
-
 export const { setUnit } = unitSlice.actions;
 
-export const unit = (state: { unit: UnitState }) => state.unit.unit;
+export const selectUnit = (state: { unit: UnitState }) => state.unit.currentUnit;
 
 export default unitSlice.reducer;

@@ -3,26 +3,19 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 
 import LabeledInputConversion from "../../common/LabeledInput";
-
-import { DesignParams, Units } from "@/types/units";
 import { unitConversions } from "@/utils/unitConversions";
+import { useDispatch, useSelector } from "react-redux";
+import { updateCorrosionAllowance } from "@/state/multipleSlice";
+import { RootState } from "@/state/store";
 
-type GlobalDesignParametersProps = {
-  designParams: DesignParams;
 
-  onUnitsChange: (
-    event: React.MouseEvent<HTMLElement>,
-    newUnits: Units
-  ) => void;
-  onCAChange: (value: number) => void;
-};
-
-export default function GlobalDesignParameters({
-  designParams,
-  onCAChange,
-}: GlobalDesignParametersProps) {
-  const { corrosionAllowance } = designParams;
-
+export default function GlobalDesignParameters() {
+  const dispatch = useDispatch();
+  const corrosionAllowance = useSelector((state: RootState) => state.multiple.global.corrosionAllowance);
+  const units = useSelector((state: RootState) => state.unit.currentUnit);
+  const handleCAChange = (value: number) => {
+    dispatch(updateCorrosionAllowance(value));
+  };
   return (
     <Box
       sx={{
@@ -48,9 +41,9 @@ export default function GlobalDesignParameters({
         <LabeledInputConversion
           label="Corrosion Allowance"
           symbol="CA"
-          unit={unitConversions.length[designParams.units].unit}
+          unit={unitConversions.length[units].unit}
           value={corrosionAllowance}
-          onChange={onCAChange}
+          onChange={handleCAChange}
           sx={{ minWidth: 140, flex: 1 }}
           precision={4}
         />

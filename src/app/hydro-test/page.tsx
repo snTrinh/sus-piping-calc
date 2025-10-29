@@ -5,11 +5,11 @@ import { Box, Container, Typography } from "@mui/material";
 import InputValuesCard from "./../../components/hydro-test/InputValuesCard";
 import CalculatedValueCard from "./../../components/hydro-test/CalculatedValuesCard";
 import UnitsToggle from "@/components/common/UnitsToggle";
-import { Units } from "@/types/units";
+import { useSelector } from "react-redux";
+import { selectUnit } from "@/state/unitSlice";
 
 export default function HydroTestPage() {
-  const [units, setUnits] = useState<Units>(Units.Imperial);
-
+  const units = useSelector(selectUnit);
   const [P, setP] = useState(250);
   const [St, setSt] = useState(132000);
   const [S, setS] = useState(300);
@@ -20,14 +20,6 @@ export default function HydroTestPage() {
 
   const calculatedPressure = hydroTestPressure(P, St, S);
 
-  const handleUnitsChange = (
-    event: React.MouseEvent<HTMLElement>,
-    newUnits: Units
-  ) => {
-    if (!newUnits || newUnits === units) return;
-
-    setUnits(newUnits);
-  };
 
   return (
     <Box
@@ -41,7 +33,7 @@ export default function HydroTestPage() {
         Hydro Test Pressure
       </Typography>
 
-      <UnitsToggle units={units} onChange={handleUnitsChange} />
+      <UnitsToggle/>
 
       <Box
         sx={{

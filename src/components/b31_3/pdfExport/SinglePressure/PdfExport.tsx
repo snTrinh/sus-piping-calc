@@ -4,29 +4,22 @@ import { Box, TextField, Button } from "@mui/material";
 import { DesignParams } from "@/types/units";
 import PdfContent from "./PdfContent";
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
+import { PipeSchedule } from "@/utils/unitConversions";
+import { Pipe } from "@/types/pipe";
+import { useSelector } from "react-redux";
+import { RootState } from "@/state/store";
 
-type Pipe = {
-  id: string;
-  nps: string;
-  od: string;
-  schedule: string;
-  tRequired: number;
-  t: number;
-};
 
 type PdfExportProps = {
-  material: string;
-  designParams: DesignParams;
   pipes: Pipe[];
 };
 
 export default function PdfExport({
-  material,
   pipes,
-  designParams,
+
 }: PdfExportProps) {
   const printRef = useRef<HTMLDivElement>(null);
-
+  const material = useSelector((state: RootState) => state.single.selectedMaterial);
   const [drawingNumber, setDrawingNumber] = useState("");
   const [drawingRevision, setDrawingRevision] = useState("0");
   const [calculationRevision, setCalculationRevision] = useState("0");
@@ -139,7 +132,6 @@ export default function PdfExport({
       <PdfContent
         ref={printRef}
         drawingInfo={drawingInfo}
-        designParams={designParams}
         material={material}
         pipes={pipes}
       />

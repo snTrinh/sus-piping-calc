@@ -3,6 +3,7 @@ import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 
 import { DesignParams } from "@/types/units";
+import { E, GAMMA, MILL_TOL, W } from "@/constants/constants";
 
 interface FormulaDisplayProps {
   designParams?: DesignParams;
@@ -10,10 +11,10 @@ interface FormulaDisplayProps {
 
 export default function FormulaDisplay({ designParams }: FormulaDisplayProps) {
   const theme = useTheme(); 
-  const e = designParams?.e ?? 1;
-  const w = designParams?.w ?? 1;
-  const gamma = designParams?.gamma ?? 0.4;
-  const millTol = designParams?.millTol ?? 0.125;
+  const e = designParams?.e ?? E;
+  const w = designParams?.w ?? W;
+  const gamma = designParams?.gamma ?? GAMMA;
+  const millTol = designParams?.millTol ?? MILL_TOL;
 
   return (
     <Box

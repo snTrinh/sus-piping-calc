@@ -5,11 +5,10 @@ export enum Units {
 }
 
 export type DesignParams = {
-  units: Units;
   pressure: number;
   temperature: number;
   corrosionAllowance: number;
-  allowableStress: number;
+  allowableStress: number | null;
   e?: number;
   w?: number;
   gamma?: number;

@@ -6,6 +6,7 @@ import { DesignParams, Units } from "@/types/units";
 import { unitConversions } from "@/utils/unitConversions"; 
 import csaZ662Data from '@/data/z662Data.json'; 
 import LabeledInput from "../common/LabeledInput";
+import { E, GAMMA, MILL_TOL, W } from "@/constants/constants";
 
 interface ApplicationClassFactor {
   Application: string;
@@ -60,16 +61,15 @@ type DesignParametersProps = {
 
 
 export default function DesignParameters({
-  designParams = { 
-    units: Units.Imperial,
+  designParams = {
     pressure: 1000,
     temperature: 20,
     corrosionAllowance: 0.0625,
     allowableStress: 20000, 
-    gamma: 0.4, 
-    millTol: 0.125, 
-    e: 1, 
-    w: 1, 
+    gamma: GAMMA, 
+    millTol: MILL_TOL, 
+    e: E, 
+    w: W, 
   },
   onTemperatureChange = () => {},
   onCAChange = () => {},
@@ -90,11 +90,11 @@ export default function DesignParameters({
   uniqueApplications: propsUniqueApplications, 
   minYieldStress = 35000, 
 }: DesignParametersProps) {
-  const { pressure, temperature, corrosionAllowance, units, millTol } =
+  const { pressure, temperature, corrosionAllowance, millTol } =
     designParams;
-  const pressureUnitDetails = unitConversions.pressure[units];
-  const temperatureUnitDetails = unitConversions.temperature[units];
-  const lengthUnitDetails = unitConversions.length[units];
+  const pressureUnitDetails = unitConversions.pressure[Units.Imperial];
+  const temperatureUnitDetails = unitConversions.temperature[Units.Imperial];
+  const lengthUnitDetails = unitConversions.length[Units.Imperial];
   const currentUniqueApplications = propsUniqueApplications || Array.from(
     new Set(
       (selectedFluidType

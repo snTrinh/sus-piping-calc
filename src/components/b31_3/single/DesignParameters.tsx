@@ -1,40 +1,73 @@
 "use client";
-import React from "react"; 
-import { MenuItem, TextField, Box, Typography } from "@mui/material"; 
+import React, { useMemo } from "react";
+import { MenuItem, TextField, Box, Typography } from "@mui/material";
 
-import LabeledInput from "../../common/LabeledInput"; 
-
+import LabeledInput from "../../common/LabeledInput";
 import { DesignParams, Units } from "@/types/units";
 import { unitConversions } from "@/utils/unitConversions";
-import { MaterialName } from "@/utils/materialsData"; 
+import {
+  getAllowableStressForTemp,
+  MaterialName,
+  materialsData,
+} from "@/utils/materialsData";
+import { RootState, useAppDispatch, useAppSelector } from "@/state/store";
+import {
+  selectSingleMaterial,
+  setMaterial,
+  updateAllowableStress,
+  updateCorrosionAllowance,
+  updatePipeSingleField,
+  updatePressure,
+  updateTemperature,
+} from "@/state/singleSlice";
+import { useSelector } from "react-redux";
 
-type DesignParametersProps = {
-  materials: string[];
-  material: MaterialName; 
-  designParams: DesignParams;
+interface DesignParametersProps {
+  pipeId?: string; // optional: if not provided, use global parameters
+}
 
-  onUnitsChange: (
-    event: React.MouseEvent<HTMLElement>,
-    newUnits: Units
-  ) => void;
-  onMaterialChange: (value: MaterialName) => void; 
-  onTemperatureChange: (value: number) => void;
-  onCAChange: (value: number) => void;
-  onDesignPressureChange: (value: number) => void;
-};
+export default function DesignParameters({ pipeId }: DesignParametersProps) {
+  const dispatch = useAppDispatch();
+  const materials = useMemo(() => {
+    const metricMaterials = Object.keys(materialsData.Metric.materials);
+    const imperialMaterials = Object.keys(materialsData.Imperial.materials);
+    return [
+      ...new Set([...metricMaterials, ...imperialMaterials]),
+    ] as MaterialName[];
+  }, []);
+
+  const material = useAppSelector(selectSingleMaterial);
+  const globalPressure = useAppSelector((state) => state.single.pressure);
+  const globalTemperature = useAppSelector((state) => state.single.temperature);
+  const units = useAppSelector((state) => state.unit.currentUnit);
+
+  const { corrosionAllowance} = useSelector(
+    (state: RootState) => state.single.global
+  );
+  const pipe = pipeId
+    ? useAppSelector((state) => state.single.pipes.find((p) => p.id === pipeId))
+    : undefined;
+
+  const handlePressureChange = (value: number) => {
+    dispatch(updatePressure(value));
+  };
+
+  const handleTemperatureChange = (value: number) => {
+    dispatch(updateTemperature(value));
+  };
+
+  const handleMaterialChange = (value: string) => {
+    dispatch(setMaterial(value as MaterialName));
+  };
+
+  const handleCAChange = (value: number) =>
+    dispatch(updateCorrosionAllowance(value));
+
+  const allowableStressFromMaterial = material
+    ? getAllowableStressForTemp(material, units, globalTemperature)
+    : 0;
 
 
-export default function DesignParameters({
-  materials,
-  material,
-  designParams,
-  onMaterialChange,
-  onTemperatureChange,
-  onCAChange,
-  onDesignPressureChange,
-}: DesignParametersProps) {
-  const { pressure, temperature, corrosionAllowance, allowableStress } =
-    designParams;
   return (
     <Box
       sx={{
@@ -53,15 +86,14 @@ export default function DesignParameters({
           display: "flex",
           gap: 2,
           flexWrap: "wrap",
-          justifyContent: "flex-start",
           flexDirection: { xs: "column", sm: "row" },
         }}
       >
         <TextField
           select
           label="Material"
-          value={material}
-          onChange={(e) => onMaterialChange(e.target.value as MaterialName)} 
+          value={material ?? ""}
+          onChange={(e) => handleMaterialChange(e.target.value)}
           sx={{ minWidth: 200, flexGrow: 1 }}
           size="small"
         >
@@ -85,18 +117,18 @@ export default function DesignParameters({
         <LabeledInput
           label="Design Pressure"
           symbol="P"
-          unit={unitConversions.pressure[designParams.units].unit}
-          value={pressure}
-          onChange={onDesignPressureChange}
+          unit={unitConversions.pressure[units].unit}
+          value={globalPressure}
+          onChange={handlePressureChange}
           sx={{ minWidth: 140, flex: 1 }}
         />
 
         <LabeledInput
           label="Temperature"
           symbol="T"
-          unit={unitConversions.temperature[designParams.units].unit}
-          value={temperature}
-          onChange={onTemperatureChange}
+          unit={unitConversions.temperature[units].unit}
+          value={globalTemperature}
+          onChange={handleTemperatureChange}
           sx={{ minWidth: 140, flex: 1 }}
         />
       </Box>
@@ -113,21 +145,22 @@ export default function DesignParameters({
         <LabeledInput
           label="Corrosion Allowance"
           symbol="CA"
-          unit={unitConversions.length[designParams.units].unit}
+          unit={unitConversions.length[units].unit}
           value={corrosionAllowance}
-          onChange={onCAChange}
+          onChange={handleCAChange}
           sx={{ minWidth: 140, flex: 1 }}
-          precision={4} 
+          precision={4}
         />
 
         <LabeledInput
           label="Allowable Stress"
           symbol="S"
-          unit={unitConversions.pressure[designParams.units].unit}
-          value={allowableStress}
-          onChange={() => {}} 
+          unit={unitConversions.pressure[units].unit}
+          value={allowableStressFromMaterial}
+          onChange={() => {}}
           disabled
           sx={{ minWidth: 140, flex: 1 }}
+          precision={2}
         />
       </Box>
     </Box>

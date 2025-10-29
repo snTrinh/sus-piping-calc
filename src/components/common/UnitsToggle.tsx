@@ -2,25 +2,28 @@
 import React from "react";
 import { ToggleButton, ToggleButtonGroup, useMediaQuery, useTheme } from "@mui/material";
 import { Units } from "./../../types/units";
+import { selectUnit, setUnit } from "@/state/unitSlice";
+import { useDispatch, useSelector } from "react-redux";
 
-type UnitsToggleProps = {
-  units: Units;
-  onChange: (
-    event: React.MouseEvent<HTMLElement>,
-    newUnits: Units
-  ) => void;
-};
 
-export default function UnitsToggle({ units, onChange }: UnitsToggleProps) {
+export default function UnitsToggle() {
   const theme = useTheme();
-
+  const dispatch = useDispatch();
+  const unit = useSelector(selectUnit);
   const shouldButtonsStretch = useMediaQuery(theme.breakpoints.down('md'));
+  const handleChange = (
+    event: React.MouseEvent<HTMLElement>,
+    newUnit: Units
+  ) => {
+    if (newUnit) dispatch(setUnit(newUnit));
+  };
+
 
   return (
     <ToggleButtonGroup
-      value={units}
+      value={unit}
       exclusive
-      onChange={onChange}
+      onChange={handleChange}
       sx={{
         display: { xs: 'flex', sm: 'flex' },
         width: { xs: "100%" },

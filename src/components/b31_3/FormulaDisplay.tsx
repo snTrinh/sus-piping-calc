@@ -1,20 +1,13 @@
-
 import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
+import { useAppSelector } from "@/state/store";
 
-import { DesignParams } from "@/types/units";
-
-interface FormulaDisplayProps {
-  designParams?: DesignParams;
-}
-
-export default function FormulaDisplay({ designParams }: FormulaDisplayProps) {
-  const theme = useTheme(); 
-  const e = designParams?.e ?? 1;
-  const w = designParams?.w ?? 1;
-  const gamma = designParams?.gamma ?? 0.4;
-  const millTol = designParams?.millTol ?? 0.125;
-
+export default function FormulaDisplay() {
+  const theme = useTheme();
+  const e = useAppSelector((state) => state.single.global.e);
+  const w = useAppSelector((state) => state.single.global.w);
+  const gamma = useAppSelector((state) => state.single.global.gamma);
+  const millTol = useAppSelector((state) => state.single.global.millTol);
   return (
     <Box
       sx={{
@@ -126,7 +119,6 @@ export default function FormulaDisplay({ designParams }: FormulaDisplayProps) {
           </Box>
         </Box>
       </Typography>
-
 
       <Typography
         variant="body2"

@@ -1,5 +1,6 @@
 
 
+import { E, GAMMA, MILL_TOL, W } from "@/constants/constants";
 import { calculateTRequired, TRequiredParams } from "../pipeCalculations";
 
 
@@ -19,11 +20,11 @@ describe('calculateTRequired', () => {
       pressure: 1000,
       outerDiameterInches: 10,
       allowableStress: 20000,
-      e: 1,
-      w: 1,
-      gamma: 0.4,
+      e: E,
+      w: W,
+      gamma: GAMMA,
       corrosionAllowanceInches: 0.0625, 
-      millTol: 0.125, 
+      millTol: MILL_TOL, 
     };
 
     const expected = 0.3515406; 
@@ -42,7 +43,7 @@ describe('calculateTRequired', () => {
       w: 0,
       gamma: 0,
       corrosionAllowanceInches: 0.0625,
-      millTol: 0.125,
+      millTol: MILL_TOL,
     };
     const result = calculateTRequired(params);
     expect(result).toBe(0);
@@ -55,9 +56,9 @@ describe('calculateTRequired', () => {
       pressure: 100,
       outerDiameterInches: 10,
       allowableStress: 20000,
-      e: 1,
-      w: 1,
-      gamma: 0.4,
+      e: E,
+      w: W,
+      gamma: GAMMA,
       corrosionAllowanceInches: 0.0625,
       millTol: 1,
     };
@@ -71,9 +72,9 @@ describe('calculateTRequired', () => {
       pressure: 100,
       outerDiameterInches: 10,
       allowableStress: 20000,
-      e: 1,
-      w: 1,
-      gamma: 0.4,
+      e: E,
+      w: W,
+      gamma: GAMMA,
       corrosionAllowanceInches: 0.0625,
       millTol: 1.5, 
     };
@@ -88,11 +89,11 @@ describe('calculateTRequired', () => {
       pressure: 1000,
       outerDiameterInches: 10,
       allowableStress: 20000,
-      e: 1,
-      w: 1,
-      gamma: 0.4,
+      e: E,
+      w: W,
+      gamma: GAMMA,
       corrosionAllowanceInches: 0,
-      millTol: 0.125,
+      millTol: MILL_TOL,
     };
 
     const expected = 0.280112; 
@@ -107,11 +108,11 @@ describe('calculateTRequired', () => {
       pressure: 1000,
       outerDiameterInches: 10,
       allowableStress: null, 
-      e: 1,
-      w: 1,
-      gamma: 0.4,
+      e: E,
+      w: W,
+      gamma: GAMMA,
       corrosionAllowanceInches: 0.0625,
-      millTol: 0.125,
+      millTol: MILL_TOL,
     };
 
     const expected = 14.3571428; 
@@ -126,8 +127,8 @@ describe('calculateTRequired', () => {
       pressure: 500,
       outerDiameterInches: 5,
       allowableStress: 10000,
-      e: 1,
-      w: 1,
+      e: E,
+      w: W,
       gamma: 1,
       corrosionAllowanceInches: 0.0,
       millTol: 0.0,
