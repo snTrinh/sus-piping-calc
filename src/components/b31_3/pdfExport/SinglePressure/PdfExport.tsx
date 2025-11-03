@@ -4,8 +4,6 @@ import { Box, TextField, Button } from "@mui/material";
 import PdfContent from "./PdfContent";
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import { Pipe } from "@/types/pipe";
-import { useSelector } from "react-redux";
-import { RootState } from "@/state/store";
 
 
 type PdfExportProps = {
@@ -17,7 +15,6 @@ export default function PdfExport({
 
 }: PdfExportProps) {
   const printRef = useRef<HTMLDivElement>(null);
-  const material = useSelector((state: RootState) => state.single.selectedMaterial);
   const [drawingNumber, setDrawingNumber] = useState("");
   const [drawingRevision, setDrawingRevision] = useState("0");
   const [calculationRevision, setCalculationRevision] = useState("0");
