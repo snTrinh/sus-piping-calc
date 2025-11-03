@@ -85,19 +85,15 @@ export default function PipeCard({
   const outerDiameterDisplay = selectedPipeSizeData?.OD || 0;
   const outerDiameterInches = units === Units.Metric ? unitConversions.length.Metric.toImperial(outerDiameterDisplay) : outerDiameterDisplay;
 
-  // Corrosion allowance in inches
-  const corrosionAllowanceInches = units === Units.Metric ? unitConversions.length.Metric.toImperial(corrosionAllowance) : corrosionAllowance;
-
-  // Prepare params for tRequired calculation
   const paramsForCalculation: TRequiredParams = {
-    pressure: pressure ?? 0,                 // psi if imperial, MPa if metric
+    pressure,                
     outerDiameterInches,
-    allowableStress: allowableStress ?? 0,   // psi if imperial, MPa if metric
-    e: e ?? 1,
-    w: w ?? 1,
-    gamma: gamma ?? 1,
-    corrosionAllowanceInches,
-    millTol: designParams.millTol ?? 0,
+    allowableStress,   
+    e ,
+    w,
+    gamma,
+    corrosionAllowance,
+    millTol: designParams.millTol,
   };
 
   // Calculate required thickness

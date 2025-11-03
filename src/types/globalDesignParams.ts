@@ -1,4 +1,4 @@
-interface GlobalDesignParams {
+export interface GlobalDesignParams {
     corrosionAllowance: number;
     e: number;
     w: number;

@@ -7,7 +7,7 @@ export interface TRequiredParams {
     e: number;
     w: number;
     gamma: number; 
-    corrosionAllowanceInches: number; 
+    corrosionAllowance: number; 
     millTol: number;
 }
 
@@ -18,7 +18,7 @@ export const calculateTRequired = ({
     e,
     w,
     gamma,
-    corrosionAllowanceInches,
+    corrosionAllowance,
     millTol,
 }: TRequiredParams): number => {
 
@@ -39,7 +39,7 @@ export const calculateTRequired = ({
     }
 
     const requiredThickness =
-        (pressureDesignThickness + corrosionAllowanceInches) / (1 - millTol);
+        (pressureDesignThickness + corrosionAllowance) / (1 - millTol);
 
     return requiredThickness;
 };

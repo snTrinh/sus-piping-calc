@@ -6,6 +6,7 @@ import { calculateTRequired } from "@/utils/pipeCalculations";
 import { Units } from "@/types/units";
 import pipeData from "@/data/transformed_pipeData.json";
 import { E, GAMMA, MILL_TOL, W } from "@/constants/constants";
+import { GlobalDesignParams } from "@/types/globalDesignParams";
 interface MultiplePipe {
   pipe: Pipe;
   material: MaterialName;
@@ -14,7 +15,7 @@ interface MultiplePipe {
 }
 
 interface MultipleState {
-  global: Omit<GlobalDesignParams, "allowableStress">; // remove allowableStress from global
+  global: GlobalDesignParams;
   pipes: MultiplePipe[];
 }
 
@@ -52,6 +53,7 @@ export const multipleSlice = createSlice({
       const units = Units.Imperial;
             const targetNpsKey =
               (units as Units) === Units.Metric ? npsToMmMap[pipe.nps] : pipe.nps;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any        
       const pipeDataEntry = (pipeData as any)[units]?.[targetNpsKey];
       const odValue = pipeDataEntry?.OD ?? parseFloat(pipe.od);
       const tValue = pipeDataEntry?.schedules?.[pipe.schedule] ?? 0;
@@ -67,7 +69,7 @@ export const multipleSlice = createSlice({
         e,
         w,
         gamma,
-        corrosionAllowanceInches: corrosionAllowance,
+        corrosionAllowance,
         millTol,
       };
       const tRequired = calculateTRequired(paramsForCalc);
@@ -123,15 +125,7 @@ export const multipleSlice = createSlice({
       if (wrapper) wrapper.temperature = action.payload.temperature;
     },
 
-    updatePipeTRequiredMultiple(
-      state,
-      action: PayloadAction<{ pipeId: string; tRequired: number }>
-    ) {
-      const wrapper = state.pipes.find(
-        (p) => p.pipe.id === action.payload.pipeId
-      );
-      if (wrapper) wrapper.pipe.tRequired = action.payload.tRequired;
-    },
+
 
     updateCorrosionAllowance(state, action: PayloadAction<number>) {
       state.global.corrosionAllowance = action.payload;
@@ -150,13 +144,14 @@ export const multipleSlice = createSlice({
 
     updatePipeField(
       state,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       action: PayloadAction<{ pipeId: string; key: keyof Pipe; value: any }>
     ) {
       const wrapper = state.pipes.find(
         (p) => p.pipe.id === action.payload.pipeId
       );
       if (wrapper) {
-        // @ts-ignore
+        // @ts-expect-error error here
         wrapper.pipe[action.payload.key] = action.payload.value;
       }
     },
@@ -169,7 +164,6 @@ export const {
   updatePipeMaterialMultiple,
   updatePipePressureMultiple,
   updatePipeTemperatureMultiple,
-  updatePipeTRequiredMultiple,
   updateCorrosionAllowance,
   updatePipeAllowableStress,
   updatePipeField,

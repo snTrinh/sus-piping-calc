@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { DesignParams, Units } from "@/types/units";
+import { Units } from "@/types/units";
 import pipeData from "@/data/transformed_pipeData.json";
 import { npsToMmMap, unitConversions } from "@/utils/unitConversions";
 import { useTheme } from "@mui/material/styles";
@@ -9,6 +9,7 @@ import { calculateTRequired, TRequiredParams } from "@/utils/pipeCalculations";
 import { RootState } from "@/state/store";
 import { useSelector } from "react-redux";
 import { Pipe } from "@/types/pipe";
+import { getAllowableStressForTemp } from "@/utils/materialsData";
 
 export type PipeDataEntry = {
   OD: number;
@@ -24,7 +25,6 @@ const typedPipeData: PipeDataJson = pipeData;
 
 type PdfPipeOutputsProps = {
   pipes: Pipe[];
-  material: string;
   isMultiple: boolean;
 };
 
@@ -48,11 +48,19 @@ const numeratorStyle: React.CSSProperties = {
   textAlign: "center",
 };
 
-const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({ pipes, material, isMultiple }) => {
+const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
+  pipes,
+
+  isMultiple,
+}) => {
   const theme = useTheme();
   const { pressure } = useSelector((state: RootState) => state.single);
-  const { corrosionAllowance, gamma, e, w, millTol } =
-    useSelector((state: RootState) => state.single.global);
+  const {temperature, selectedMaterial } = useSelector(
+    (state: RootState) => state.single
+  );
+  const { corrosionAllowance, gamma, e, w, millTol } = useSelector(
+    (state: RootState) => state.single.global
+  );
   const units: Units = useSelector(
     (state: RootState) => state.unit.currentUnit
   );
@@ -73,44 +81,41 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({ pipes, material, isMult
         const targetNpsKey =
           units === Units.Metric ? npsToMmMap[pipe.nps] : pipe.nps;
         const currentUnitPipeDataEntry = typedPipeData[units]?.[targetNpsKey];
-        const outerDiameterDisplay = currentUnitPipeDataEntry?.OD || 0;
+        const outerDiameterDisplay = currentUnitPipeDataEntry?.OD;
         const displayedScheduleThickness =
           currentUnitPipeDataEntry?.schedules?.[pipe.schedule];
-        const displayPressure = pressureConversion.to(pressure);
+        console.log("pressure: " + pressure);
         const displayOuterDiameter = outerDiameterDisplay;
-        const displayCorrosionAllowance = corrosionAllowance;
-        const displayAllowableStress = pressureConversion.to(pipe.allowableStress);
-        const imperialPressure = pressureConversion.toImperial(pressure);
-        const imperialAllowableStress = pressureConversion.toImperial(pipe.allowableStress);
-
         const imperialOuterDiameter =
           lengthConversion.toImperial(outerDiameterDisplay);
-          console.log('P: ' +imperialPressure)
-          console.log('OD: ' +imperialOuterDiameter)
-          console.log('S: ' +imperialAllowableStress)
-          console.log('t: ' +displayedScheduleThickness)
+          console.log("outerDiameterDisplay: " + outerDiameterDisplay);
+        console.log("imperialOuterDiameter: " + imperialOuterDiameter);
   
-          console.log('cora: ' +corrosionAllowance)
+        console.log("displayedScheduleThickness: " + displayedScheduleThickness);
+        const allowableStress = getAllowableStressForTemp(selectedMaterial, units, temperature);
+        console.log("cora: " + corrosionAllowance);
         const paramsForCalculation: TRequiredParams = {
-          pressure: imperialPressure,
+          pressure,
           outerDiameterInches: imperialOuterDiameter,
-          allowableStress: imperialAllowableStress,
+          allowableStress: allowableStress,
           e,
           w,
           gamma,
-          corrosionAllowanceInches: corrosionAllowance,
-          millTol: millTol,
+          corrosionAllowance,
+          millTol,
         };
 
-        const tRequiredCalculatedImperial =
-          calculateTRequired(paramsForCalculation);
-        console.log('Treq: ' +tRequiredCalculatedImperial)
+      
+        console.log("isMultiple: " + isMultiple);
+        console.log("temp: " + temperature);
+        console.log("stressLookup: " + allowableStress);
         const tRequiredCalculatedDisplayUnits = lengthConversion.to(
-          tRequiredCalculatedImperial
+          calculateTRequired(paramsForCalculation)
         );
-        const numeratorForDisplay = displayPressure * displayOuterDiameter;
+        console.log("tRequiredCalculatedDisplayUnits: " + tRequiredCalculatedDisplayUnits);
+        const numeratorForDisplay = pressure * displayOuterDiameter;
         const denominatorForDisplay =
-          2 * (displayAllowableStress * e * w + displayPressure * gamma);
+          2 * (allowableStress  * e * w + pressure * gamma);
 
         return (
           <div
@@ -123,12 +128,10 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({ pipes, material, isMult
           >
             <div style={valueStyle}>
               <strong>Pipe {index + 1}</strong> — For NPS {pipe.nps} SCH{" "}
-              {pipe.schedule} {material} (D=
+              {pipe.schedule} {selectedMaterial} (D=
               {outerDiameterDisplay.toFixed(3)}
               {lengthConversion.unit}, t ={" "}
-              {typeof displayedScheduleThickness === "number"
-                ? displayedScheduleThickness.toFixed(3)
-                : "N/A"}
+              {displayedScheduleThickness.toFixed(3)}
               {lengthConversion.unit}):
             </div>
 
@@ -150,21 +153,21 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({ pipes, material, isMult
                 <span>tᵣ = (</span>
                 <span style={fractionStyle}>
                   <span style={numeratorStyle}>
-                    {displayPressure.toFixed(2)}
+                    {pressure.toFixed(2)}
                     {pressureConversion.unit} ×{" "}
                     {displayOuterDiameter.toFixed(3)}
                     {lengthConversion.unit}
                   </span>
                   <span style={denominatorStyle}>
-                    2(({displayAllowableStress.toFixed(2)}
+                    2(({allowableStress.toFixed(2)}
                     {pressureConversion.unit})({e})(
-                    {w}) + ({displayPressure.toFixed(2)}
+                    {w}) + ({pressure.toFixed(2)}
                     {pressureConversion.unit})(
                     {gamma}))
                   </span>
                 </span>
                 <span>
-                  + {displayCorrosionAllowance.toFixed(4)}
+                  + {corrosionAllowance.toFixed(4)}
                   {lengthConversion.unit}) ×{" "}
                 </span>
                 <span style={fractionStyle}>
@@ -187,7 +190,7 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({ pipes, material, isMult
                 </span>
                 <span>
                   {lengthConversion.unit} +{" "}
-                  {displayCorrosionAllowance.toFixed(4)}
+                  {corrosionAllowance.toFixed(4)}
                   {lengthConversion.unit}) ×{" "}
                 </span>
                 <span style={fractionStyle}>

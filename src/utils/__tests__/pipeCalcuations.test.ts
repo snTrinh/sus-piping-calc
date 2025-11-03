@@ -23,7 +23,7 @@ describe('calculateTRequired', () => {
       e: E,
       w: W,
       gamma: GAMMA,
-      corrosionAllowanceInches: 0.0625, 
+      corrosionAllowance: 0.0625, 
       millTol: MILL_TOL, 
     };
 
@@ -42,7 +42,7 @@ describe('calculateTRequired', () => {
       e: 0,
       w: 0,
       gamma: 0,
-      corrosionAllowanceInches: 0.0625,
+      corrosionAllowance: 0.0625,
       millTol: MILL_TOL,
     };
     const result = calculateTRequired(params);
@@ -59,7 +59,7 @@ describe('calculateTRequired', () => {
       e: E,
       w: W,
       gamma: GAMMA,
-      corrosionAllowanceInches: 0.0625,
+      corrosionAllowance: 0.0625,
       millTol: 1,
     };
     const result = calculateTRequired(params);
@@ -75,7 +75,7 @@ describe('calculateTRequired', () => {
       e: E,
       w: W,
       gamma: GAMMA,
-      corrosionAllowanceInches: 0.0625,
+      corrosionAllowance: 0.0625,
       millTol: 1.5, 
     };
     const result = calculateTRequired(params);
@@ -92,7 +92,7 @@ describe('calculateTRequired', () => {
       e: E,
       w: W,
       gamma: GAMMA,
-      corrosionAllowanceInches: 0,
+      corrosionAllowance: 0,
       millTol: MILL_TOL,
     };
 
@@ -111,7 +111,7 @@ describe('calculateTRequired', () => {
       e: E,
       w: W,
       gamma: GAMMA,
-      corrosionAllowanceInches: 0.0625,
+      corrosionAllowance: 0.0625,
       millTol: MILL_TOL,
     };
 
@@ -130,7 +130,7 @@ describe('calculateTRequired', () => {
       e: E,
       w: W,
       gamma: 1,
-      corrosionAllowanceInches: 0.0,
+      corrosionAllowance: 0.0,
       millTol: 0.0,
     };
 
@@ -149,7 +149,7 @@ describe('calculateTRequired', () => {
       e: 0.9,
       w: 0.8,
       gamma: 0.5,
-      corrosionAllowanceInches: 0.25,
+      corrosionAllowance: 0.25,
       millTol: 0.1,
     };
 

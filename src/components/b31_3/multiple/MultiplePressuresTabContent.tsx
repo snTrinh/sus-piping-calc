@@ -1,16 +1,15 @@
 "use client";
 
-import React, { useMemo, useEffect } from "react";
+import React, { useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Box, Button, Card, Typography } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import PipeCard from "../PipeCard";
 import FormulaDisplay from "../FormulaDisplay";
 import PdfExport from "../pdfExport/SinglePressure/PdfExport";
-import { MaterialName, materialsData } from "@/utils/materialsData";
 import DesignParameters from "./DesignParameters";
 import GlobalDesignParameters from "./GlobalDesignParameters";
-import { addPipeMultiple, removePipeMultiple } from "@/state/multipleSlice";
+import { addPipeMultiple, removePipeMultiple, updatePipeField } from "@/state/multipleSlice";
 import { RootState } from "@/state/store";
 import { useDispatch, useSelector } from "react-redux";
 import { PipeSchedule } from "@/utils/unitConversions";
@@ -24,7 +23,6 @@ const MultiplePressuresTabContent: React.FC = () => {
     (state: RootState) => state.single.global
   );
 
-  // Add default 4" Schedule 40 pipe on first mount
   useEffect(() => {
     if (pipes.length === 0) {
       dispatch(
@@ -62,14 +60,6 @@ const MultiplePressuresTabContent: React.FC = () => {
   const handleRemovePipe = (id: string) => {
     dispatch(removePipeMultiple(id));
   };
-
-  function updatePipeField(arg0: {
-    pipeId: string;
-    key: keyof import("../../../types/pipe").Pipe;
-    value: string | number;
-  }): any {
-    throw new Error("Function not implemented.");
-  }
 
   return (
     <>
@@ -160,9 +150,9 @@ const MultiplePressuresTabContent: React.FC = () => {
 
             <PipeCard
               pipe={pipeState.pipe}
-              updatePipe={(id, key, value) => {
-                dispatch(updatePipeField({ pipeId: id, key, value }));
-              }}
+              updatePipe={(id, key, value) =>
+                dispatch(updatePipeField({ pipeId: id, key, value }))
+              }
               removePipe={() => handleRemovePipe(pipeState.pipe.id)}
               designParams={{
                 pressure: pipeState.pressure,

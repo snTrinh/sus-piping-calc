@@ -9,8 +9,8 @@ export type DesignParams = {
   temperature: number;
   corrosionAllowance: number;
   allowableStress: number | null;
-  e?: number;
-  w?: number;
-  gamma?: number;
-  millTol?: number;
+  e: number;
+  w: number;
+  gamma: number;
+  millTol: number;
 };

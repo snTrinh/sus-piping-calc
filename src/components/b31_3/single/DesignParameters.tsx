@@ -1,9 +1,7 @@
 "use client";
 import React, { useMemo } from "react";
 import { MenuItem, TextField, Box, Typography } from "@mui/material";
-
 import LabeledInput from "../../common/LabeledInput";
-import { DesignParams, Units } from "@/types/units";
 import { unitConversions } from "@/utils/unitConversions";
 import {
   getAllowableStressForTemp,
@@ -14,19 +12,14 @@ import { RootState, useAppDispatch, useAppSelector } from "@/state/store";
 import {
   selectSingleMaterial,
   setMaterial,
-  updateAllowableStress,
   updateCorrosionAllowance,
-  updatePipeSingleField,
   updatePressure,
   updateTemperature,
 } from "@/state/singleSlice";
 import { useSelector } from "react-redux";
 
-interface DesignParametersProps {
-  pipeId?: string; // optional: if not provided, use global parameters
-}
 
-export default function DesignParameters({ pipeId }: DesignParametersProps) {
+export default function DesignParameters() {
   const dispatch = useAppDispatch();
   const materials = useMemo(() => {
     const metricMaterials = Object.keys(materialsData.Metric.materials);
@@ -44,9 +37,6 @@ export default function DesignParameters({ pipeId }: DesignParametersProps) {
   const { corrosionAllowance} = useSelector(
     (state: RootState) => state.single.global
   );
-  const pipe = pipeId
-    ? useAppSelector((state) => state.single.pipes.find((p) => p.id === pipeId))
-    : undefined;
 
   const handlePressureChange = (value: number) => {
     dispatch(updatePressure(value));
@@ -63,9 +53,7 @@ export default function DesignParameters({ pipeId }: DesignParametersProps) {
   const handleCAChange = (value: number) =>
     dispatch(updateCorrosionAllowance(value));
 
-  const allowableStressFromMaterial = material
-    ? getAllowableStressForTemp(material, units, globalTemperature)
-    : 0;
+  const allowableStressFromMaterial = getAllowableStressForTemp(material, units, globalTemperature);
 
 
   return (

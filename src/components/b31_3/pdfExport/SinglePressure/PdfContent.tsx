@@ -1,27 +1,24 @@
 "use client";
 import React, { forwardRef } from "react";
+import { useTheme } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "@/state/store";
-import { Box, useTheme } from "@mui/material";
 import PdfDesignInputs, { DrawingInfo } from "./PdfDesignInputs";
 import PdfPipeOutputs from "./PdfPipeOutputs";
 import { Pipe } from "@/types/pipe";
 
 export type PdfContentProps = {
   drawingInfo: DrawingInfo;
-  material: string;
   pipes: Pipe[];
   isMultiple?: boolean;
 };
 
 const PdfContent = forwardRef<HTMLDivElement, PdfContentProps>(
-  ({ drawingInfo, material, pipes, isMultiple = false }, ref) => {
+  ({ drawingInfo, pipes, isMultiple = false }, ref) => {
     const theme = useTheme();
     const globalDesign = useSelector((state: RootState) => state.single.global);
 
-
-    const pipeList = (isMultiple ? pipes : [pipes[0]]).filter(Boolean);
-
+    const pipeList = isMultiple ? pipes : [pipes[0]].filter(Boolean);
 
     return (
       <div
@@ -39,7 +36,7 @@ const PdfContent = forwardRef<HTMLDivElement, PdfContentProps>(
           const designParams = {
             pressure: pipe.pressure ?? 0,
             temperature: pipe.temperature ?? 0,
-            allowableStress: pipe.allowableStress ?? 0,
+            allowableStress: pipe.allowableStress , // get from pipe
             corrosionAllowance: globalDesign.corrosionAllowance,
             gamma: globalDesign.gamma,
             e: globalDesign.e,
@@ -56,16 +53,14 @@ const PdfContent = forwardRef<HTMLDivElement, PdfContentProps>(
                   drawingInfo.calculationRevision +
                   (isMultiple ? `.${index + 1}` : ""),
               }}
-              designParamsSingle={designParams} 
+              designParamsMultiple={isMultiple ? [designParams] : undefined}
+              designParamsSingle={!isMultiple ? designParams : undefined}
+              isMultiple={isMultiple}
             />
           );
         })}
 
-        <PdfPipeOutputs
-          pipes={pipes}
-          material={material}
-          isMultiple={isMultiple}
-        />
+        <PdfPipeOutputs pipes={pipes} isMultiple={isMultiple} />
       </div>
     );
   }

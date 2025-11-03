@@ -7,6 +7,7 @@ import { calculateTRequired } from "@/utils/pipeCalculations";
 import { Units } from "@/types/units";
 import pipeData from "@/data/transformed_pipeData.json";
 import { E, GAMMA, MILL_TOL, W } from "@/constants/constants";
+import { GlobalDesignParams } from "@/types/globalDesignParams";
 
 interface SingleState {
   global: GlobalDesignParams;
@@ -47,6 +48,7 @@ export const singleSlice = createSlice({
       const units = Units.Imperial;
       const targetNpsKey =
         (units as Units) === Units.Metric ? npsToMmMap[nps] : nps;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const pipeDataEntry = (pipeData as any)[units]?.[targetNpsKey];
       const odValue = pipeDataEntry?.OD ?? 0;
       const tValue = pipeDataEntry?.schedules?.[schedule] ?? 0;
@@ -64,7 +66,7 @@ export const singleSlice = createSlice({
         e,
         w,
         gamma,
-        corrosionAllowanceInches: corrosionAllowance,
+        corrosionAllowance,
         millTol,
       };
       const tRequired = calculateTRequired(paramsForCalc);
@@ -82,12 +84,13 @@ export const singleSlice = createSlice({
 
     updatePipeSingleField: (
       state,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       action: PayloadAction<{ pipeId: string; key: keyof Pipe; value: any }>
     ) => {
       const { pipeId, key, value } = action.payload;
       const pipe = state.pipes.find((p) => p.id === pipeId);
       if (pipe) {
-        // @ts-ignore
+        // @ts-expect-error error here
         pipe[key] = value;
       }
     },

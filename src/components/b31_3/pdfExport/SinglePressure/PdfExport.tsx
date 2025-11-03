@@ -1,10 +1,8 @@
 "use client";
 import { useRef, useState, useEffect } from "react";
 import { Box, TextField, Button } from "@mui/material";
-import { DesignParams } from "@/types/units";
 import PdfContent from "./PdfContent";
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
-import { PipeSchedule } from "@/utils/unitConversions";
 import { Pipe } from "@/types/pipe";
 import { useSelector } from "react-redux";
 import { RootState } from "@/state/store";
@@ -132,7 +130,7 @@ export default function PdfExport({
       <PdfContent
         ref={printRef}
         drawingInfo={drawingInfo}
-        material={material}
+
         pipes={pipes}
       />
     </Box>

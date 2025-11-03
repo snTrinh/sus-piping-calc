@@ -6,11 +6,10 @@ import SinglePressureTabContent from "./single/SinglePressureTabContent";
 import MultiplePressuresTabContent from "./multiple/MultiplePressuresTabContent";
 import UnitsToggle from "../common/UnitsToggle";
 
-
 export default function B31_3Calculator() {
-
+  const ENABLE_MULTIPLE_PRESSURES =
+    process.env.NEXT_PUBLIC_ENABLE_MULTIPLE_PRESSURES === "true";
   const [tabIndex, setTabIndex] = useState(0);
-
 
   return (
     <Box sx={{ width: "100%", ml: 0 }}>
@@ -39,7 +38,7 @@ export default function B31_3Calculator() {
             scrollButtons="auto"
           >
             <Tab label="Single Pressure" />
-            <Tab label="Multiple Pressure" />
+            {ENABLE_MULTIPLE_PRESSURES && <Tab label="Multiple Pressures" />}
           </Tabs>
           <UnitsToggle />
         </Box>
