@@ -34,61 +34,6 @@ export const multipleSlice = createSlice({
   name: "multiplePressure",
   initialState,
   reducers: {
-    addPipeMultiple(
-      state,
-      action: PayloadAction<{
-        pipe: {
-          id: string;
-          nps: string;
-          schedule: PipeSchedule;
-          od: string;
-        };
-        material: MaterialName;
-        pressure: number;
-        temperature: number;
-      }>
-    ) {
-      const { pipe, material, pressure, temperature } = action.payload;
-      const { corrosionAllowance, e, w, gamma, millTol } = state.global;
-      const units = Units.Imperial;
-      const targetNpsKey =
-        (units as Units) === Units.Metric ? npsToDnMap[pipe.nps] : pipe.nps;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const pipeDataEntry = (pipeData as any)[units]?.[targetNpsKey];
-      const odValue = pipeDataEntry?.OD ?? parseFloat(pipe.od);
-      const tValue = pipeDataEntry?.schedules?.[pipe.schedule] ?? 0;
-
-      // Lookup or default allowable stress (you can refine this later)
-      const allowableStress = 20000; // psi placeholder
-
-      const paramsForCalc = {
-        pressure,
-        outerDiameterInches: odValue,
-        allowableStress,
-        e,
-        w,
-        gamma,
-        corrosionAllowance,
-        millTol,
-      };
-      const tRequired = calculateTRequired(paramsForCalc);
-
-      // Push the complete object into pipes[]
-      state.pipes.push({
-        pipe: {
-          id: pipe.id,
-          nps: pipe.nps,
-          schedule: pipe.schedule,
-          od: odValue.toString(),
-          t: tValue,
-          tRequired,
-          allowableStress,
-        },
-        material,
-        pressure,
-        temperature,
-      });
-    },
 
     removePipeMultiple(state, action: PayloadAction<string>) {
       state.pipes = state.pipes.filter((p) => p.pipe.id !== action.payload);
@@ -156,7 +101,6 @@ export const multipleSlice = createSlice({
 });
 
 export const {
-  addPipeMultiple,
   removePipeMultiple,
   updatePipeMaterialMultiple,
   updatePipePressureMultiple,

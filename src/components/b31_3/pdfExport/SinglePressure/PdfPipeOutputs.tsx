@@ -48,11 +48,7 @@ const numeratorStyle: React.CSSProperties = {
   textAlign: "center",
 };
 
-const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
-  pipes,
-
-  isMultiple,
-}) => {
+const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({ pipes }) => {
   const theme = useTheme();
 
   const { temperature, selectedMaterial, pressure } = useSelector(
@@ -62,7 +58,7 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
     (state: RootState) => state.single.global
   );
   const units: Units = useSelector(
-    (state: RootState) => state.single.currentUnit,
+    (state: RootState) => state.single.currentUnit
   );
   const millTolDenominator = 1 - millTol;
 
@@ -78,37 +74,13 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
       {pipes.map((pipe, index) => {
         const lengthConversion = unitConversions.length[units];
         const pressureConversion = unitConversions.pressure[units];
-        const targetNpsKey =
-          units === Units.Metric ? npsToDnMap[pipe.nps] : pipe.nps;
-        const currentUnitPipeDataEntry = typedPipeData[units]?.[targetNpsKey];
-        const outerDiameterDisplay = currentUnitPipeDataEntry?.OD ?? 0;
-        const displayedScheduleThickness =
-          currentUnitPipeDataEntry?.schedules?.[pipe.schedule] ?? 0;
 
-        const displayOuterDiameter = outerDiameterDisplay;
-        
-        const allowableStress = getAllowableStressForTemp(
-          selectedMaterial,
-          units,
-          temperature
-        );
+        const outerDiameterDisplay = pipe.od;
+        const displayedScheduleThickness = pipe.t;
+        const allowableStress = pipe.allowableStress;
+        const tRequired = pipe.tRequired;
 
-        const paramsForCalculation: TRequiredParams = {
-          pressure,
-          outerDiameter: outerDiameterDisplay,
-          allowableStress: allowableStress,
-          e,
-          w,
-          gamma,
-          corrosionAllowance,
-          millTol,
-        };
-
-        const tRequiredCalculatedDisplayUnits = lengthConversion.to(
-          calculateTRequired(paramsForCalculation)
-        );
-
-        const numeratorForDisplay = pressure * displayOuterDiameter;
+        const numeratorForDisplay = pressure * outerDiameterDisplay;
         const denominatorForDisplay =
           2 * (allowableStress * e * w + pressure * gamma);
 
@@ -116,8 +88,6 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
           <div
             key={pipe.id}
             style={{
-              borderTop: `1px solid ${theme.palette.divider}`,
-              paddingTop: 10,
               marginTop: 16,
             }}
           >
@@ -155,7 +125,7 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
                   <span style={numeratorStyle}>
                     {pressure.toFixed(2)}
                     {pressureConversion.unit} ×{" "}
-                    {displayOuterDiameter.toFixed(3)}
+                    {outerDiameterDisplay.toFixed(3)}
                     {lengthConversion.unit}
                   </span>
                   <span style={denominatorStyle}>
@@ -199,26 +169,38 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({
                   </span>
                 </span>
               </div>
+
+              <div>
+                <span>
+                  tᵣ = (
+                  {(numeratorForDisplay / denominatorForDisplay).toFixed(4)}
+                </span>
+
+                <span>
+                  {lengthConversion.unit} + {corrosionAllowance.toFixed(4)}
+                  {lengthConversion.unit}) ×{" "}
+                </span>
+                <span style={fractionStyle}>
+                  <span style={numeratorStyle}>1</span>
+                  <span style={denominatorStyle}>
+                    ({millTolDenominator.toFixed(3)})
+                  </span>
+                </span>
+              </div>
             </div>
 
             <div style={{ marginTop: 8, marginLeft: 24 }}>
               <div>
                 <span>
-                  tᵣ = {tRequiredCalculatedDisplayUnits.toFixed(3)}{" "}
-                  {lengthConversion.unit}
+                  tᵣ = {tRequired.toFixed(3)} {lengthConversion.unit}
                 </span>
               </div>
             </div>
             <div style={{ marginTop: 8 }}>
               <div>
                 <span>
-                  t{" "}
-                  {displayedScheduleThickness > tRequiredCalculatedDisplayUnits
-                    ? ">"
-                    : "<"}{" "}
-                  tᵣ ∴{" "}
-                  {displayedScheduleThickness >
-                  tRequiredCalculatedDisplayUnits ? (
+                  t {displayedScheduleThickness > tRequired ? ">" : "<"} tᵣ ∴{" "}
+                  {displayedScheduleThickness > tRequired ? (
                     <span
                       style={{
                         color: theme.palette.success.main,
