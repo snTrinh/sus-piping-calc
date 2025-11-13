@@ -8,6 +8,14 @@ First, run the development server:
 npm run dev
 ```
 
+To run unit tests:
+
+```bash
+npx jest
+```
+
+
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 

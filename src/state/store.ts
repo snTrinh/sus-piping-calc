@@ -6,11 +6,9 @@ import {
 } from "react-redux";
 import singleReducer from "./singleSlice";
 import multipleReducer from "./multipleSlice";
-import unitReducer from "./unitSlice";
 
 export const store = configureStore({
   reducer: {
-    unit: unitReducer,
     single: singleReducer,
     multiple: multipleReducer,
   },

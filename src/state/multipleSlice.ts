@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { MaterialName } from "../utils/materialsData";
-import { npsToMmMap, PipeSchedule } from "@/utils/unitConversions";
+import { npsToDnMap, PipeSchedule } from "@/utils/unitConversions";
 import { Pipe } from "@/types/pipe";
 import { calculateTRequired } from "@/utils/pipeCalculations";
 import { Units } from "@/types/units";
@@ -51,9 +51,9 @@ export const multipleSlice = createSlice({
       const { pipe, material, pressure, temperature } = action.payload;
       const { corrosionAllowance, e, w, gamma, millTol } = state.global;
       const units = Units.Imperial;
-            const targetNpsKey =
-              (units as Units) === Units.Metric ? npsToMmMap[pipe.nps] : pipe.nps;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any        
+      const targetNpsKey =
+        (units as Units) === Units.Metric ? npsToDnMap[pipe.nps] : pipe.nps;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const pipeDataEntry = (pipeData as any)[units]?.[targetNpsKey];
       const odValue = pipeDataEntry?.OD ?? parseFloat(pipe.od);
       const tValue = pipeDataEntry?.schedules?.[pipe.schedule] ?? 0;
@@ -61,7 +61,6 @@ export const multipleSlice = createSlice({
       // Lookup or default allowable stress (you can refine this later)
       const allowableStress = 20000; // psi placeholder
 
-      
       const paramsForCalc = {
         pressure,
         outerDiameterInches: odValue,
@@ -124,8 +123,6 @@ export const multipleSlice = createSlice({
       );
       if (wrapper) wrapper.temperature = action.payload.temperature;
     },
-
-
 
     updateCorrosionAllowance(state, action: PayloadAction<number>) {
       state.global.corrosionAllowance = action.payload;

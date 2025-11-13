@@ -1,21 +1,34 @@
+// singleSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { MaterialName } from "../utils/materialsData";
-import { npsToMmMap, PipeSchedule } from "@/utils/unitConversions";
+import { getAllowableStressForTemp, MaterialName } from "../utils/materialsData";
+import { npsToDnMap, PipeSchedule } from "@/utils/unitConversions";
 import { RootState } from "./store";
 import { Pipe } from "@/types/pipe";
 import { calculateTRequired } from "@/utils/pipeCalculations";
-import { Units } from "@/types/units";
-import pipeData from "@/data/transformed_pipeData.json";
+import metricPipeData from "@/data/metricData.json";
+import imperialPipeData from "@/data/imperialData.json";
 import { E, GAMMA, MILL_TOL, W } from "@/constants/constants";
 import { GlobalDesignParams } from "@/types/globalDesignParams";
+import { Units } from "@/types/units";
 
 interface SingleState {
   global: GlobalDesignParams;
   pressure: number;
   temperature: number;
   selectedMaterial: MaterialName;
+  currentUnit: Units;
   pipes: Pipe[];
 }
+
+type PipeDataEntry = {
+  OD: number;
+  schedules: Partial<Record<PipeSchedule, number>>;
+};
+
+type PipeData = Record<string, PipeDataEntry>;
+
+const metricData: PipeData = metricPipeData;
+const imperialData: PipeData = imperialPipeData;
 
 const initialState: SingleState = {
   global: {
@@ -28,79 +41,123 @@ const initialState: SingleState = {
   pressure: 1440,
   temperature: 100,
   selectedMaterial: "A106B",
+  currentUnit: Units.Imperial,
   pipes: [],
 };
 
-export const singleSlice = createSlice({
+// --- Helper to update OD, schedule thickness, tRequired, allowableStress ---
+function recalcPipe(
+  pipe: Pipe,
+  units: Units,
+  global: GlobalDesignParams,
+  pressure: number,
+  material: MaterialName,
+  temperature: number
+) {
+  // Get pipe data in current unit
+  let pipeDataEntry;
+  if (units === Units.Metric) {
+    pipeDataEntry = metricData[pipe.dn]; // DN key for metric
+  } else {
+    pipeDataEntry = imperialData[pipe.nps]; // NPS key for imperial
+  }
+  if (!pipeDataEntry) return;
+
+  // OD and schedule thickness
+  pipe.od = pipeDataEntry.OD; 
+  pipe.t = pipeDataEntry.schedules[pipe.schedule] ?? 0;
+  pipe.allowableStress = getAllowableStressForTemp(material, units, temperature);
+
+  console.log(pressure);
+  console.log(pipe.od);
+  console.log(pipe.allowableStress); // incorrect
+  console.log(global.e);
+  console.log(global.w);
+  console.log(global.gamma);
+  console.log(global.corrosionAllowance);
+  console.log(global.millTol);
+  // Recalculate required thickness
+  pipe.tRequired = calculateTRequired({
+    pressure,
+    outerDiameter: pipe.od,
+    allowableStress: pipe.allowableStress,
+    e: global.e,
+    w: global.w,
+    gamma: global.gamma,
+    corrosionAllowance: global.corrosionAllowance,
+    millTol: global.millTol,
+  });
+}
+
+
+const singleSlice = createSlice({
   name: "singlePressure",
   initialState,
   reducers: {
-    addPipeSingle(
-      state,
-      action: PayloadAction<{
-        id: string;
-        nps: string;
-        schedule: PipeSchedule;
-        od: string;
-      }>
-    ) {
-      const { id, nps, schedule, od } = action.payload;
-      const units = Units.Imperial;
-      const targetNpsKey =
-        (units as Units) === Units.Metric ? npsToMmMap[nps] : nps;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const pipeDataEntry = (pipeData as any)[units]?.[targetNpsKey];
-      const odValue = pipeDataEntry?.OD ?? 0;
-      const tValue = pipeDataEntry?.schedules?.[schedule] ?? 0;
-      const { corrosionAllowance, e, w, gamma, millTol } = state.global;
-      const pressure = state.pressure;
+    // --- Switch units globally ---
+    setUnit(state, action: PayloadAction<Units>) {
+      const newUnit = action.payload;
+      state.currentUnit = newUnit;
 
-      // sample: use material stress (here hardcoded; later pull from materialsData)
-      const allowableStress = 20000; // psi default or lookup from materialsData
+      state.pipes.forEach((pipe) => {
+        recalcPipe(pipe, state.currentUnit, state.global, state.pressure, state.selectedMaterial, state.temperature);
 
-      // compute tRequired in imperial units
-      const paramsForCalc = {
-        pressure,
-        outerDiameterInches: odValue,
-        allowableStress,
-        e,
-        w,
-        gamma,
-        corrosionAllowance,
-        millTol,
-      };
-      const tRequired = calculateTRequired(paramsForCalc);
-
-      state.pipes.push({
-        id,
-        nps,
-        schedule,
-        od,
-        t: tValue,
-        tRequired,
-        allowableStress,
       });
     },
 
-    updatePipeSingleField: (
+    // --- Add a new pipe ---
+    addPipeSingle(
       state,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      action: PayloadAction<{ pipeId: string; key: keyof Pipe; value: any }>
-    ) => {
+      action: PayloadAction<{ id: string; nps: string; schedule: PipeSchedule }>
+    ) {
+      const { id, nps, schedule } = action.payload;
+      const pipe: Pipe = {
+        id,
+        nps,
+        dn: npsToDnMap[nps],
+        schedule,
+        od: 0,
+        t: 0,
+        tRequired: 0,
+        allowableStress: 20000, // default
+      };
+      recalcPipe(pipe, state.currentUnit, state.global, state.pressure, state.selectedMaterial, state.temperature);
+
+      state.pipes.push(pipe);
+    },
+
+    // --- Update pipe field and recalc if needed ---
+    updatePipeSingleField(
+      state,
+      action: PayloadAction<{ pipeId: string; key: keyof Pipe; value: string | number }>
+    ) {
       const { pipeId, key, value } = action.payload;
       const pipe = state.pipes.find((p) => p.id === pipeId);
-      if (pipe) {
-        // @ts-expect-error error here
-        pipe[key] = value;
+      if (!pipe) return;
+
+      if (["od", "t", "tRequired", "allowableStress"].includes(key)) {
+        (pipe[key] as number) = value as number;
+      } else if (["nps", "dn", "schedule", "id"].includes(key)) {
+        (pipe[key] as string) = value as string;
+      }
+
+      // Recalc OD/t/tRequired if NPS, Schedule or Units change
+      if (key === "nps" || key === "schedule") {
+        pipe.dn = npsToDnMap[pipe.nps];
+        recalcPipe(pipe, state.currentUnit, state.global, state.pressure, state.selectedMaterial, state.temperature);
+
       }
     },
 
+    // --- Remove pipe ---
     removePipe(state, action: PayloadAction<string>) {
       state.pipes = state.pipes.filter((p) => p.id !== action.payload);
     },
 
+    // --- Update pressure globally and recalc ---
     updatePressure(state, action: PayloadAction<number>) {
       state.pressure = action.payload;
+      state.pipes.forEach((pipe) => recalcPipe(pipe, state.currentUnit, state.global, state.pressure, state.selectedMaterial, state.temperature)    );
     },
 
     updateTemperature(state, action: PayloadAction<number>) {
@@ -111,42 +168,39 @@ export const singleSlice = createSlice({
       state.selectedMaterial = action.payload;
     },
 
-    updatePipeTRequiredSingle(
-      state,
-      action: PayloadAction<{ pipeId: string; tRequired: number }>
-    ) {
-      const pipe = state.pipes.find((p) => p.id === action.payload.pipeId);
-      if (pipe) pipe.tRequired = action.payload.tRequired;
-    },
     updateCorrosionAllowance(state, action: PayloadAction<number>) {
       state.global.corrosionAllowance = action.payload;
+      state.pipes.forEach((pipe) => recalcPipe(pipe, state.currentUnit, state.global, state.pressure, state.selectedMaterial, state.temperature));
+
     },
+
     updateAllowableStress(
       state,
       action: PayloadAction<{ pipeId: string; allowableStress: number }>
     ) {
       const { pipeId, allowableStress } = action.payload;
       const pipe = state.pipes.find((p) => p.id === pipeId);
-      if (pipe) {
-        pipe.allowableStress = allowableStress;
-      }
+      if (!pipe) return;
+      pipe.allowableStress = allowableStress;
+      recalcPipe(pipe, state.currentUnit, state.global, state.pressure, state.selectedMaterial, state.temperature);
+
     },
   },
 });
 
 export const {
+  setUnit,
   addPipeSingle,
   removePipe,
+  updatePipeSingleField,
   updatePressure,
   updateTemperature,
   setMaterial,
-  updatePipeTRequiredSingle,
   updateCorrosionAllowance,
   updateAllowableStress,
-  updatePipeSingleField,
 } = singleSlice.actions;
 
-export const selectSingleMaterial = (state: RootState) =>
-  state.single.selectedMaterial;
+export const selectSingleMaterial = (state: RootState) => state.single.selectedMaterial;
+export const selectSingleUnit = (state: RootState) => state.single.currentUnit;
 
 export default singleSlice.reducer;

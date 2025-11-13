@@ -1,16 +1,28 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ToggleButton, ToggleButtonGroup, useMediaQuery, useTheme } from "@mui/material";
 import { Units } from "./../../types/units";
-import { selectUnit, setUnit } from "@/state/unitSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/state/store";
+import { setUnit } from "@/state/singleSlice";
 
 
 export default function UnitsToggle() {
   const theme = useTheme();
   const dispatch = useDispatch();
-  const unit = useSelector(selectUnit);
-  const shouldButtonsStretch = useMediaQuery(theme.breakpoints.down('md'));
+  const unit = useSelector((state: RootState) => state.single.currentUnit);
+
+  const [shouldButtonsStretch, setShouldButtonsStretch] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia(theme.breakpoints.down("md"));
+    setShouldButtonsStretch(mq.matches);
+
+    const listener = (e: MediaQueryListEvent) => setShouldButtonsStretch(e.matches);
+    mq.addEventListener("change", listener);
+    return () => mq.removeEventListener("change", listener);
+  }, [theme]);
+  
   const handleChange = (
     event: React.MouseEvent<HTMLElement>,
     newUnit: Units

@@ -1,4 +1,5 @@
 "use client";
+
 import React from "react";
 import {
   Box,
@@ -12,12 +13,17 @@ import {
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import { useTheme } from "@mui/material/styles";
 
-import { DesignParams, Units } from "@/types/units"; 
-import { npsToMmMap, PIPE_SCHEDULE_ORDER, PipeSchedule, unitConversions } from "@/utils/unitConversions";
-import pipeData from "@/data/transformed_pipeData.json"; 
-import { calculateTRequired, TRequiredParams } from "@/utils/pipeCalculations"; 
+import { DesignParams, Units } from "@/types/units";
+import {
+  npsToDnMap,
+  PIPE_SCHEDULE_ORDER,
+  PipeSchedule,
+  unitConversions,
+} from "@/utils/unitConversions";
 import { useAppSelector } from "@/state/store";
 import { Pipe } from "@/types/pipe";
+import metricPipeData from "@/data/metricData.json";
+import imperialPipeData from "@/data/imperialData.json";
 
 interface ScheduleThicknesses {
   [key: string]: number | null;
@@ -33,7 +39,10 @@ interface TransformedPipeData {
   Imperial: { [key: string]: PipeSizeData };
 }
 
-const typedPipeData: TransformedPipeData = pipeData; 
+const typedPipeData: TransformedPipeData = {
+  Metric: metricPipeData,
+  Imperial: imperialPipeData,
+};
 
 type PipeCardProps = {
   pipe: Pipe;
@@ -48,100 +57,99 @@ export default function PipeCard({
   updatePipe,
   removePipe,
   designParams,
-  sx
+  sx,
 }: PipeCardProps) {
   const theme = useTheme();
-  const units = useAppSelector((state) => state.unit.currentUnit);
-  const { pressure, allowableStress, corrosionAllowance, e, w, gamma } = designParams;
+  const units = useAppSelector((state) => state.single.currentUnit,);
+  const { pressure, allowableStress, corrosionAllowance, e, w, gamma } =
+    designParams;
 
   const thicknessConversion = unitConversions.length[units];
   const unitLabel = thicknessConversion.unit;
 
-  // Select pipe size data
-  const currentNpsKey = units === Units.Metric ? npsToMmMap[pipe.nps]?.toString() : pipe.nps;
-  const currentUnitPipeData = typedPipeData[units];
-  const selectedPipeSizeData = currentUnitPipeData?.[currentNpsKey || ''];
+  const currentNpsKey =
+    units === Units.Metric
+      ? (npsToDnMap[pipe.nps] ?? pipe.dn).toString() 
+      : pipe.nps;
+
+  const selectedPipeSizeData = typedPipeData[units]?.[currentNpsKey];
 
   const scheduleOptions = selectedPipeSizeData
     ? Object.keys(selectedPipeSizeData.schedules).sort((a, b) => {
-        const indexA = PIPE_SCHEDULE_ORDER.indexOf(a as PipeSchedule); 
+        const indexA = PIPE_SCHEDULE_ORDER.indexOf(a as PipeSchedule);
         const indexB = PIPE_SCHEDULE_ORDER.indexOf(b as PipeSchedule);
         return indexA - indexB;
       })
     : [];
 
-  // Get schedule thickness
-  let rawScheduleThickness = 0;
-  if (selectedPipeSizeData && selectedPipeSizeData.schedules && pipe.schedule in selectedPipeSizeData.schedules) {
-    const fetchedThickness = selectedPipeSizeData.schedules[pipe.schedule];
-    rawScheduleThickness = fetchedThickness ?? 0;
-  }
 
-  // Convert thickness to current units
-  const thicknessInInches = units === Units.Metric ? unitConversions.length.Metric.toImperial(rawScheduleThickness) : rawScheduleThickness;
-  const displayedScheduleThickness = thicknessConversion.to(thicknessInInches);
+  const outerDiameter = selectedPipeSizeData?.OD ?? pipe.od;
 
-  // Outer diameter
-  const outerDiameterDisplay = selectedPipeSizeData?.OD || 0;
-  const outerDiameterInches = units === Units.Metric ? unitConversions.length.Metric.toImperial(outerDiameterDisplay) : outerDiameterDisplay;
-
-  const paramsForCalculation: TRequiredParams = {
-    pressure,                
-    outerDiameterInches,
-    allowableStress,   
-    e ,
-    w,
-    gamma,
-    corrosionAllowance,
-    millTol: designParams.millTol,
+  const parseNPS = (nps: string) => {
+    if (nps.includes("-")) {
+      const [whole, fraction] = nps.split("-");
+      const [num, denom] = fraction.split("/").map(Number);
+      return Number(whole) + num / denom;
+    }
+    if (nps.includes("/")) {
+      const [num, denom] = nps.split("/").map(Number);
+      return num / denom;
+    }
+    return Number(nps);
   };
-
-  // Calculate required thickness
-  const tRequiredCalculatedImperial = calculateTRequired(paramsForCalculation);
-  const displayedTRequired = thicknessConversion.to(tRequiredCalculatedImperial);
-
-  // NPS options for dropdown
-  const npsOptions = Object.keys(typedPipeData.Imperial).sort((a, b) => {
-    const toNumber = (val: string) => {
-      if (val.includes(" ")) { 
-        const [whole, fraction] = val.split(" ");
-        const [num, denom] = fraction.split("/").map(Number);
-        return Number(whole) + num / denom;
-      } else if (val.includes("/")) { 
-        const [num, denom] = val.split("/").map(Number);
-        return num / denom;
-      } else { 
-        return Number(val);
-      }
-    };
-    return toNumber(a) - toNumber(b);
-  });
+  const npsOptions = Object.keys(typedPipeData.Imperial).sort(
+    (a, b) => parseNPS(a) - parseNPS(b)
+  );
 
   return (
-    <Card sx={{ flex: 1, borderRadius: 2, border: "1px solid #ddd", boxShadow: "none", position: "relative", minWidth: 450, ...sx }}>
-      <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+    <Card
+      sx={{
+        flex: 1,
+        borderRadius: 2,
+        border: "1px solid #ddd",
+        boxShadow: "none",
+        position: "relative",
+        minWidth: 450,
+        ...sx,
+      }}
+    >
+      <CardContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <Typography variant="h6" gutterBottom={false}>
-            Pipe — NPS {pipe.nps}, Schedule {pipe.schedule}
+            Pipe — {units === Units.Metric ? <>DN {pipe.dn}</> : <>NPS {pipe.nps}</>}, Schedule {pipe.schedule}
           </Typography>
-          <IconButton aria-label="remove pipe" onClick={() => removePipe(pipe.id)} sx={{ color: theme.palette.error.main, p: 0.5 }}>
+          <IconButton
+            aria-label="remove pipe"
+            onClick={() => removePipe(pipe.id)}
+            sx={{ color: theme.palette.error.main, p: 0.5 }}
+          >
             <RemoveCircleOutlineIcon />
           </IconButton>
         </Box>
 
+        {/* NPS & Schedule */}
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, alignItems: "center" }}>
           <TextField
             select
-            label={`NPS`}
+            label="NPS"
             value={pipe.nps}
             onChange={(e) => {
               updatePipe(pipe.id, "nps", e.target.value);
-              const newNpsKey = units === Units.Metric ? npsToMmMap[e.target.value]?.toString() : e.target.value;
-              const newSelectedPipeSizeData = typedPipeData[units]?.[newNpsKey || ''];
-              if (newSelectedPipeSizeData) {
-                const firstNewSchedule = Object.keys(newSelectedPipeSizeData.schedules).sort()[0];
-                if (firstNewSchedule && !newSelectedPipeSizeData.schedules[pipe.schedule]) {
-                  updatePipe(pipe.id, "schedule", firstNewSchedule);
+              const newNpsKey =
+                units === Units.Metric
+                  ? (npsToDnMap[e.target.value] ?? "").toString()
+                  : e.target.value;
+              const newPipeData = typedPipeData[units]?.[newNpsKey];
+              if (newPipeData) {
+                const firstSchedule = Object.keys(newPipeData.schedules).sort()[0];
+                if (firstSchedule && !newPipeData.schedules[pipe.schedule]) {
+                  updatePipe(pipe.id, "schedule", firstSchedule);
                 }
               }
             }}
@@ -150,7 +158,7 @@ export default function PipeCard({
           >
             {npsOptions.map((npsValue) => (
               <MenuItem key={npsValue} value={npsValue}>
-                {`${npsValue}" (${npsToMmMap[npsValue] || 'N/A'} DN)`}
+                {`${npsValue}" (${npsToDnMap[npsValue] || "N/A"} DN)`}
               </MenuItem>
             ))}
           </TextField>
@@ -165,29 +173,56 @@ export default function PipeCard({
             size="small"
           >
             {scheduleOptions.map((sch) => (
-              <MenuItem key={sch} value={sch}>{sch}</MenuItem>
+              <MenuItem key={sch} value={sch}>
+                {sch}
+              </MenuItem>
             ))}
           </TextField>
         </Box>
 
+        {/* Outer Diameter */}
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, alignItems: "center" }}>
-          <TextField label={`Outer Diameter, D (${unitLabel})`} value={outerDiameterDisplay.toFixed(2)} size="small" disabled sx={{ minWidth: 120, flexGrow: 1, flexBasis: "120px" }} />
+          <TextField
+            label={`Outer Diameter, D (${unitLabel})`}
+            value={outerDiameter.toFixed(3)}
+            size="small"
+            disabled
+            sx={{ minWidth: 120, flexGrow: 1, flexBasis: "120px" }}
+          />
         </Box>
 
+        {/* Required Thickness */}
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, alignItems: "center" }}>
-          <TextField label={`Required Thickness, tᵣ (${unitLabel})`} value={displayedTRequired.toFixed(3)} size="small" disabled sx={{ minWidth: 120, flexGrow: 1, flexBasis: "120px" }} />
+          <TextField
+            label={`Required Thickness, tᵣ (${unitLabel})`}
+            value={pipe.tRequired.toFixed(3)}
+            size="small"
+            disabled
+            sx={{ minWidth: 120, flexGrow: 1, flexBasis: "120px" }}
+          />
         </Box>
 
+        {/* Schedule Thickness */}
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, alignItems: "center" }}>
-          <TextField label={`Schedule Thickness (${unitLabel})`} value={displayedScheduleThickness.toFixed(3)} size="small" disabled sx={{ minWidth: 120, flexGrow: 1, flexBasis: "120px" }} />
+          <TextField
+            label={`Schedule Thickness (${unitLabel})`}
+            value={pipe.t.toFixed(3)}
+            size="small"
+            disabled
+            sx={{ minWidth: 120, flexGrow: 1, flexBasis: "120px" }}
+          />
         </Box>
 
         <Typography sx={{ textAlign: "right" }}>
           <strong>Result:</strong>{" "}
-          {thicknessInInches >= tRequiredCalculatedImperial ? (
-            <span style={{ color: theme.palette.success.main, fontWeight: "bold" }}>ACCEPTABLE</span>
+          {pipe.t >= pipe.tRequired ? (
+            <span style={{ color: theme.palette.success.main, fontWeight: "bold" }}>
+              ACCEPTABLE
+            </span>
           ) : (
-            <span style={{ color: theme.palette.error.main, fontWeight: "bold" }}>NOT ACCEPTABLE</span>
+            <span style={{ color: theme.palette.error.main, fontWeight: "bold" }}>
+              NOT ACCEPTABLE
+            </span>
           )}
         </Typography>
       </CardContent>

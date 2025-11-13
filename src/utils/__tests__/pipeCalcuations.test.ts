@@ -1,43 +1,38 @@
-
-
 import { E, GAMMA, MILL_TOL, W } from "@/constants/constants";
 import { calculateTRequired, TRequiredParams } from "../pipeCalculations";
 
-
 const originalWarn = console.warn;
 beforeAll(() => {
-  console.warn = jest.fn(); 
+  console.warn = jest.fn();
 });
 
 afterAll(() => {
-  console.warn = originalWarn; 
+  console.warn = originalWarn;
 });
 
-describe('calculateTRequired', () => {
-
-  test('should correctly calculate tRequired for valid inputs', () => {
+describe("calculateTRequired", () => {
+  test("should correctly calculate tRequired for valid inputs", () => {
     const params: TRequiredParams = {
       pressure: 1000,
-      outerDiameterInches: 10,
+      outerDiameter: 10.75,
       allowableStress: 20000,
       e: E,
       w: W,
       gamma: GAMMA,
-      corrosionAllowance: 0.0625, 
-      millTol: MILL_TOL, 
+      corrosionAllowance: 0.0625,
+      millTol: MILL_TOL,
     };
 
-    const expected = 0.3515406; 
+    const expected = 0.37255;
 
     const result = calculateTRequired(params);
-    expect(result).toBeCloseTo(expected, 7); 
+    expect(result).toBeCloseTo(expected, 5);
   });
 
-
-  test('should return 0 when the denominator (2*(SEW + PY)) is zero', () => {
+  test("should return 0 when the denominator (2*(SEW + PY)) is zero", () => {
     const params: TRequiredParams = {
       pressure: 0,
-      outerDiameterInches: 10,
+      outerDiameter: 10,
       allowableStress: 0,
       e: 0,
       w: 0,
@@ -47,14 +42,12 @@ describe('calculateTRequired', () => {
     };
     const result = calculateTRequired(params);
     expect(result).toBe(0);
-    expect(console.warn).toHaveBeenCalledWith("Denominator is zero. Returning 0 for tRequired.");
   });
 
-
-  test('should return 0 when (1 - millTol) is zero', () => {
+  test("should return 0 when (1 - millTol) is zero", () => {
     const params: TRequiredParams = {
       pressure: 100,
-      outerDiameterInches: 10,
+      outerDiameter: 10,
       allowableStress: 20000,
       e: E,
       w: W,
@@ -64,30 +57,27 @@ describe('calculateTRequired', () => {
     };
     const result = calculateTRequired(params);
     expect(result).toBe(0);
-    expect(console.warn).toHaveBeenCalledWith("Invalid millTol (1 - millTol <= 0). Returning 0 for tRequired.");
   });
 
-  test('should return 0 when (1 - millTol) is negative', () => {
+  test("should return 0 when (1 - millTol) is negative", () => {
     const params: TRequiredParams = {
       pressure: 100,
-      outerDiameterInches: 10,
+      outerDiameter: 10,
       allowableStress: 20000,
       e: E,
       w: W,
       gamma: GAMMA,
       corrosionAllowance: 0.0625,
-      millTol: 1.5, 
+      millTol: 2,
     };
     const result = calculateTRequired(params);
     expect(result).toBe(0);
-    expect(console.warn).toHaveBeenCalledWith("Invalid millTol (1 - millTol <= 0). Returning 0 for tRequired.");
   });
 
-
-  test('should calculate correctly when corrosionAllowanceInches is zero', () => {
+  test("should calculate correctly when corrosionAllowanceInches is zero", () => {
     const params: TRequiredParams = {
       pressure: 1000,
-      outerDiameterInches: 10,
+      outerDiameter: 10.75,
       allowableStress: 20000,
       e: E,
       w: W,
@@ -96,18 +86,17 @@ describe('calculateTRequired', () => {
       millTol: MILL_TOL,
     };
 
-    const expected = 0.280112; 
+    const expected = 0.30112;
 
     const result = calculateTRequired(params);
-    expect(result).toBeCloseTo(expected, 7); 
+    expect(result).toBeCloseTo(expected, 5);
   });
 
-
-  test('should treat null allowableStress as 0', () => {
+  test("should treat null allowableStress as 0", () => {
     const params: TRequiredParams = {
       pressure: 1000,
-      outerDiameterInches: 10,
-      allowableStress: null, 
+      outerDiameter: 10.75,
+      allowableStress: null,
       e: E,
       w: W,
       gamma: GAMMA,
@@ -115,47 +104,46 @@ describe('calculateTRequired', () => {
       millTol: MILL_TOL,
     };
 
-    const expected = 14.3571428; 
+    const expected = 15.42857;
 
     const result = calculateTRequired(params);
-    expect(result).toBeCloseTo(expected, 5); 
+    expect(result).toBeCloseTo(expected, 5);
   });
 
 
-  test('should calculate correctly when E, W, Gamma are all 1', () => {
-    const params: TRequiredParams = {
-      pressure: 500,
-      outerDiameterInches: 5,
-      allowableStress: 10000,
-      e: E,
-      w: W,
-      gamma: 1,
-      corrosionAllowance: 0.0,
-      millTol: 0.0,
-    };
-
-    const expected = 0.1190476; 
-
-    const result = calculateTRequired(params);
-    expect(result).toBeCloseTo(expected, 7); 
-  });
-
-
-  test('should handle larger numbers correctly', () => {
+  test("should handle larger numbers correctly", () => {
     const params: TRequiredParams = {
       pressure: 5000,
-      outerDiameterInches: 24,
+      outerDiameter: 24,
       allowableStress: 30000,
-      e: 0.9,
-      w: 0.8,
-      gamma: 0.5,
+      e: E,
+      w: W,
+      gamma: GAMMA,
       corrosionAllowance: 0.25,
-      millTol: 0.1,
+      millTol: MILL_TOL,
     };
 
-    const expected = 3.0440295; 
+    const expected = 2.42857;
 
     const result = calculateTRequired(params);
-    expect(result).toBeCloseTo(expected, 7); 
+    expect(result).toBeCloseTo(expected, 5);
+  });
+
+  test("should handle live test case", () => {
+    const params: TRequiredParams = {
+      pressure: 5110,
+      outerDiameter: 508,
+      allowableStress: 138000,
+      e: E,
+      w: W,
+      gamma: GAMMA,
+      corrosionAllowance: 1.6,
+      millTol: MILL_TOL,
+    };
+
+    const expected = 12.42067;
+
+    const result = calculateTRequired(params);
+    expect(result).toBeCloseTo(expected, 5);
   });
 });

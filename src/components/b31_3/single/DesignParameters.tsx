@@ -32,7 +32,7 @@ export default function DesignParameters() {
   const material = useAppSelector(selectSingleMaterial);
   const globalPressure = useAppSelector((state) => state.single.pressure);
   const globalTemperature = useAppSelector((state) => state.single.temperature);
-  const units = useAppSelector((state) => state.unit.currentUnit);
+  const units = useAppSelector((state) => state.single.currentUnit);
 
   const { corrosionAllowance} = useSelector(
     (state: RootState) => state.single.global

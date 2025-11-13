@@ -4,12 +4,14 @@
   "private": true,
   "homepage": "https://sntrinh.github.io/sus-piping-calc",
   "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "predeploy": "npm run build",
-  "deploy": "gh-pages -d out"
+    "deploy": "gh-pages -d out"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -33,8 +35,11 @@
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
     "gh-pages": "^6.3.0",
+    "jest": "^30.2.0",
     "react-redux": "^9.2.0",
     "tailwindcss": "^4",
+    "ts-jest": "^29.4.5",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }

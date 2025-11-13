@@ -44,7 +44,7 @@ const PdfDesignInputs: React.FC<PdfDesignInputsProps> = ({
 }) => {
   const globalDesign = useSelector((state: RootState) => state.single.global);
   const {pressure, temperature, selectedMaterial} = useSelector((state: RootState) => state.single);
-  const units = useSelector((state: RootState) => state.unit.currentUnit);
+  const units = useSelector((state: RootState) => state.single.currentUnit);
   const pressureConversion = unitConversions.pressure[units];
   const temperatureConversion = unitConversions.temperature[units];
   const lengthConversion = unitConversions.length[units];

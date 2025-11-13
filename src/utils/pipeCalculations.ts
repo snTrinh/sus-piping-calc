@@ -1,45 +1,39 @@
-
-
 export interface TRequiredParams {
-    pressure: number; 
-    outerDiameterInches: number; 
-    allowableStress: number | null; 
-    e: number;
-    w: number;
-    gamma: number; 
-    corrosionAllowance: number; 
-    millTol: number;
+  pressure: number;
+  outerDiameter: number;
+  allowableStress: number | null;
+  e: number;
+  w: number;
+  gamma: number;
+  corrosionAllowance: number;
+  millTol: number;
 }
 
 export const calculateTRequired = ({
-    pressure,
-    outerDiameterInches,
-    allowableStress,
-    e,
-    w,
-    gamma,
-    corrosionAllowance,
-    millTol,
+  pressure,
+  outerDiameter,
+  allowableStress,
+  e,
+  w,
+  gamma,
+  corrosionAllowance,
+  millTol,
 }: TRequiredParams): number => {
+  if (1 - millTol <= 0) {
+    return 0;
+  }
+  const S = allowableStress ?? 0;
 
-    const S = allowableStress ?? 0;
+  const numerator = pressure * outerDiameter;
+  const denominator = 2 * (S * e * w + pressure * gamma);
 
-    const numerator = pressure * outerDiameterInches;
-    const denominator = 2 * (S * e * w + pressure * gamma);
+  if (denominator === 0) {
+    return 0;
+  }
 
-    if (denominator === 0) {
+  const pressureDesignThickness = numerator / denominator;
 
-        return 0;
-    }
-
-    const pressureDesignThickness = numerator / denominator;
-
-    if (1 - millTol <= 0) {
-        return 0; 
-    }
-
-    const requiredThickness =
-        (pressureDesignThickness + corrosionAllowance) / (1 - millTol);
-
-    return requiredThickness;
+  const requiredThickness =
+    (pressureDesignThickness + corrosionAllowance) / (1 - millTol);
+  return requiredThickness;
 };

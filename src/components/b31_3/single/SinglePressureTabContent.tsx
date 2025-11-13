@@ -22,23 +22,30 @@ import { Pipe } from "@/types/pipe";
 
 const SinglePressureTabContent: React.FC = ({}) => {
   const dispatch = useDispatch();
-  const { pipes, pressure, temperature, global } =
-    useSelector((state: RootState) => state.single);
+  const { pipes, currentUnit, pressure, temperature, global } = useSelector(
+    (state: RootState) => ({
+      pipes: state.single.pipes,
+      currentUnit: state.single.currentUnit, // from unit slice
+      pressure: state.single.pressure,
+      temperature: state.single.temperature,
+      global: state.single.global,
+    })
+  );
 
+  const hasInitialized = React.useRef(false);
 
   useEffect(() => {
-    if (pipes.length === 0) {
+    if (!hasInitialized.current && pipes.length === 0) {
       dispatch(
         addPipeSingle({
           id: uuidv4(),
           nps: "4",
           schedule: "40" as PipeSchedule,
-          od: "4.5", // nominal OD for 4" pipe (adjust if needed)
-          
         })
       );
+      hasInitialized.current = true;
     }
-  }, [dispatch, pipes.length]);
+  }, [dispatch, pipes.length, currentUnit]);
 
   const handleAddPipe = () => {
     dispatch(
@@ -46,7 +53,6 @@ const SinglePressureTabContent: React.FC = ({}) => {
         id: uuidv4(),
         nps: "2",
         schedule: "40" as PipeSchedule,
-        od: "2.375",
       })
     );
   };
