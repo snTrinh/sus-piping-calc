@@ -5,11 +5,25 @@ import { Box, Typography, Container, Tabs, Tab } from "@mui/material";
 import SinglePressureTabContent from "./single/SinglePressureTabContent";
 import MultiplePressuresTabContent from "./multiple/MultiplePressuresTabContent";
 import UnitsToggle from "../common/UnitsToggle";
+import { useDispatch } from "react-redux";
+import { resetMultipleSlice } from "@/state/multipleSlice";
+import { resetSingleSlice } from "@/state/singleSlice";
 
 export default function B31_3Calculator() {
   const ENABLE_MULTIPLE_PRESSURES =
     process.env.NEXT_PUBLIC_ENABLE_MULTIPLE_PRESSURES === "true";
   const [tabIndex, setTabIndex] = useState(0);
+  const dispatch = useDispatch();
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
+    if (newValue === 0) {
+      dispatch(resetMultipleSlice());
+    } else if (newValue === 1) {
+      dispatch(resetSingleSlice());
+    }
+  
+    setTabIndex(newValue);
+  };
+  
 
   return (
     <Box sx={{ width: "100%", ml: 0 }}>
@@ -32,7 +46,7 @@ export default function B31_3Calculator() {
         >
           <Tabs
             value={tabIndex}
-            onChange={(_, newValue) => setTabIndex(newValue)}
+            onChange={handleTabChange}
             textColor="primary"
             indicatorColor="primary"
             variant="scrollable"

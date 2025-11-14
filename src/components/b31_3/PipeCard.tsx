@@ -148,7 +148,7 @@ export default function PipeCard({
           >
             {npsOptions.map((npsValue) => (
               <MenuItem key={npsValue} value={npsValue}>
-                {`${npsValue}" (${npsToDnMap[npsValue] || "N/A"} DN)`}
+                {`${npsValue}" (DN ${npsToDnMap[npsValue] || "N/A"})`}
               </MenuItem>
             ))}
           </TextField>

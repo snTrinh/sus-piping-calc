@@ -13,6 +13,7 @@ import { Box, Button, Card, Typography } from "@mui/material";
 
 import { useAppSelector } from "@/state/store";
 import FormulaDisplay from "../FormulaDisplay";
+import PdfExport from "../pdfExport/PdfExport";
 import PipeCard from "../PipeCard";
 import DesignParameters from "./DesignParameters";
 import GlobalDesignParameters from "./GlobalDesignParameters";
@@ -157,9 +158,9 @@ const MultiplePressuresTabContent: React.FC = () => {
         </Box>
       ))}
 
-      {/* <Box sx={{ mt: 6 }}>
+      <Box sx={{ mt: 6 }}>
         <PdfExport pipes={pipes} />
-      </Box> */}
+      </Box>
     </>
   );
 };

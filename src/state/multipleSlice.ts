@@ -156,6 +156,7 @@ const multipleSlice = createSlice({
       state.global.corrosionAllowance = action.payload;
       state.pipes.forEach((pipe) => recalcPipe(pipe, state.currentUnit, state.global));
     },
+    resetMultipleSlice: () => initialState,
   },
 });
 
@@ -168,6 +169,7 @@ export const {
   updatePipeMaterial,
   updatePipePressure,
   updatePipeTemperature,
+  resetMultipleSlice,
 } = multipleSlice.actions;
 
 export const selectMultiplePipes = (state: { multiple: MultipleState }) =>

@@ -16,8 +16,6 @@ import {
   useTheme,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
-
-import { useEffect, useState } from "react";
 import { useThemeMode } from "../../app/ThemeContext";
 
 const collapsedWidth = 56;
@@ -34,10 +32,6 @@ export default function Sidebar() {
     // import AssessmentIcon from "@mui/icons-material/Assessment";
     { icon: <FunctionsIcon />, href: "/interpolation", label: "Utilities" },
   ];
-
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  if (!mounted) return null;
 
   const themeToggleItem = {
     icon: mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />,

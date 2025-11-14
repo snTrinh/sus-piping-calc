@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { PipeSchedule } from "@/utils/unitConversions";
 import FormulaDisplay from "../FormulaDisplay";
-import PdfExport from "../pdfExport/SinglePressure/PdfExport";
+import PdfExport from "../pdfExport/PdfExport";
 import PipeCard from "../PipeCard";
 import DesignParameters from "./DesignParameters";
 

@@ -1,24 +1,28 @@
 "use client";
-import { useRef, useState, useEffect } from "react";
-import { Box, TextField, Button } from "@mui/material";
-import PdfContent from "./PdfContent";
-import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
+import { RootState } from "@/state/store";
 import { Pipe } from "@/types/pipe";
-
+import ArrowCircleDownIcon from "@mui/icons-material/ArrowCircleDown";
+import { Box, Button, TextField, useTheme } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import PdfPipeOutputs from "./PdfPipeOutputs";
 
 type PdfExportProps = {
   pipes: Pipe[];
 };
 
-export default function PdfExport({
-  pipes,
-
-}: PdfExportProps) {
+export default function PdfExport({ pipes }: PdfExportProps) {
   const printRef = useRef<HTMLDivElement>(null);
-  const [drawingNumber, setDrawingNumber] = useState("");
+  const [drawingNumber, setDrawingNumber] = useState("0");
   const [drawingRevision, setDrawingRevision] = useState("0");
   const [calculationRevision, setCalculationRevision] = useState("0");
-  const [date, setDate] = useState(() => new Date().toISOString().split("T")[0]);
+  const [date, setDate] = useState(
+    () => new Date().toISOString().split("T")[0]
+  );
+  const theme = useTheme();
+
+  const multiplePipes = useSelector((state: RootState) => state.multiple.pipes);
+  const isMultiple = multiplePipes.length > 0;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const html2pdfRef = useRef<any>(null);
@@ -34,10 +38,13 @@ export default function PdfExport({
   const handleDownloadPdf = () => {
     if (!printRef.current || !html2pdfRef.current) return;
 
-    html2pdfRef.current()
+    html2pdfRef
+      .current()
       .set({
         margin: 1,
-        filename: `Drawing-${drawingNumber || "N/A"}-Rev${drawingRevision || "0"}-${date}.pdf`,
+        filename: `Drawing-${drawingNumber || "N/A"}-Rev${
+          drawingRevision || "0"
+        }-${date}.pdf`,
         image: { type: "jpeg", quality: 0.98 },
         html2canvas: {},
         jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
@@ -78,7 +85,7 @@ export default function PdfExport({
         }}
       >
         <TextField
-          label={`Drawing Number${drawingNumber ? `, ${drawingNumber}` : ""}`}
+          label={`Drawing Number`}
           value={drawingNumber}
           onChange={(e) => setDrawingNumber(e.target.value)}
           size="small"
@@ -124,12 +131,25 @@ export default function PdfExport({
         </Button>
       </Box>
 
-      <PdfContent
-        ref={printRef}
-        drawingInfo={drawingInfo}
+      {/* <PdfContent ref={printRef} drawingInfo={drawingInfo} pipes={pipes} /> */}
 
-        pipes={pipes}
-      />
+      <div
+        ref={printRef}
+        style={{
+          padding: 10,
+          maxWidth: 600,
+          fontSize: 12,
+          fontFamily:
+            "'Calibri', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+          color: theme.palette.text.primary,
+        }}
+      >
+        <PdfPipeOutputs
+          pipes={pipes}
+          isMultiple={isMultiple}
+          drawingInfo={drawingInfo}
+        />
+      </div>
     </Box>
   );
 }

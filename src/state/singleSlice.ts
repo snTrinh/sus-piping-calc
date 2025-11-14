@@ -175,6 +175,7 @@ const singleSlice = createSlice({
       pipe.allowableStress = allowableStress;
       recalcPipe(pipe, state.currentUnit, state.global, state.pressure, state.selectedMaterial, state.temperature);
     },
+    resetSingleSlice: () => initialState,
   },
 });
 
@@ -188,6 +189,7 @@ export const {
   setMaterial,
   updateCorrosionAllowance,
   updateAllowableStress,
+  resetSingleSlice,
 } = singleSlice.actions;
 
 export const selectSingleMaterial = (state: RootState) =>
