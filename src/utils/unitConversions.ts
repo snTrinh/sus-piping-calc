@@ -179,13 +179,13 @@ export const unitConversions = {
           : NaN,
       from: (value: number) => {
         const entry = Object.entries(npsToDnMap).find(
-          ([_, mm]) => mm === value.toString()
+          ([, mm]) => mm === value.toString()
         );
         return entry ? Number(entry[0]) : NaN;
       },
       toImperial: (value: number) => {
         const entry = Object.entries(npsToDnMap).find(
-          ([_, mm]) => mm === value.toString()
+          ([, mm]) => mm === value.toString()
         );
         return entry ? Number(entry[0]) : NaN;
       },
@@ -198,35 +198,4 @@ export const unitConversions = {
   },
 };
 
-interface ConvertDesignInputsProps {
-  units: Units;
-  temperature: number;
-  allowableStress: number | null;
-  corrosionAllowance: number;
-  pressure: number;
-}
 
-interface ConvertedDesignInputs {
-  temperatureDisplay: number;
-  allowableStressDisplay: number;
-  corrosionAllowanceDisplay: number;
-  pressureDisplay: number;
-}
-
-export function convertDesignInputs({
-  units,
-  temperature,
-  allowableStress,
-  corrosionAllowance,
-  pressure,
-}: ConvertDesignInputsProps): ConvertedDesignInputs {
-  return {
-    temperatureDisplay: temperature,
-    pressureDisplay: pressure,
-    corrosionAllowanceDisplay: corrosionAllowance,
-    allowableStressDisplay:
-      allowableStress !== null
-        ? unitConversions.pressure[units].fromImperial(allowableStress)
-        : 0,
-  };
-}

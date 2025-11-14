@@ -22,10 +22,10 @@ import { Pipe } from "@/types/pipe";
 
 const SinglePressureTabContent: React.FC = ({}) => {
   const dispatch = useDispatch();
-  const { pipes, currentUnit, pressure, temperature, global } = useSelector(
+  const { pipes, currentUnit } = useSelector(
     (state: RootState) => ({
       pipes: state.single.pipes,
-      currentUnit: state.single.currentUnit, // from unit slice
+      currentUnit: state.single.currentUnit, 
       pressure: state.single.pressure,
       temperature: state.single.temperature,
       global: state.single.global,
@@ -130,16 +130,6 @@ const SinglePressureTabContent: React.FC = ({}) => {
 
       <Box sx={{ mt: 4, display: "flex", flexDirection: "column", gap: 2 }}>
         {pipes.map((pipe) => {
-          const pipeDesignParams = {
-            pressure,
-            temperature,
-            allowableStress: pipe.allowableStress, // pipe-specific
-            corrosionAllowance: global.corrosionAllowance,
-            gamma: global.gamma,
-            millTol: global.millTol,
-            e: global.e,
-            w: global.w,
-          };
 
           return (
             <PipeCard
@@ -147,7 +137,6 @@ const SinglePressureTabContent: React.FC = ({}) => {
               pipe={pipe}
               updatePipe={handleUpdatePipe}
               removePipe={handleRemovePipe}
-              designParams={pipeDesignParams}
             />
           );
         })}

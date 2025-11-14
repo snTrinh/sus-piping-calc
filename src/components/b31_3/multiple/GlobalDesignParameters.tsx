@@ -13,7 +13,7 @@ import { updateCorrosionAllowance } from "@/state/multipleSlice";
 export default function GlobalDesignParameters() {
   const dispatch = useDispatch();
   const corrosionAllowance = useSelector((state: RootState) => state.multiple.global.corrosionAllowance);
-  const units = useSelector((state: RootState) => state.unit.currentUnit);
+  const units = useSelector((state: RootState) => state.single.currentUnit); // move to single slice
   const handleCAChange = (value: number) => {
     dispatch(updateCorrosionAllowance(value));
   };

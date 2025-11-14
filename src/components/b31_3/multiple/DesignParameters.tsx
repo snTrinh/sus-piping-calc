@@ -22,20 +22,18 @@ type DesignParametersProps = {
 
 export default function DesignParameters({ pipeId }: DesignParametersProps) {
   const dispatch = useDispatch();
-  const units = useSelector((state: RootState) => state.unit.currentUnit);
+  const units = useSelector((state: RootState) => state.single.currentUnit); // moved to single slice
 
   const pipeState = useSelector((state: RootState) =>
     state.multiple.pipes.find((p) => p.pipe.id === pipeId)
   );
 
-  // Always call useMemo
   const materials = useMemo(() => {
     const metric = Object.keys(materialsData.Metric.materials);
     const imperial = Object.keys(materialsData.Imperial.materials);
     return Array.from(new Set([...metric, ...imperial])) as MaterialName[];
   }, []);
 
-  // Compute allowable stress safely
   const allowableStress = useMemo(() => {
     if (!pipeState || !pipeState.material) return 0;
 
@@ -52,7 +50,6 @@ export default function DesignParameters({ pipeId }: DesignParametersProps) {
     return stress;
   }, [pipeState, units]);
 
-  // If pipeState doesn't exist, show nothing (hooks already safe)
   if (!pipeState) return null;
 
   const { material, pressure, temperature } = pipeState;

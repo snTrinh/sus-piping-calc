@@ -13,7 +13,7 @@ import {
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import { useTheme } from "@mui/material/styles";
 
-import { DesignParams, Units } from "@/types/units";
+import {Units } from "@/types/units";
 import {
   npsToDnMap,
   PIPE_SCHEDULE_ORDER,
@@ -48,7 +48,6 @@ type PipeCardProps = {
   pipe: Pipe;
   updatePipe: (id: string, key: keyof Pipe, value: string | number) => void;
   removePipe: (id: string) => void;
-  designParams: DesignParams;
   sx?: object;
 };
 
@@ -56,13 +55,10 @@ export default function PipeCard({
   pipe,
   updatePipe,
   removePipe,
-  designParams,
   sx,
 }: PipeCardProps) {
   const theme = useTheme();
-  const units = useAppSelector((state) => state.single.currentUnit,);
-  const { pressure, allowableStress, corrosionAllowance, e, w, gamma } =
-    designParams;
+  const units = useAppSelector((state) => state.single.currentUnit);
 
   const thicknessConversion = unitConversions.length[units];
   const unitLabel = thicknessConversion.unit;

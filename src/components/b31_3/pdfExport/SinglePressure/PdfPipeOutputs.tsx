@@ -2,14 +2,11 @@
 
 import React from "react";
 import { Units } from "@/types/units";
-import pipeData from "@/data/transformed_pipeData.json";
-import { npsToDnMap, unitConversions } from "@/utils/unitConversions";
+import { unitConversions } from "@/utils/unitConversions";
 import { useTheme } from "@mui/material/styles";
-import { calculateTRequired, TRequiredParams } from "@/utils/pipeCalculations";
 import { RootState } from "@/state/store";
 import { useSelector } from "react-redux";
 import { Pipe } from "@/types/pipe";
-import { getAllowableStressForTemp } from "@/utils/materialsData";
 
 export type PipeDataEntry = {
   OD: number;
@@ -20,8 +17,6 @@ export type PipeDataJson = {
   Imperial: Record<string, PipeDataEntry>;
   Metric: Record<string, PipeDataEntry>;
 };
-
-const typedPipeData: PipeDataJson = pipeData;
 
 type PdfPipeOutputsProps = {
   pipes: Pipe[];
@@ -51,7 +46,7 @@ const numeratorStyle: React.CSSProperties = {
 const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({ pipes }) => {
   const theme = useTheme();
 
-  const { temperature, selectedMaterial, pressure } = useSelector(
+  const { selectedMaterial, pressure } = useSelector(
     (state: RootState) => state.single
   );
   const { corrosionAllowance, gamma, e, w, millTol } = useSelector(
@@ -96,7 +91,7 @@ const PdfPipeOutputs: React.FC<PdfPipeOutputsProps> = ({ pipes }) => {
               {units === Units.Metric ? (
                 <>DN {pipe.dn} </>
               ) : (
-                <>NPS {pipe.nps}" </>
+                <>NPS {pipe.nps}&quot; </>
               )}
               SCH {pipe.schedule} {selectedMaterial} (D=
               {outerDiameterDisplay.toFixed(3)}

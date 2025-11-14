@@ -5,11 +5,12 @@ import { Box, Container, Typography } from "@mui/material";
 import InputValuesCard from "./../../components/hydro-test/InputValuesCard";
 import CalculatedValueCard from "./../../components/hydro-test/CalculatedValuesCard";
 import UnitsToggle from "@/components/common/UnitsToggle";
-import { useSelector } from "react-redux";
-import { selectUnit } from "@/state/unitSlice";
+
+import { useAppSelector } from "@/state/store";
+
 
 export default function HydroTestPage() {
-  const units = useSelector(selectUnit);
+   const units = useAppSelector((state) => state.single.currentUnit,);
   const [P, setP] = useState(250);
   const [St, setSt] = useState(132000);
   const [S, setS] = useState(300);

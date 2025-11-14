@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { v4 as uuidv4 } from "uuid";
+import React from "react";
 import { Box, Button, Card, Typography } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import PipeCard from "../PipeCard";
@@ -9,54 +8,14 @@ import FormulaDisplay from "../FormulaDisplay";
 import PdfExport from "../pdfExport/SinglePressure/PdfExport";
 import DesignParameters from "./DesignParameters";
 import GlobalDesignParameters from "./GlobalDesignParameters";
-import { addPipeMultiple, removePipeMultiple, updatePipeField } from "@/state/multipleSlice";
+import { removePipeMultiple, updatePipeField } from "@/state/multipleSlice";
 import { RootState } from "@/state/store";
 import { useDispatch, useSelector } from "react-redux";
-import { PipeSchedule } from "@/utils/unitConversions";
 
 const MultiplePressuresTabContent: React.FC = () => {
   const dispatch = useDispatch();
 
   const pipes = useSelector((state: RootState) => state.multiple.pipes);
-
-  const { corrosionAllowance, gamma, e, w, millTol } = useSelector(
-    (state: RootState) => state.single.global
-  );
-
-  useEffect(() => {
-    if (pipes.length === 0) {
-      dispatch(
-        addPipeMultiple({
-          pipe: {
-            id: uuidv4(),
-            nps: "4",
-            schedule: "40" as PipeSchedule,
-            od: "4.5",
-          },
-          material: "A106B",
-          pressure: 1414,
-          temperature: 100,
-        })
-      );
-    }
-  }, [dispatch, pipes.length]);
-
-  const handleAddPipe = () => {
-    dispatch(
-      addPipeMultiple({
-        pipe: {
-          id: uuidv4(),
-          nps: "4",
-          schedule: "40",
-          od: "4.5",
-        },
-        material: "A106B",
-        pressure: 0,
-        temperature: 0,
-      })
-    );
-  };
-
   const handleRemovePipe = (id: string) => {
     dispatch(removePipeMultiple(id));
   };
@@ -92,7 +51,7 @@ const MultiplePressuresTabContent: React.FC = () => {
             <Button
               startIcon={<AddCircleOutlineIcon />}
               variant="outlined"
-              onClick={handleAddPipe}
+              onClick={() =>{}}
               fullWidth
             >
               Add Pipe
@@ -154,16 +113,6 @@ const MultiplePressuresTabContent: React.FC = () => {
                 dispatch(updatePipeField({ pipeId: id, key, value }))
               }
               removePipe={() => handleRemovePipe(pipeState.pipe.id)}
-              designParams={{
-                pressure: pipeState.pressure,
-                temperature: pipeState.temperature,
-                allowableStress: pipeState.pipe.allowableStress,
-                corrosionAllowance,
-                gamma,
-                e,
-                w,
-                millTol,
-              }}
             />
           </Box>
         </Box>

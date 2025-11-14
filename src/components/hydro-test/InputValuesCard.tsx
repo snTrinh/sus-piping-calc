@@ -27,7 +27,6 @@ export default function InputValuesCard({
 }: InputValuesCardProps) {
   const pressureUnit = unitConversions.pressure[units].unit;
 
-
   const prevUnits = useRef(units);
 
   useEffect(() => {

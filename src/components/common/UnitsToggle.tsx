@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { ToggleButton, ToggleButtonGroup, useMediaQuery, useTheme } from "@mui/material";
+import { ToggleButton, ToggleButtonGroup, useTheme } from "@mui/material";
 import { Units } from "./../../types/units";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/state/store";
