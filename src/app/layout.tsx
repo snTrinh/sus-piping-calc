@@ -4,7 +4,6 @@ import { store } from "@/state/store";
 import { Inter } from "next/font/google";
 import Sidebar from "../components/common/Sidebar";
 
-import { useState } from "react";
 import { Provider } from "react-redux";
 import ThemeContextProvider from "./ThemeContext";
 
