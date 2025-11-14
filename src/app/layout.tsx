@@ -15,7 +15,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [dialogOpen, setDialogOpen] = useState(false);
   return (
     <html lang="en" className={inter.className}>
       <body style={{ display: "flex" }}>
