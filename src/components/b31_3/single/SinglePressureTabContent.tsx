@@ -1,48 +1,45 @@
 "use client";
 
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import { Box, Button, Card, Typography } from "@mui/material";
 import React, { useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { Box, Button, Card, Typography } from "@mui/material";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
 import { PipeSchedule } from "@/utils/unitConversions";
-import PipeCard from "../PipeCard";
 import FormulaDisplay from "../FormulaDisplay";
 import PdfExport from "../pdfExport/SinglePressure/PdfExport";
+import PipeCard from "../PipeCard";
 import DesignParameters from "./DesignParameters";
 
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/state/store";
 import {
   addPipeSingle,
   removePipe,
   updatePipeSingleField,
 } from "@/state/singleSlice";
+import { RootState } from "@/state/store";
 import { Pipe } from "@/types/pipe";
+import { useDispatch, useSelector } from "react-redux";
 
 const SinglePressureTabContent: React.FC = ({}) => {
   const dispatch = useDispatch();
-  const { pipes, currentUnit } = useSelector(
-    (state: RootState) => ({
-      pipes: state.single.pipes,
-      currentUnit: state.single.currentUnit, 
-      pressure: state.single.pressure,
-      temperature: state.single.temperature,
-      global: state.single.global,
-    })
+  const pipes = useSelector((state: RootState) => state.single.pipes);
+  const currentUnit = useSelector(
+    (state: RootState) => state.single.currentUnit
   );
 
   const hasInitialized = React.useRef(false);
 
   useEffect(() => {
     if (!hasInitialized.current && pipes.length === 0) {
-      dispatch(
-        addPipeSingle({
-          id: uuidv4(),
-          nps: "4",
-          schedule: "40" as PipeSchedule,
-        })
-      );
+      if (addPipeSingle) {
+        dispatch(
+          addPipeSingle({
+            id: uuidv4(),
+            nps: "4",
+            schedule: "40" as PipeSchedule,
+          })
+        );
+      }
       hasInitialized.current = true;
     }
   }, [dispatch, pipes.length, currentUnit]);
@@ -130,11 +127,11 @@ const SinglePressureTabContent: React.FC = ({}) => {
 
       <Box sx={{ mt: 4, display: "flex", flexDirection: "column", gap: 2 }}>
         {pipes.map((pipe) => {
-
           return (
             <PipeCard
               key={pipe.id}
               pipe={pipe}
+              units={currentUnit}
               updatePipe={handleUpdatePipe}
               removePipe={handleRemovePipe}
             />

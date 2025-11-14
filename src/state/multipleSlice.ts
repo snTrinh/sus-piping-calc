@@ -1,20 +1,31 @@
+// multipleSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { MaterialName } from "../utils/materialsData";
+import { v4 as uuidv4 } from "uuid";
 
-import { Pipe } from "@/types/pipe";
-
+import { Pipe, PipeExt } from "@/types/pipe";
+import { MaterialName, getAllowableStressForTemp } from "@/utils/materialsData";
+import { calculateTRequired } from "@/utils/pipeCalculations";
 import { E, GAMMA, MILL_TOL, W } from "@/constants/constants";
 import { GlobalDesignParams } from "@/types/globalDesignParams";
-interface MultiplePipe {
-  pipe: Pipe;
-  material: MaterialName;
-  pressure: number;
-  temperature: number;
-}
+
+import metricPipeData from "@/data/metricData.json";
+import imperialPipeData from "@/data/imperialData.json";
+import { Units } from "@/types/units";
+import { npsToDnMap, PipeSchedule } from "@/utils/unitConversions";
+
+type PipeDataEntry = {
+  OD: number;
+  schedules: Partial<Record<PipeSchedule, number>>;
+};
+type PipeData = Record<string, PipeDataEntry>;
+
+const metricData: PipeData = metricPipeData;
+const imperialData: PipeData = imperialPipeData;
 
 interface MultipleState {
   global: GlobalDesignParams;
-  pipes: MultiplePipe[];
+  currentUnit: Units;
+  pipes: PipeExt[];
 }
 
 const initialState: MultipleState = {
@@ -25,95 +36,141 @@ const initialState: MultipleState = {
     gamma: GAMMA,
     millTol: MILL_TOL,
   },
+  currentUnit: Units.Imperial,
   pipes: [],
 };
 
-export const multipleSlice = createSlice({
+
+function recalcPipe(pipe: PipeExt, units: Units, global: GlobalDesignParams) {
+  if (units === Units.Metric) {
+    pipe.dn = npsToDnMap[pipe.nps]; 
+  }
+
+  const pipeDataEntry =
+    units === Units.Metric ? metricData[pipe.dn] : imperialData[pipe.nps];
+  if (!pipeDataEntry) return;
+
+  pipe.od = pipeDataEntry.OD;
+  pipe.t = pipeDataEntry.schedules[pipe.schedule] ?? 0;
+  pipe.allowableStress = getAllowableStressForTemp(pipe.material, units, pipe.temperature);
+  pipe.tRequired = calculateTRequired({
+    pressure: pipe.pressure,
+    outerDiameter: pipe.od,
+    allowableStress: pipe.allowableStress,
+    e: global.e,
+    w: global.w,
+    gamma: global.gamma,
+    corrosionAllowance: global.corrosionAllowance,
+    millTol: global.millTol,
+  });
+}
+
+
+const multipleSlice = createSlice({
   name: "multiplePressure",
   initialState,
   reducers: {
-
-    removePipeMultiple(state, action: PayloadAction<string>) {
-      state.pipes = state.pipes.filter((p) => p.pipe.id !== action.payload);
+    setUnitMultiple(state, action: PayloadAction<Units>) {
+      state.currentUnit = action.payload;
+      state.pipes.forEach((pipe) => recalcPipe(pipe, state.currentUnit, state.global));
     },
 
-    updatePipeMaterialMultiple(
-      state,
-      action: PayloadAction<{ pipeId: string; material: MaterialName }>
-    ) {
-      const wrapper = state.pipes.find(
-        (p) => p.pipe.id === action.payload.pipeId
-      );
-      if (wrapper) wrapper.material = action.payload.material;
+    addPipe(state) {
+      const pipe: PipeExt = {
+        id: uuidv4(),
+        nps: "4",
+        dn: "DN 100",
+        schedule: "40",
+        od: 0,
+        t: 0,
+        tRequired: 0,
+        allowableStress: 0,
+        pressure: 1440,
+        temperature: 100,
+        material: "A106B",
+      };
+      recalcPipe(pipe, state.currentUnit, state.global);
+      state.pipes.push(pipe);
     },
 
-    updatePipePressureMultiple(
-      state,
-      action: PayloadAction<{ pipeId: string; pressure: number }>
-    ) {
-      const wrapper = state.pipes.find(
-        (p) => p.pipe.id === action.payload.pipeId
-      );
-      if (wrapper) wrapper.pressure = action.payload.pressure;
-    },
-
-    updatePipeTemperatureMultiple(
-      state,
-      action: PayloadAction<{ pipeId: string; temperature: number }>
-    ) {
-      const wrapper = state.pipes.find(
-        (p) => p.pipe.id === action.payload.pipeId
-      );
-      if (wrapper) wrapper.temperature = action.payload.temperature;
-    },
-
-    updateCorrosionAllowance(state, action: PayloadAction<number>) {
-      state.global.corrosionAllowance = action.payload;
-    },
-
-    updatePipeAllowableStress(
-      state,
-      action: PayloadAction<{ pipeId: string; allowableStress: number }>
-    ) {
-      const wrapper = state.pipes.find(
-        (p) => p.pipe.id === action.payload.pipeId
-      );
-      if (wrapper)
-        wrapper.pipe.allowableStress = action.payload.allowableStress;
+    removePipe(state, action: PayloadAction<string>) {
+      state.pipes = state.pipes.filter((p) => p.id !== action.payload);
     },
 
     updatePipeField(
       state,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      action: PayloadAction<{ pipeId: string; key: keyof Pipe; value: any }>
+      action: PayloadAction<{ pipeId: string; key: keyof PipeExt; value: string | number }>
     ) {
-      const wrapper = state.pipes.find(
-        (p) => p.pipe.id === action.payload.pipeId
-      );
-      if (wrapper) {
-        // @ts-expect-error error here
-        wrapper.pipe[action.payload.key] = action.payload.value;
+      const { pipeId, key, value } = action.payload;
+      const pipe = state.pipes.find((p) => p.id === pipeId);
+      if (!pipe) return;
+    
+      if (["od", "t", "tRequired", "allowableStress", "pressure", "temperature"].includes(key)) {
+        (pipe[key] as number) = value as number;
+      } else if (["nps", "dn", "schedule", "id", "material"].includes(key)) {
+        (pipe[key] as string | MaterialName) = value as string | MaterialName;
       }
+    
+      if (["nps", "schedule", "pressure", "temperature", "material"].includes(key)) {
+        if (key === "nps" || key === "schedule") pipe.dn = npsToDnMap[pipe.nps];
+        recalcPipe(pipe, state.currentUnit, state.global);
+      }
+    }
+    ,
+
+
+    updatePipeMaterial(
+      state,
+      action: PayloadAction<{ pipeId: string; material: MaterialName }>
+    ) {
+      const { pipeId, material } = action.payload;
+      const pipe = state.pipes.find((p) => p.id === pipeId);
+      if (!pipe) return;
+      pipe.material = material;
+      recalcPipe(pipe, state.currentUnit, state.global);
+    },
+
+    updatePipePressure(
+      state,
+      action: PayloadAction<{ pipeId: string; pressure: number }>
+    ) {
+      const { pipeId, pressure } = action.payload;
+      const pipe = state.pipes.find((p) => p.id === pipeId);
+      if (!pipe) return;
+      pipe.pressure = pressure;
+      recalcPipe(pipe, state.currentUnit, state.global);
+    },
+
+    updatePipeTemperature(
+      state,
+      action: PayloadAction<{ pipeId: string; temperature: number }>
+    ) {
+      const { pipeId, temperature } = action.payload;
+      const pipe = state.pipes.find((p) => p.id === pipeId);
+      if (!pipe) return;
+      pipe.temperature = temperature;
+      recalcPipe(pipe, state.currentUnit, state.global);
+    },
+
+    updateCorrosionAllowance(state, action: PayloadAction<number>) {
+      state.global.corrosionAllowance = action.payload;
+      state.pipes.forEach((pipe) => recalcPipe(pipe, state.currentUnit, state.global));
     },
   },
 });
 
 export const {
-  removePipeMultiple,
-  updatePipeMaterialMultiple,
-  updatePipePressureMultiple,
-  updatePipeTemperatureMultiple,
-  updateCorrosionAllowance,
-  updatePipeAllowableStress,
+  setUnitMultiple,
+  addPipe,
+  removePipe,
   updatePipeField,
+  updateCorrosionAllowance,
+  updatePipeMaterial,
+  updatePipePressure,
+  updatePipeTemperature,
 } = multipleSlice.actions;
 
-export const selectMultiplePipes = (state: {
-  multiplePressure: MultipleState;
-}) => state.multiplePressure.pipes;
-
-export const selectMultipleGlobal = (state: {
-  multiplePressure: MultipleState;
-}) => state.multiplePressure.global;
+export const selectMultiplePipes = (state: { multiple: MultipleState }) =>
+  state.multiple.pipes;
 
 export default multipleSlice.reducer;

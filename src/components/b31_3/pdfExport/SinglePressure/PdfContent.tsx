@@ -17,7 +17,8 @@ const PdfContent = forwardRef<HTMLDivElement, PdfContentProps>(
   ({ drawingInfo, pipes, isMultiple = false }, ref) => {
     const theme = useTheme();
     const globalDesign = useSelector((state: RootState) => state.single.global);
-
+    const pressure = useSelector((state: RootState) => state.single.pressure);
+    const temperature = useSelector((state: RootState) => state.single.temperature);
     const pipeList = isMultiple ? pipes : [pipes[0]].filter(Boolean);
 
     return (
@@ -26,7 +27,7 @@ const PdfContent = forwardRef<HTMLDivElement, PdfContentProps>(
         style={{
           padding: 10,
           maxWidth: 600,
-          fontSize: 14,
+          fontSize: 12,
           fontFamily:
             "'Calibri', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
           color: theme.palette.text.primary,
@@ -34,9 +35,9 @@ const PdfContent = forwardRef<HTMLDivElement, PdfContentProps>(
       >
         {pipeList.map((pipe, index) => {
           const designParams = {
-            pressure: pipe.pressure ?? 0,
-            temperature: pipe.temperature ?? 0,
-            allowableStress: pipe.allowableStress , // get from pipe
+            pressure: pressure ?? 0,
+            temperature: temperature ?? 0,
+            allowableStress: pipe.allowableStress , 
             corrosionAllowance: globalDesign.corrosionAllowance,
             gamma: globalDesign.gamma,
             e: globalDesign.e,

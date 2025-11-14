@@ -1,24 +1,49 @@
 "use client";
+import React, { useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addPipe,
+  removePipe,
+  selectMultiplePipes,
+  updatePipeField,
+} from "@/state/multipleSlice";
 
-import React from "react";
-import { Box, Button, Card, Typography } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import PipeCard from "../PipeCard";
+import { Box, Button, Card, Typography } from "@mui/material";
+
 import FormulaDisplay from "../FormulaDisplay";
 import PdfExport from "../pdfExport/SinglePressure/PdfExport";
+import PipeCard from "../PipeCard";
 import DesignParameters from "./DesignParameters";
 import GlobalDesignParameters from "./GlobalDesignParameters";
-import { removePipeMultiple, updatePipeField } from "@/state/multipleSlice";
-import { RootState } from "@/state/store";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppSelector } from "@/state/store";
 
 const MultiplePressuresTabContent: React.FC = () => {
   const dispatch = useDispatch();
+  const units = useAppSelector((state) => state.multiple.currentUnit);
+  const pipes = useSelector(selectMultiplePipes);
+  const initialized = useRef(false);
 
-  const pipes = useSelector((state: RootState) => state.multiple.pipes);
+  useEffect(() => {
+    if (!initialized.current && pipes.length === 0) {
+      dispatch(addPipe());
+      initialized.current = true;
+    }
+  }, [dispatch, pipes.length]);
+
   const handleRemovePipe = (id: string) => {
-    dispatch(removePipeMultiple(id));
+    dispatch(removePipe(id));
   };
+
+  const handleUpdatePipe = <K extends keyof typeof pipes[0]>(
+    pipeId: string,
+    key: K,
+    value: typeof pipes[0][K] | undefined
+  ) => {
+    if (value === undefined) return; 
+    dispatch(updatePipeField({ pipeId, key, value }));
+  };
+  
 
   return (
     <>
@@ -46,18 +71,18 @@ const MultiplePressuresTabContent: React.FC = () => {
           elevation={0}
         >
           <GlobalDesignParameters />
-
           <Box sx={{ mt: "auto", width: "100%" }}>
             <Button
               startIcon={<AddCircleOutlineIcon />}
               variant="outlined"
-              onClick={() =>{}}
               fullWidth
+              onClick={() => dispatch(addPipe())}
             >
-              Add Pipe
+              Add Design Condition
             </Button>
           </Box>
         </Card>
+
         <Card
           sx={{
             flex: 1,
@@ -78,9 +103,9 @@ const MultiplePressuresTabContent: React.FC = () => {
         </Card>
       </Box>
 
-      {pipes.map((pipeState) => (
+      {pipes.map((pipe) => (
         <Box
-          key={pipeState.pipe.id}
+          key={pipe.id}
           sx={{ mt: 4, display: "flex", flexDirection: "column", gap: 2 }}
         >
           <Box
@@ -104,23 +129,22 @@ const MultiplePressuresTabContent: React.FC = () => {
               }}
               elevation={0}
             >
-              <DesignParameters pipeId={pipeState.pipe.id} />
+              <DesignParameters pipeId={pipe.id} />
             </Card>
 
             <PipeCard
-              pipe={pipeState.pipe}
-              updatePipe={(id, key, value) =>
-                dispatch(updatePipeField({ pipeId: id, key, value }))
-              }
-              removePipe={() => handleRemovePipe(pipeState.pipe.id)}
+              pipe={pipe}
+              units={units}
+              updatePipe={handleUpdatePipe}
+              removePipe={() => handleRemovePipe(pipe.id)}
             />
           </Box>
         </Box>
       ))}
 
-      <Box sx={{ mt: 6 }}>
-        <PdfExport pipes={pipes.map((p) => p.pipe)} />
-      </Box>
+      {/* <Box sx={{ mt: 6 }}>
+        <PdfExport pipes={pipes} />
+      </Box> */}
     </>
   );
 };

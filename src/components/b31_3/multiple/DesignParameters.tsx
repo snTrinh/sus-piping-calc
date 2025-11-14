@@ -11,9 +11,9 @@ import { MaterialName, materialsData } from "@/utils/materialsData";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/state/store";
 import {
-  updatePipeMaterialMultiple,
-  updatePipePressureMultiple,
-  updatePipeTemperatureMultiple,
+  updatePipeMaterial,
+  updatePipePressure,
+  updatePipeTemperature,
 } from "@/state/multipleSlice";
 
 type DesignParametersProps = {
@@ -22,10 +22,10 @@ type DesignParametersProps = {
 
 export default function DesignParameters({ pipeId }: DesignParametersProps) {
   const dispatch = useDispatch();
-  const units = useSelector((state: RootState) => state.single.currentUnit); // moved to single slice
+  const units = useSelector((state: RootState) => state.multiple.currentUnit);
 
   const pipeState = useSelector((state: RootState) =>
-    state.multiple.pipes.find((p) => p.pipe.id === pipeId)
+    state.multiple.pipes.find((p) => p.id === pipeId)
   );
 
   const materials = useMemo(() => {
@@ -66,7 +66,7 @@ export default function DesignParameters({ pipeId }: DesignParametersProps) {
           label="Material"
           value={material}
           onChange={(e) =>
-            dispatch(updatePipeMaterialMultiple({ pipeId, material: e.target.value as MaterialName }))
+            dispatch(updatePipeMaterial({ pipeId, material: e.target.value as MaterialName }))
           }
           sx={{ minWidth: 200, flexGrow: 1 }}
           size="small"
@@ -85,7 +85,7 @@ export default function DesignParameters({ pipeId }: DesignParametersProps) {
           symbol="P"
           unit={unitConversions.pressure[units].unit}
           value={pressure}
-          onChange={(val) => dispatch(updatePipePressureMultiple({ pipeId, pressure: val }))}
+          onChange={(val) => dispatch(updatePipePressure({ pipeId, pressure: val }))}
           sx={{ minWidth: 140, flex: 1 }}
         />
         <LabeledInputConversion
@@ -93,7 +93,7 @@ export default function DesignParameters({ pipeId }: DesignParametersProps) {
           symbol="T"
           unit={unitConversions.temperature[units].unit}
           value={temperature}
-          onChange={(val) => dispatch(updatePipeTemperatureMultiple({ pipeId, temperature: val }))}
+          onChange={(val) => dispatch(updatePipeTemperature({ pipeId, temperature: val }))}
           sx={{ minWidth: 140, flex: 1 }}
         />
       </Box>

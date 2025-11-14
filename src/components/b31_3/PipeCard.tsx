@@ -46,6 +46,7 @@ const typedPipeData: TransformedPipeData = {
 
 type PipeCardProps = {
   pipe: Pipe;
+  units: Units; 
   updatePipe: (id: string, key: keyof Pipe, value: string | number) => void;
   removePipe: (id: string) => void;
   sx?: object;
@@ -53,12 +54,13 @@ type PipeCardProps = {
 
 export default function PipeCard({
   pipe,
+  units,
   updatePipe,
   removePipe,
   sx,
 }: PipeCardProps) {
   const theme = useTheme();
-  const units = useAppSelector((state) => state.single.currentUnit);
+
 
   const thicknessConversion = unitConversions.length[units];
   const unitLabel = thicknessConversion.unit;
@@ -129,7 +131,6 @@ export default function PipeCard({
           </IconButton>
         </Box>
 
-        {/* NPS & Schedule */}
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, alignItems: "center" }}>
           <TextField
             select
@@ -176,7 +177,6 @@ export default function PipeCard({
           </TextField>
         </Box>
 
-        {/* Outer Diameter */}
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, alignItems: "center" }}>
           <TextField
             label={`Outer Diameter, D (${unitLabel})`}
@@ -187,7 +187,6 @@ export default function PipeCard({
           />
         </Box>
 
-        {/* Required Thickness */}
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, alignItems: "center" }}>
           <TextField
             label={`Required Thickness, tᵣ (${unitLabel})`}
@@ -198,7 +197,6 @@ export default function PipeCard({
           />
         </Box>
 
-        {/* Schedule Thickness */}
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, alignItems: "center" }}>
           <TextField
             label={`Schedule Thickness (${unitLabel})`}

@@ -60,18 +60,11 @@ const allowableStressFromMaterial = getAllowableStressForTemp(selectedMaterial, 
     <Box sx={{ mb: 4 }}>
       {designParamsList.map((dp, idx) => (
         <Box key={idx} sx={{ mb: 2, borderBottom: "1px solid #ddd", pb: 1 }}>
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, mb: 1 }}>
-            <Typography fontWeight="bold">Drawing Number:</Typography>
-            <Typography>{drawingInfo.drawingNumber}</Typography>
-            <Typography fontWeight="bold">Revision:</Typography>
-            <Typography>
-              {drawingInfo.calculationRevision}
-              {isMultiple ? `.${idx + 1}` : ""}
-            </Typography>
-            <Typography fontWeight="bold">Date:</Typography>
-            <Typography>{drawingInfo.date}</Typography>
-          </Box>
-
+          <div style={rowStyle}>
+          <div style={labelStyle}>Drawing Number: {drawingInfo.drawingNumber}</div>
+            <div style={labelStyle}>Revision: {drawingInfo.calculationRevision}</div>
+            <div style={labelStyle}>Date: {drawingInfo.date}</div>
+          </div>
           <div style={rowStyle}>
             <div style={labelStyle}>Design Pressure:</div>
             <div style={valueStyle}>{pressureConversion.to(pressure).toFixed(2)}</div>

@@ -1,3 +1,4 @@
+import { MaterialName } from "@/utils/materialsData";
 import { PipeSchedule } from "@/utils/unitConversions";
 
 export type Pipe = {
@@ -9,8 +10,11 @@ export type Pipe = {
   tRequired: number;
   t: number;
   allowableStress: number;
-  pressure?: number;
-  temperature?: number;
 };
 
 
+export type PipeExt = Pipe & {
+  pressure: number;
+  temperature: number;
+  material: MaterialName;
+};

@@ -5,6 +5,8 @@ import { Units } from "./../../types/units";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/state/store";
 import { setUnit } from "@/state/singleSlice";
+import { setUnitMultiple } from "@/state/multipleSlice";
+
 
 
 export default function UnitsToggle() {
@@ -27,7 +29,15 @@ export default function UnitsToggle() {
     event: React.MouseEvent<HTMLElement>,
     newUnit: Units
   ) => {
-    if (newUnit) dispatch(setUnit(newUnit));
+    if (newUnit) {
+      dispatch(
+        setUnit(newUnit)
+      )
+      dispatch(
+        setUnitMultiple(newUnit)
+      )
+    }
+    ;
   };
 
 
