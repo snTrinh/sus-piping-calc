@@ -54,29 +54,20 @@ function recalcPipe(
   material: MaterialName,
   temperature: number
 ) {
-  // Get pipe data in current unit
+
   let pipeDataEntry;
   if (units === Units.Metric) {
-    pipeDataEntry = metricData[pipe.dn]; // DN key for metric
+    pipeDataEntry = metricData[pipe.dn]; 
   } else {
-    pipeDataEntry = imperialData[pipe.nps]; // NPS key for imperial
+    pipeDataEntry = imperialData[pipe.nps]; 
   }
   if (!pipeDataEntry) return;
 
-  // OD and schedule thickness
+
   pipe.od = pipeDataEntry.OD; 
   pipe.t = pipeDataEntry.schedules[pipe.schedule] ?? 0;
   pipe.allowableStress = getAllowableStressForTemp(material, units, temperature);
 
-  console.log(pressure);
-  console.log(pipe.od);
-  console.log(pipe.allowableStress); // incorrect
-  console.log(global.e);
-  console.log(global.w);
-  console.log(global.gamma);
-  console.log(global.corrosionAllowance);
-  console.log(global.millTol);
-  // Recalculate required thickness
   pipe.tRequired = calculateTRequired({
     pressure,
     outerDiameter: pipe.od,
@@ -94,7 +85,7 @@ const singleSlice = createSlice({
   name: "singlePressure",
   initialState,
   reducers: {
-    // --- Switch units globally ---
+
     setUnit(state, action: PayloadAction<Units>) {
       const newUnit = action.payload;
       state.currentUnit = newUnit;
@@ -105,7 +96,7 @@ const singleSlice = createSlice({
       });
     },
 
-    // --- Add a new pipe ---
+
     addPipeSingle(
       state,
       action: PayloadAction<{ id: string; nps: string; schedule: PipeSchedule }>
@@ -119,14 +110,14 @@ const singleSlice = createSlice({
         od: 0,
         t: 0,
         tRequired: 0,
-        allowableStress: 20000, // default
+        allowableStress: 20000, 
       };
       recalcPipe(pipe, state.currentUnit, state.global, state.pressure, state.selectedMaterial, state.temperature);
 
       state.pipes.push(pipe);
     },
 
-    // --- Update pipe field and recalc if needed ---
+
     updatePipeSingleField(
       state,
       action: PayloadAction<{ pipeId: string; key: keyof Pipe; value: string | number }>
@@ -141,7 +132,6 @@ const singleSlice = createSlice({
         (pipe[key] as string) = value as string;
       }
 
-      // Recalc OD/t/tRequired if NPS, Schedule or Units change
       if (key === "nps" || key === "schedule") {
         pipe.dn = npsToDnMap[pipe.nps];
         recalcPipe(pipe, state.currentUnit, state.global, state.pressure, state.selectedMaterial, state.temperature);
@@ -149,12 +139,11 @@ const singleSlice = createSlice({
       }
     },
 
-    // --- Remove pipe ---
     removePipe(state, action: PayloadAction<string>) {
       state.pipes = state.pipes.filter((p) => p.id !== action.payload);
     },
 
-    // --- Update pressure globally and recalc ---
+   
     updatePressure(state, action: PayloadAction<number>) {
       state.pressure = action.payload;
       state.pipes.forEach((pipe) => recalcPipe(pipe, state.currentUnit, state.global, state.pressure, state.selectedMaterial, state.temperature)    );
