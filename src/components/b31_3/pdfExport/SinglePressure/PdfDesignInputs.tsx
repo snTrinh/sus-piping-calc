@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Box} from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "@/state/store";
 import { unitConversions } from "@/utils/unitConversions";

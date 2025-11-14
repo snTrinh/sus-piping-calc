@@ -12,7 +12,6 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { Box, Button, Card, Typography } from "@mui/material";
 
 import FormulaDisplay from "../FormulaDisplay";
-import PdfExport from "../pdfExport/SinglePressure/PdfExport";
 import PipeCard from "../PipeCard";
 import DesignParameters from "./DesignParameters";
 import GlobalDesignParameters from "./GlobalDesignParameters";

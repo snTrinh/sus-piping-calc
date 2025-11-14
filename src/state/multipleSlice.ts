@@ -2,7 +2,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
 
-import { Pipe, PipeExt } from "@/types/pipe";
+import { PipeExt } from "@/types/pipe";
 import { MaterialName, getAllowableStressForTemp } from "@/utils/materialsData";
 import { calculateTRequired } from "@/utils/pipeCalculations";
 import { E, GAMMA, MILL_TOL, W } from "@/constants/constants";

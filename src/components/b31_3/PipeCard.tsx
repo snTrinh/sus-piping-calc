@@ -20,7 +20,6 @@ import {
   PipeSchedule,
   unitConversions,
 } from "@/utils/unitConversions";
-import { useAppSelector } from "@/state/store";
 import { Pipe } from "@/types/pipe";
 import metricPipeData from "@/data/metricData.json";
 import imperialPipeData from "@/data/imperialData.json";
