@@ -123,7 +123,7 @@ const MultiplePressuresTabContent: React.FC = () => {
                 flexDirection: "column",
                 p: 2,
                 gap: 2,
-                height: 305,
+                height: 338,
                 border: "1px solid #ddd",
               }}
               elevation={0}
