@@ -6,8 +6,6 @@ import {
   TextField,
   MenuItem,
   Typography,
-  Card,
-  CardContent,
   IconButton,
 } from "@mui/material";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
@@ -56,7 +54,6 @@ export default function PipeCard({
   units,
   updatePipe,
   removePipe,
-  sx,
 }: PipeCardProps) {
   const theme = useTheme();
 
@@ -99,18 +96,15 @@ export default function PipeCard({
   );
 
   return (
-    <Card
-      sx={{
-        flex: 1,
-        borderRadius: 2,
-        border: "1px solid #ddd",
-        boxShadow: "none",
-        position: "relative",
-        minWidth: 450,
-        ...sx,
-      }}
-    >
-      <CardContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+
+       <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+              width: "100%",
+            }}
+          >
         <Box
           sx={{
             display: "flex",
@@ -218,7 +212,6 @@ export default function PipeCard({
             </span>
           )}
         </Typography>
-      </CardContent>
-    </Card>
+        </Box>
   );
 }

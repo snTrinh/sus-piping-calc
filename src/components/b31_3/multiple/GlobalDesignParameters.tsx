@@ -27,7 +27,7 @@ export default function GlobalDesignParameters() {
       }}
     >
       <Typography variant="h6" gutterBottom>
-        Design Parameters
+        Global Design Parameters
       </Typography>
 
       <Box

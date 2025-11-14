@@ -1,21 +1,21 @@
 "use client";
-import React, { useEffect, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import {
   addPipe,
   removePipe,
   selectMultiplePipes,
   updatePipeField,
 } from "@/state/multipleSlice";
+import React, { useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { Box, Button, Card, Typography } from "@mui/material";
 
+import { useAppSelector } from "@/state/store";
 import FormulaDisplay from "../FormulaDisplay";
 import PipeCard from "../PipeCard";
 import DesignParameters from "./DesignParameters";
 import GlobalDesignParameters from "./GlobalDesignParameters";
-import { useAppSelector } from "@/state/store";
 
 const MultiplePressuresTabContent: React.FC = () => {
   const dispatch = useDispatch();
@@ -34,15 +34,14 @@ const MultiplePressuresTabContent: React.FC = () => {
     dispatch(removePipe(id));
   };
 
-  const handleUpdatePipe = <K extends keyof typeof pipes[0]>(
+  const handleUpdatePipe = <K extends keyof (typeof pipes)[0]>(
     pipeId: string,
     key: K,
-    value: typeof pipes[0][K] | undefined
+    value: (typeof pipes)[0][K] | undefined
   ) => {
-    if (value === undefined) return; 
+    if (value === undefined) return;
     dispatch(updatePipeField({ pipeId, key, value }));
   };
-  
 
   return (
     <>
@@ -105,25 +104,28 @@ const MultiplePressuresTabContent: React.FC = () => {
       {pipes.map((pipe) => (
         <Box
           key={pipe.id}
-          sx={{ mt: 4, display: "flex", flexDirection: "column", gap: 2 }}
+          sx={{ mt: 4, display: "flex", justifyContent: "center" }}
         >
           <Box
             sx={{
               display: "flex",
               flexDirection: { xs: "column", md: "row" },
               gap: 4,
+              width: "100%",
+              maxWidth: 1300, // same max width as the top row
               alignItems: "stretch",
             }}
           >
+            {/* Design Parameters Card */}
             <Card
               sx={{
                 flex: 1,
-                minWidth: 450,
                 display: "flex",
                 flexDirection: "column",
                 p: 2,
                 gap: 2,
                 height: 338,
+                minWidth: { xs: "90%", md: 450 },
                 border: "1px solid #ddd",
               }}
               elevation={0}
@@ -131,12 +133,26 @@ const MultiplePressuresTabContent: React.FC = () => {
               <DesignParameters pipeId={pipe.id} />
             </Card>
 
-            <PipeCard
-              pipe={pipe}
-              units={units}
-              updatePipe={handleUpdatePipe}
-              removePipe={() => handleRemovePipe(pipe.id)}
-            />
+            <Card
+              sx={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                p: 2,
+                gap: 2,
+                height: 338,
+                minWidth: { xs: "90%", md: 450 },
+                border: "1px solid #ddd",
+              }}
+              elevation={0}
+            >
+              <PipeCard
+                pipe={pipe}
+                units={units}
+                updatePipe={handleUpdatePipe}
+                removePipe={() => handleRemovePipe(pipe.id)}
+              />
+            </Card>
           </Box>
         </Box>
       ))}

@@ -128,13 +128,27 @@ const SinglePressureTabContent: React.FC = ({}) => {
       <Box sx={{ mt: 4, display: "flex", flexDirection: "column", gap: 2 }}>
         {pipes.map((pipe) => {
           return (
-            <PipeCard
+            <Card
               key={pipe.id}
-              pipe={pipe}
-              units={currentUnit}
-              updatePipe={handleUpdatePipe}
-              removePipe={handleRemovePipe}
-            />
+              sx={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                p: 2,
+                gap: 2,
+                height: 338,
+                minWidth: { xs: "90%", md: 450 },
+                border: "1px solid #ddd",
+              }}
+              elevation={0}
+            >
+              <PipeCard
+                pipe={pipe}
+                units={currentUnit}
+                updatePipe={handleUpdatePipe}
+                removePipe={handleRemovePipe}
+              />
+            </Card>
           );
         })}
       </Box>

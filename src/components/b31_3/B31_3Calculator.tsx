@@ -21,12 +21,13 @@ export default function B31_3Calculator() {
         <Box
           sx={{
             display: "flex",
-            flexDirection: { xs: "column", md: "row" },
-            justifyContent: { xs: "flex-start", md: "space-between" },
-            alignItems: { xs: "flex-start", md: "center" },
-            gap: { xs: 2, md: 0 },
+            flexDirection: "row",
+            justifyContent: "space-between" ,
+            alignItems: "center" ,
+            gap: 2,
             mt: 2,
             mb: 2,
+            overflow: "hidden",
           }}
         >
           <Tabs
@@ -36,11 +37,19 @@ export default function B31_3Calculator() {
             indicatorColor="primary"
             variant="scrollable"
             scrollButtons="auto"
+            sx={{
+              flexGrow: 1, 
+
+            }}
           >
             <Tab label="Single Pressure" />
             {ENABLE_MULTIPLE_PRESSURES && <Tab label="Multiple Pressures" />}
           </Tabs>
-          <UnitsToggle />
+          <Box 
+          sx={{ flexShrink: 0 }}
+          >
+    <UnitsToggle />
+  </Box>
         </Box>
 
         {tabIndex === 0 && <SinglePressureTabContent />}
